@@ -24,10 +24,9 @@ int flag;
 char * printString;
 char * stringError;
 %}
-%X MULTCOMMENT
-%X STRING
+%X MULTCOMMENT STRING
 %%
-<MULTCOMMENT>"\n"           {column=1; line++;}
+<MULTCOMMENT>"\n"|"\r"           {column=1; line++;}
 <MULTCOMMENT>"*/"           {lComment = 0; cComment = 0; BEGIN 0; column+=yyleng;}
 <MULTCOMMENT>.              {column++;}
 
