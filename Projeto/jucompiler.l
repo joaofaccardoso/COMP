@@ -1,8 +1,10 @@
 letters                 [a-zA-Z]
 number                  [1-9]
 number0                 [0-9]
-scape                   "\\"[n|f|r|t|"\\"|"\""]
+scape                   \\[n|f|r|t|\\|\"]
 integer                 {number}(_*{number0}+)*
+integer0                {number0}(_*{number0}+)*
+exp                     (e|E)("+"|"-")?{integer0}+
 %{
 int line = 1;
 int column = 1;
@@ -10,24 +12,27 @@ int lError = 0;
 int cError = 0;
 int lComment = 0;
 int cComment = 0;
+int lString = 0;
+int cString = 0;
 int string = 0;
 int flag;
 int first = 1;
 char * printString;
 %}
-%X COMMENT
-%X STRING
+%X COMMENT STRING
 %%
-<COMMENT>("\n"|"\r")            {column=1; line++;}
+<COMMENT>(\n|\r|\r\n)           {column=1; line++;}
 <COMMENT>"*/"                   {lComment = 0; cComment = 0; BEGIN 0; column+=yyleng;}
 <COMMENT>.                      {column++;}
 
-<STRING>("\n"|"\r")             {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",line,column); column+=yyleng; line++; BEGIN 0; string=0;}     
+<STRING>(\n|\r|\r\n)            {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; BEGIN 0; string=1;}     
 <STRING>{scape}                 {column+=yyleng;}
-<STRING>"\\"                    {if(flag==1 || flag==2) printf("Line %d, col %d: invalid escape sequence (\\)\n",line,column); column+=yyleng; string=1;}
-<STRING>"\""                    {column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0;}     
+<STRING>\\.                     {if(flag==1 || flag==2) printf("Line %d, col %d: invalid escape sequence (%s)\n",line,column,yytext); column+=yyleng; string=1;}
+<STRING>\"                      {column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0;}     
 <STRING>(.)                     {column+=yyleng;}
 
+\/\/([^\r\n])*                  {;}
+(\n|\r|\r\n)                    {column=1; line++;}
 System"."out"."print            {column+=yyleng; if(flag==1) printf("PRINT\n");}
 Integer"."parseInt              {column+=yyleng; if(flag==1) printf("PARSEINT\n");}
 "."length                       {column+=yyleng; if(flag==1) printf("DOTLENGHT\n");}
@@ -65,7 +70,6 @@ class                           {column+=yyleng; if(flag==1) printf("CLASS\n");}
 "*"                             {column+=yyleng; if(flag==1) printf("STAR\n");}
 "->"                            {column+=yyleng; if(flag==1) printf("ARROW\n");}
 "&&"                            {column+=yyleng; if(flag==1) printf("AND\n");}
-("\n"|"\r")                     {column=1; line++;}
 "{"                             {column+=yyleng; if(flag==1) printf("LBRACE\n");}
 "}"                             {column+=yyleng; if(flag==1) printf("RBRACE\n");}
 "("                             {column+=yyleng; if(flag==1) printf("LPAR\n");}
@@ -73,13 +77,16 @@ class                           {column+=yyleng; if(flag==1) printf("CLASS\n");}
 "["                             {column+=yyleng; if(flag==1) printf("LSQ\n");}
 "]"                             {column+=yyleng; if(flag==1) printf("RSQ\n");}
 (float|Integer|System|null|"++"|"--"|abstract|assert|break|byte|case|catch|char|const|continue|default|do|enum|extends|final|finally|for|goto|implements|import|instanceof|interface|long|native|new|package|private|protected|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|volatile)                {column+=yyleng; if(flag==1) printf("RESERVED(%s)\n",yytext);}
-"\""                            {BEGIN (STRING); printString = yytext; column+=yyleng;}
+\"                              {BEGIN (STRING); lString=line; cString=column; printString = yytext; column+=yyleng;}
 "/*"                            {lComment = line; cComment = column; BEGIN (COMMENT); column+=yyleng;}
 ("_"|"$"|{letters})("_"|"$"|{letters}|{number0})*           {column+=yyleng; if(flag==1) printf("ID(%s)\n",yytext);}
-(0|{integer})                                       {column+=yyleng; if(flag==1) printf("INTLIT(%s)\n",yytext);}
-(({integer}"."({number0}(_*{number0}*)*)?((e|E)("+"|"-")?{number0}(_*{number0}*)*)?)|"."{integer}((e|E)("+"|"-")?{integer})?|{number}((e|E)("+"|"-")?{integer})?)(f|F|d|D)?         {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
+(0|{integer})                                               {column+=yyleng; if(flag==1) printf("INTLIT(%s)\n",yytext);}
+{integer0}"."{integer0}?{exp}?(f|F|d|D)?                      {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
+"."{integer0}{exp}?(f|F|d|D)?                      {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
+{integer0}({exp}?(f|F|d|D)|{exp}(f|F|d|D)?)                      {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
 
-(.|"//".*) {column++;}
+
+(.) {column++;}
 %% 
 
 #include <string.h>
