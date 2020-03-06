@@ -1,10 +1,11 @@
 letters                 [a-zA-Z]
 number                  [1-9]
 number0                 [0-9]
-scape                   \\[n|f|r|t|\\|\"]
+escape                   \\[n|f|r|t|\\|\"]
 integer                 {number}(_*{number0}+)*
 integer0                {number0}(_*{number0}+)*
 exp                     (e|E)("+"|"-")?{integer0}+
+reserved                float|Integer|System|null|"++"|"--"|abstract|assert|break|byte|case|catch|char|const|continue|default|do|enum|extends|final|finally|for|goto|implements|import|instanceof|interface|long|native|new|package|private|protected|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|volatile
 %{
 int line = 1;
 int column = 1;
@@ -25,13 +26,14 @@ char * printString;
 <COMMENT>"*/"                   {lComment = 0; cComment = 0; BEGIN 0; column+=yyleng;}
 <COMMENT>.                      {column++;}
 
-<STRING>(\n|\r|\r\n)            {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; BEGIN 0; string=1;}     
-<STRING>{scape}                 {column+=yyleng;}
+<STRING>(\n|\r|\r\n)            {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}     
+<STRING>{escape}                 {column+=yyleng;}
 <STRING>\\.                     {if(flag==1 || flag==2) printf("Line %d, col %d: invalid escape sequence (%s)\n",line,column,yytext); column+=yyleng; string=1;}
 <STRING>\"                      {column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0;}     
 <STRING>(.)                     {column+=yyleng;}
 
 \/\/([^\r\n])*                  {;}
+(" "|"\t")                      {column++;}
 (\n|\r|\r\n)                    {column=1; line++;}
 System"."out"."print            {column+=yyleng; if(flag==1) printf("PRINT\n");}
 Integer"."parseInt              {column+=yyleng; if(flag==1) printf("PARSEINT\n");}
@@ -76,7 +78,7 @@ class                           {column+=yyleng; if(flag==1) printf("CLASS\n");}
 ")"                             {column+=yyleng; if(flag==1) printf("RPAR\n");}
 "["                             {column+=yyleng; if(flag==1) printf("LSQ\n");}
 "]"                             {column+=yyleng; if(flag==1) printf("RSQ\n");}
-(float|Integer|System|null|"++"|"--"|abstract|assert|break|byte|case|catch|char|const|continue|default|do|enum|extends|final|finally|for|goto|implements|import|instanceof|interface|long|native|new|package|private|protected|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|volatile)                {column+=yyleng; if(flag==1) printf("RESERVED(%s)\n",yytext);}
+{reserved}                      {column+=yyleng; if(flag==1) printf("RESERVED(%s)\n",yytext);}
 \"                              {BEGIN (STRING); lString=line; cString=column; printString = yytext; column+=yyleng;}
 "/*"                            {lComment = line; cComment = column; BEGIN (COMMENT); column+=yyleng;}
 ("_"|"$"|{letters})("_"|"$"|{letters}|{number0})*           {column+=yyleng; if(flag==1) printf("ID(%s)\n",yytext);}
@@ -86,7 +88,7 @@ class                           {column+=yyleng; if(flag==1) printf("CLASS\n");}
 {integer0}({exp}?(f|F|d|D)|{exp}(f|F|d|D)?)                      {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
 
 
-(.) {column++;}
+(.)                             {if (flag==1) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column++;}
 %% 
 
 #include <string.h>
