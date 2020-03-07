@@ -8,11 +8,13 @@ Line 3, col 9: invalid escape sequence (\g)
 Line 4, col 5: invalid escape sequence (\g)
 Line 5, col 5: invalid escape sequence (\g)
 Line 5, col 1: unterminated string literal
+Line 6, col 2: invalid escape sequence (\)
 Line 6, col 1: unterminated string literal
 REALLIT(0123.3)
 REALLIT(3.333)
 ID(_e_1)
 ID(recurso)
+Line 9, col 9: invalid escape sequence (\)
 Line 9, col 8: unterminated string literal
 Line 10, col 1: unterminated string literal
 Line 11, col 1: illegal character (#)
@@ -22,7 +24,6 @@ ID(linha)
 Line 12, col 7: illegal character (#)
 Line 13, col 1: illegal character (`)
 Line 13, col 2: illegal character (')
-Line 14, col 1: illegal character ()
 STRLIT("outraLinha")
 Line 16, col 1: illegal character (#)
 STRLIT("recurso''")
@@ -63,3 +64,4 @@ STRLIT("aspas\"")
 STRLIT("\\dsadasdsadas")
 Line 35, col 1: illegal character (\)
 Line 35, col 3: invalid escape sequence (\b)
+Line 35, col 2: unterminated string literal

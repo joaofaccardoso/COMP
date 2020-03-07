@@ -24,16 +24,17 @@ char * printString;
 %%
 <COMMENT>(\n|\r|\r\n)           {column=1; line++;}
 <COMMENT>"*/"                   {lComment = 0; cComment = 0; BEGIN 0; column+=yyleng;}
-<COMMENT>.                      {column++;}
+<COMMENT>.                      {column+=yyleng;}
 
-<STRING>(\n|\r|\r\n)            {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}     
-<STRING>{escape}                 {column+=yyleng;}
-<STRING>\\.                     {if(flag==1 || flag==2) printf("Line %d, col %d: invalid escape sequence (%s)\n",line,column,yytext); column+=yyleng; string=1;}
+<STRING>(\n|\r|\r\n)            {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}          
+<STRING><<EOF>>                 {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}
+<STRING>{escape}                {column+=yyleng;}
+<STRING>\\.?                    {if(flag==1 || flag==2) printf("Line %d, col %d: invalid escape sequence (%s)\n",line,column,yytext); column+=yyleng; string=1;}
 <STRING>\"                      {column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0;}     
 <STRING>(.)                     {column+=yyleng;}
 
 \/\/([^\r\n])*                  {;}
-(" "|"\t")                      {column++;}
+(" "|\t|\f)                     {column+=yyleng;}
 (\n|\r|\r\n)                    {column=1; line++;}
 System"."out"."print            {column+=yyleng; if(flag==1) printf("PRINT\n");}
 Integer"."parseInt              {column+=yyleng; if(flag==1) printf("PARSEINT\n");}
@@ -88,7 +89,7 @@ class                           {column+=yyleng; if(flag==1) printf("CLASS\n");}
 {integer0}({exp}?(f|F|d|D)|{exp}(f|F|d|D)?)                      {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
 
 
-(.)                             {if (flag==1) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column++;}
+(.)                             {if (flag==1) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column+=yyleng;}
 %% 
 
 #include <string.h>
