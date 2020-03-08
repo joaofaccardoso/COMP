@@ -6,6 +6,7 @@ integer                 {number}(_*{number0}+)*
 integer0                {number0}(_*{number0}+)*
 exp                     (e|E)("+"|"-")?{integer0}+
 reserved                float|Integer|System|null|"++"|"--"|abstract|assert|break|byte|case|catch|char|const|continue|default|do|enum|extends|final|finally|for|goto|implements|import|instanceof|interface|long|native|new|package|private|protected|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|volatile
+whiteSpace              (" "|\t|\f)
 %{
 int line = 1;
 int column = 1;
@@ -34,7 +35,7 @@ char * printString;
 <STRING>(.)                     {column+=yyleng;}
 
 \/\/([^\r\n])*                  {;}
-(" "|\t|\f)                     {column+=yyleng;}
+{whiteSpace}                    {column+=yyleng;}
 (\n|\r|\r\n)                    {column=1; line++;}
 System"."out"."print            {column+=yyleng; if(flag==1) printf("PRINT\n");}
 Integer"."parseInt              {column+=yyleng; if(flag==1) printf("PARSEINT\n");}
@@ -84,12 +85,12 @@ class                           {column+=yyleng; if(flag==1) printf("CLASS\n");}
 "/*"                            {lComment = line; cComment = column; BEGIN (COMMENT); column+=yyleng;}
 ("_"|"$"|{letters})("_"|"$"|{letters}|{number0})*           {column+=yyleng; if(flag==1) printf("ID(%s)\n",yytext);}
 (0|{integer})                                               {column+=yyleng; if(flag==1) printf("INTLIT(%s)\n",yytext);}
-{integer0}"."{integer0}?{exp}?(f|F|d|D)?                      {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
-"."{integer0}{exp}?(f|F|d|D)?                      {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
-{integer0}({exp}?(f|F|d|D)|{exp}(f|F|d|D)?)                      {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
+{integer0}"."{integer0}?{exp}?(f|F|d|D)?                    {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
+"."{integer0}{exp}?(f|F|d|D)?                               {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
+{integer0}({exp}?(f|F|d|D)|{exp}(f|F|d|D)?)                 {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext);}
 
 
-(.)                             {if (flag==1) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column+=yyleng;}
+(.)                             {if (flag==1 || flag==2) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column+=yyleng;}
 %% 
 
 #include <string.h>
@@ -105,7 +106,7 @@ int main(int argc, char *argv[])
         }
     }
     yylex();
-    if(lComment != 0){
+    if(lComment != 0 && flag == 1){
         printf("Line %d, col %d: unterminated comment\n",lComment,cComment);
     }
 
