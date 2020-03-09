@@ -1,7 +1,7 @@
 letters                 [a-zA-Z]
 number                  [1-9]
 number0                 [0-9]
-escape                   \\[n|f|r|t|\\|\"]
+escape                   \\[nfrt\\\"]
 integer                 {number}(_*{number0}+)*
 integer0                {number0}(_*{number0}+)*
 exp                     (e|E)("+"|"-")?{integer0}+
