@@ -1,0 +1,290 @@
+Não-terminais inúteis na gramática
+
+   Decl
+   MethodField
+   CommaId
+   Type
+   MethodHeader
+   MethodHeader1
+   MethodHeader2
+   FormalParams
+   FormalParams1
+   MethodBody
+   MethodBody1
+   VarDecl
+   Statement
+   Statement1
+   Statement2
+   Statement3
+   Statement4
+   Statement5
+   MethodInvocation
+   MethodInvocation1
+   MethodInvocation2
+   Assignment
+   ParseArgs
+   Expr
+   Expr1
+   Expr2
+   Expr3
+   Expr4
+   Expr5
+
+
+Terminais sem uso na gramática
+
+   ID
+   STRLIT
+   BOOLLIT
+   PRINT
+   PARSEINT
+   DOTLENGHT
+   PUBLIC
+   RETURN
+   STATIC
+   STRING
+   VOID
+   WHILE
+   INT
+   DOUBLE
+   IF
+   ELSE
+   BOOL
+   CLASS
+   EQ
+   ASSIGN
+   COMMA
+   DIV
+   RSHIFT
+   LSHIFT
+   XOR
+   GE
+   GT
+   LE
+   LT
+   MINUS
+   MOD
+   NE
+   NOT
+   OR
+   PLUS
+   SEMICOLON
+   STAR
+   ARROW
+   AND
+   LBRACE
+   RBRACE
+   LPAR
+   RPAR
+   LSQ
+   RSQ
+   RESERVED
+   INTLIT
+   REALLIT
+
+
+Regras inúteis na gramática
+
+    2 Program: CLASS ID LBRACE Decl RBRACE
+
+    3 Decl: SEMICOLON Decl
+    4     | PUBLIC STATIC MethodField Decl
+
+    5 MethodField: MethodHeader MethodBody
+    6            | Type ID CommaId SEMICOLON
+
+    7 CommaId: COMMA ID CommaId
+    8        | %empty
+
+    9 Type: BOOL
+   10     | INT
+   11     | DOUBLE
+
+   12 MethodHeader: Type MethodHeader1
+   13             | VOID MethodHeader1
+
+   14 MethodHeader1: ID LPAR MethodHeader2 RPAR
+
+   15 MethodHeader2: FormalParams
+   16              | %empty
+
+   17 FormalParams: Type FormalParams1
+   18             | STRING LSQ RSQ ID
+
+   19 FormalParams1: ID COMMA Type ID FormalParams1
+   20              | %empty
+
+   21 MethodBody: LBRACE MethodBody1 RBRACE
+
+   22 MethodBody1: Statement MethodBody1
+   23            | VarDecl MethodBody1
+   24            | %empty
+
+   25 VarDecl: Type ID CommaId SEMICOLON
+
+   26 Statement: LBRACE Statement5 RBRACE
+   27          | IF LPAR Expr RPAR Statement Statement1
+   28          | WHILE LPAR Expr RPAR Statement
+   29          | RETURN Statement3 SEMICOLON
+   30          | Statement2 SEMICOLON
+   31          | PRINT LPAR Statement4 RPAR SEMICOLON
+
+   32 Statement1: ELSE Statement
+   33           | %empty
+
+   34 Statement2: MethodInvocation
+   35           | Assignment
+   36           | ParseArgs
+   37           | %empty
+
+   38 Statement3: Expr
+   39           | %empty
+
+   40 Statement4: Expr
+   41           | STRLIT
+
+   42 Statement5: Statement Statement5
+   43           | %empty
+
+   44 MethodInvocation: ID LPAR MethodInvocation1 RPAR
+
+   45 MethodInvocation1: Expr MethodInvocation2
+   46                  | %empty
+
+   47 MethodInvocation2: COMMA Expr MethodInvocation1
+   48                  | %empty
+
+   49 Assignment: ID ASSIGN Expr
+
+   50 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ LPAR
+
+   51 Expr: Expr Expr1 Expr
+   52     | Expr Expr2 Expr
+   53     | Expr Expr3 Expr
+   54     | Expr4 Expr
+   55     | LPAR Expr RPAR
+   56     | MethodInvocation
+   57     | Assignment
+   58     | ParseArgs
+   59     | ID Expr5
+   60     | INTLIT
+   61     | REALLIT
+   62     | BOOLLIT
+
+   63 Expr1: PLUS
+   64      | MINUS
+   65      | STAR
+   66      | DIV
+   67      | MOD
+
+   68 Expr2: AND
+   69      | OR
+   70      | XOR
+   71      | LSHIFT
+   72      | RSHIFT
+
+   73 Expr3: EQ
+   74      | GE
+   75      | GT
+   76      | LE
+   77      | LT
+   78      | NE
+
+   79 Expr4: MINUS
+   80      | NOT
+   81      | PLUS
+
+   82 Expr5: DOTLENGHT
+   83      | %empty
+
+
+Gramática
+
+    0 $accept: Program $end
+
+    1 Program: %empty
+
+
+Terminais, com as regras aonde aparecem
+
+$end (0) 0
+error (256)
+ID (258)
+STRLIT (259)
+BOOLLIT (260)
+PRINT (261)
+PARSEINT (262)
+DOTLENGHT (263)
+PUBLIC (264)
+RETURN (265)
+STATIC (266)
+STRING (267)
+VOID (268)
+WHILE (269)
+INT (270)
+DOUBLE (271)
+IF (272)
+ELSE (273)
+BOOL (274)
+CLASS (275)
+EQ (276)
+ASSIGN (277)
+COMMA (278)
+DIV (279)
+RSHIFT (280)
+LSHIFT (281)
+XOR (282)
+GE (283)
+GT (284)
+LE (285)
+LT (286)
+MINUS (287)
+MOD (288)
+NE (289)
+NOT (290)
+OR (291)
+PLUS (292)
+SEMICOLON (293)
+STAR (294)
+ARROW (295)
+AND (296)
+LBRACE (297)
+RBRACE (298)
+LPAR (299)
+RPAR (300)
+LSQ (301)
+RSQ (302)
+RESERVED (303)
+INTLIT (304)
+REALLIT (305)
+
+
+Não-terminais, com as regras aonde aparecem
+
+$accept (51)
+    à esquerda: 0
+Program (52)
+    à esquerda: 1, à direita: 0
+
+
+Estado0
+
+    0 $accept: . Program $end
+
+    $default  reduzir usando a regra 1 (Program)
+
+    Program  ir para o estado 1
+
+
+Estado1
+
+    0 $accept: Program . $end
+
+    $end  fazer shift, e ir para o estado 2
+
+
+Estado2
+
+    0 $accept: Program $end .
+
+    $default  aceite
