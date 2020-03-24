@@ -1114,7 +1114,7 @@ YY_RULE_SETUP
 case 27:
 YY_RULE_SETUP
 #line 59 "jucompiler.l"
-{column+=yyleng; if(flag==1) printf("BOOLLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return BOOLIT;}
+{column+=yyleng; if(flag==1) printf("BOOLLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return BOOLLIT;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
