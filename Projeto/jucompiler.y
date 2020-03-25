@@ -80,34 +80,34 @@ Type: BOOL
     | INT
     | DOUBLE;
 
-Expr: MINUS Expr1 
-    | NOT Expr1 
-    | PLUS Expr1
-    | LPAR Expr RPAR Expr2
-    | ID Dotlenght Expr2
-    | INTLIT Expr2
-    | REALLIT Expr2
-    | BOOLLIT Expr2
-    | MethodInvocation Expr2
-    | Assignment Expr2
-    | ParseArgs Expr2;
-Expr1: Expr
-    | Expr2;
-Expr2: STAR Expr
-    | DIV Expr
-    | MOD Expr
-    | AND Expr
-    | OR Expr 
-    | XOR Expr 
-    | LSHIFT Expr 
-    | RSHIFT Expr
-    | EQ Expr 
-    | GE Expr 
-    | GT Expr 
-    | LE Expr 
-    | LT Expr 
-    | NE Expr
-    | %empty;
+Expr: MINUS Expr11 
+    | PLUS Expr11
+    | NOT Expr11
+    | LPAR Expr11 RPAR
+    | ID Dotlenght
+    | INTLIT 
+    | REALLIT 
+    | BOOLLIT
+    | MethodInvocation
+    | Assignment
+    | ParseArgs;
+
+Expr11: Expr
+    | Expr1 Expr;
+Expr1: STAR  
+    | DIV 
+    | MOD
+    | AND
+    | OR 
+    | XOR 
+    | LSHIFT 
+    | RSHIFT
+    | EQ 
+    | GE 
+    | GT 
+    | LE 
+    | LT 
+    | NE;
 Dotlenght: DOTLENGHT
     | %empty;
 %%
