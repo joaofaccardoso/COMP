@@ -4,16 +4,6 @@ Terminais sem uso na gramática
    RESERVED
 
 
-Estado 47 conflitos: 1 reduce/reduce
-Estado 59 conflitos: 1 reduce/reduce
-Estado 65 conflitos: 14 shift/reduce, 4 reduce/reduce
-Estado 66 conflitos: 14 shift/reduce, 4 reduce/reduce
-Estado 67 conflitos: 14 shift/reduce, 4 reduce/reduce
-Estado 68 conflitos: 14 shift/reduce, 1 reduce/reduce
-Estado 94 conflitos: 14 shift/reduce, 4 reduce/reduce
-Estado 157 conflictos: 1 shift/reduce
-
-
 Gramática
 
     0 $accept: Program $end
@@ -49,7 +39,7 @@ Gramática
    20        | %empty
 
    21 Statement: LBRACE Statement1 RBRACE
-   22          | IF LPAR Expr RPAR Statement Statement2
+   22          | IF LPAR Expr RPAR Statement2 Statement
    23          | WHILE LPAR Expr RPAR Statement
    24          | RETURN Statement3 SEMICOLON
    25          | MethodInvocation SEMICOLON
@@ -60,7 +50,7 @@ Gramática
    29 Statement1: Statement Statement1
    30           | %empty
 
-   31 Statement2: ELSE Statement
+   31 Statement2: ELSE
    32           | %empty
 
    33 Statement3: Expr
@@ -87,7 +77,7 @@ Gramática
    47     | NOT Expr2
    48     | PLUS Expr2
    49     | LPAR Expr2 RPAR
-   50     | Dotlenght Expr1
+   50     | ID Dotlenght Expr1
    51     | INTLIT Expr1
    52     | REALLIT Expr1
    53     | BOOLLIT Expr1
@@ -122,7 +112,7 @@ Terminais, com as regras aonde aparecem
 
 $end (0) 0
 error (256)
-ID (258) 1 5 6 9 10 12 18 19 26 37 42 55
+ID (258) 1 5 6 9 10 12 18 19 26 37 42 50 55
 STRLIT (259) 36
 BOOLLIT (260) 53
 PRINT (261) 28
@@ -197,7 +187,7 @@ VarDecl (60)
 CommaId (61)
     à esquerda: 19 20, à direita: 8 18 19
 Statement (62)
-    à esquerda: 21 22 23 24 25 26 27 28, à direita: 15 22 23 29 31
+    à esquerda: 21 22 23 24 25 26 27 28, à direita: 15 22 23 29
 Statement1 (63)
     à esquerda: 29 30, à direita: 21 29
 Statement2 (64)
@@ -642,40 +632,36 @@ Estado47
 
    24 Statement: RETURN . Statement3 SEMICOLON
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    SEMICOLON  reduzir usando a regra 34 (Statement3)
-    SEMICOLON  [reduzir usando a regra 75 (Dotlenght)]
-    $default   reduzir usando a regra 75 (Dotlenght)
+    $default  reduzir usando a regra 34 (Statement3)
 
-    Statement3        ir para o estado 71
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
-    Expr              ir para o estado 74
-    Dotlenght         ir para o estado 75
+    Statement3        ir para o estado 70
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
+    Expr              ir para o estado 73
 
 
 Estado48
 
    23 Statement: WHILE . LPAR Expr RPAR Statement
 
-    LPAR  fazer shift, e ir para o estado 76
+    LPAR  fazer shift, e ir para o estado 74
 
 
 Estado49
 
-   22 Statement: IF . LPAR Expr RPAR Statement Statement2
+   22 Statement: IF . LPAR Expr RPAR Statement2 Statement
 
-    LPAR  fazer shift, e ir para o estado 77
+    LPAR  fazer shift, e ir para o estado 75
 
 
 Estado50
@@ -692,8 +678,8 @@ Estado50
 
     $default  reduzir usando a regra 30 (Statement1)
 
-    Statement         ir para o estado 78
-    Statement1        ir para o estado 79
+    Statement         ir para o estado 76
+    Statement1        ir para o estado 77
     MethodInvocation  ir para o estado 54
     ParseArgs         ir para o estado 55
 
@@ -702,7 +688,7 @@ Estado51
 
    14 MethodBody: LBRACE MethodBody1 . RBRACE
 
-    RBRACE  fazer shift, e ir para o estado 80
+    RBRACE  fazer shift, e ir para o estado 78
 
 
 Estado52
@@ -722,7 +708,7 @@ Estado52
 
     $default  reduzir usando a regra 17 (MethodBody1)
 
-    MethodBody1       ir para o estado 81
+    MethodBody1       ir para o estado 79
     VarDecl           ir para o estado 52
     Statement         ir para o estado 53
     MethodInvocation  ir para o estado 54
@@ -747,7 +733,7 @@ Estado53
 
     $default  reduzir usando a regra 17 (MethodBody1)
 
-    MethodBody1       ir para o estado 82
+    MethodBody1       ir para o estado 80
     VarDecl           ir para o estado 52
     Statement         ir para o estado 53
     MethodInvocation  ir para o estado 54
@@ -759,118 +745,112 @@ Estado54
 
    25 Statement: MethodInvocation . SEMICOLON
 
-    SEMICOLON  fazer shift, e ir para o estado 83
+    SEMICOLON  fazer shift, e ir para o estado 81
 
 
 Estado55
 
    27 Statement: ParseArgs . SEMICOLON
 
-    SEMICOLON  fazer shift, e ir para o estado 84
+    SEMICOLON  fazer shift, e ir para o estado 82
 
 
 Estado56
 
    18 VarDecl: Type . ID CommaId SEMICOLON
 
-    ID  fazer shift, e ir para o estado 85
+    ID  fazer shift, e ir para o estado 83
 
 
 Estado57
 
    12 FormalParams1: COMMA Type . ID FormalParams
 
-    ID  fazer shift, e ir para o estado 86
+    ID  fazer shift, e ir para o estado 84
 
 
 Estado58
 
    26 Statement: ID ASSIGN . Expr SEMICOLON
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
-    Expr              ir para o estado 87
-    Dotlenght         ir para o estado 75
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
+    Expr              ir para o estado 85
 
 
 Estado59
 
    37 MethodInvocation: ID LPAR . MethodInvocation1 RPAR
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    RPAR      reduzir usando a regra 39 (MethodInvocation1)
-    RPAR      [reduzir usando a regra 75 (Dotlenght)]
-    $default  reduzir usando a regra 75 (Dotlenght)
+    $default  reduzir usando a regra 39 (MethodInvocation1)
 
-    MethodInvocation   ir para o estado 72
-    MethodInvocation1  ir para o estado 88
-    ParseArgs          ir para o estado 73
-    Expr               ir para o estado 89
-    Dotlenght          ir para o estado 75
+    MethodInvocation   ir para o estado 71
+    MethodInvocation1  ir para o estado 86
+    ParseArgs          ir para o estado 72
+    Expr               ir para o estado 87
 
 
 Estado60
 
    28 Statement: PRINT LPAR . Statement4 RPAR SEMICOLON
 
-    ID         fazer shift, e ir para o estado 62
-    STRLIT     fazer shift, e ir para o estado 90
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    STRLIT    fazer shift, e ir para o estado 88
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    Statement4        ir para o estado 91
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
-    Expr              ir para o estado 92
-    Dotlenght         ir para o estado 75
+    Statement4        ir para o estado 89
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
+    Expr              ir para o estado 90
 
 
 Estado61
 
    42 ParseArgs: PARSEINT LPAR . ID LSQ Expr RSQ LPAR
 
-    ID  fazer shift, e ir para o estado 93
+    ID  fazer shift, e ir para o estado 91
 
 
 Estado62
 
    37 MethodInvocation: ID . LPAR MethodInvocation1 RPAR
-   55 Expr: ID . ASSIGN Expr2
+   50 Expr: ID . Dotlenght Expr1
+   55     | ID . ASSIGN Expr2
 
-    ASSIGN  fazer shift, e ir para o estado 94
-    LPAR    fazer shift, e ir para o estado 59
+    DOTLENGHT  fazer shift, e ir para o estado 92
+    ASSIGN     fazer shift, e ir para o estado 93
+    LPAR       fazer shift, e ir para o estado 59
+
+    $default  reduzir usando a regra 75 (Dotlenght)
+
+    Dotlenght  ir para o estado 94
 
 
 Estado63
@@ -899,250 +879,153 @@ Estado63
 
 Estado64
 
-   74 Dotlenght: DOTLENGHT .
+   46 Expr: MINUS . Expr2
 
-    $default  reduzir usando a regra 74 (Dotlenght)
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    EQ        fazer shift, e ir para o estado 95
+    DIV       fazer shift, e ir para o estado 96
+    RSHIFT    fazer shift, e ir para o estado 97
+    LSHIFT    fazer shift, e ir para o estado 98
+    XOR       fazer shift, e ir para o estado 99
+    GE        fazer shift, e ir para o estado 100
+    GT        fazer shift, e ir para o estado 101
+    LE        fazer shift, e ir para o estado 102
+    LT        fazer shift, e ir para o estado 103
+    MINUS     fazer shift, e ir para o estado 64
+    MOD       fazer shift, e ir para o estado 104
+    NE        fazer shift, e ir para o estado 105
+    NOT       fazer shift, e ir para o estado 65
+    OR        fazer shift, e ir para o estado 106
+    PLUS      fazer shift, e ir para o estado 66
+    STAR      fazer shift, e ir para o estado 107
+    AND       fazer shift, e ir para o estado 108
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
+
+    $default  reduzir usando a regra 73 (Expr1)
+
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
+    Expr              ir para o estado 110
+    Expr2             ir para o estado 111
+    Expr1             ir para o estado 112
 
 
 Estado65
 
-   46 Expr: MINUS . Expr2
+   47 Expr: NOT . Expr2
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    EQ         fazer shift, e ir para o estado 95
-    DIV        fazer shift, e ir para o estado 96
-    RSHIFT     fazer shift, e ir para o estado 97
-    LSHIFT     fazer shift, e ir para o estado 98
-    XOR        fazer shift, e ir para o estado 99
-    GE         fazer shift, e ir para o estado 100
-    GT         fazer shift, e ir para o estado 101
-    LE         fazer shift, e ir para o estado 102
-    LT         fazer shift, e ir para o estado 103
-    MINUS      fazer shift, e ir para o estado 65
-    MOD        fazer shift, e ir para o estado 104
-    NE         fazer shift, e ir para o estado 105
-    NOT        fazer shift, e ir para o estado 66
-    OR         fazer shift, e ir para o estado 106
-    PLUS       fazer shift, e ir para o estado 67
-    STAR       fazer shift, e ir para o estado 107
-    AND        fazer shift, e ir para o estado 108
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    EQ        fazer shift, e ir para o estado 95
+    DIV       fazer shift, e ir para o estado 96
+    RSHIFT    fazer shift, e ir para o estado 97
+    LSHIFT    fazer shift, e ir para o estado 98
+    XOR       fazer shift, e ir para o estado 99
+    GE        fazer shift, e ir para o estado 100
+    GT        fazer shift, e ir para o estado 101
+    LE        fazer shift, e ir para o estado 102
+    LT        fazer shift, e ir para o estado 103
+    MINUS     fazer shift, e ir para o estado 64
+    MOD       fazer shift, e ir para o estado 104
+    NE        fazer shift, e ir para o estado 105
+    NOT       fazer shift, e ir para o estado 65
+    OR        fazer shift, e ir para o estado 106
+    PLUS      fazer shift, e ir para o estado 66
+    STAR      fazer shift, e ir para o estado 107
+    AND       fazer shift, e ir para o estado 108
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    EQ         [reduzir usando a regra 75 (Dotlenght)]
-    COMMA      reduzir usando a regra 73 (Expr1)
-    COMMA      [reduzir usando a regra 75 (Dotlenght)]
-    DIV        [reduzir usando a regra 75 (Dotlenght)]
-    RSHIFT     [reduzir usando a regra 75 (Dotlenght)]
-    LSHIFT     [reduzir usando a regra 75 (Dotlenght)]
-    XOR        [reduzir usando a regra 75 (Dotlenght)]
-    GE         [reduzir usando a regra 75 (Dotlenght)]
-    GT         [reduzir usando a regra 75 (Dotlenght)]
-    LE         [reduzir usando a regra 75 (Dotlenght)]
-    LT         [reduzir usando a regra 75 (Dotlenght)]
-    MOD        [reduzir usando a regra 75 (Dotlenght)]
-    NE         [reduzir usando a regra 75 (Dotlenght)]
-    OR         [reduzir usando a regra 75 (Dotlenght)]
-    SEMICOLON  reduzir usando a regra 73 (Expr1)
-    SEMICOLON  [reduzir usando a regra 75 (Dotlenght)]
-    STAR       [reduzir usando a regra 75 (Dotlenght)]
-    AND        [reduzir usando a regra 75 (Dotlenght)]
-    RPAR       reduzir usando a regra 73 (Expr1)
-    RPAR       [reduzir usando a regra 75 (Dotlenght)]
-    RSQ        reduzir usando a regra 73 (Expr1)
-    RSQ        [reduzir usando a regra 75 (Dotlenght)]
-    $default   reduzir usando a regra 73 (Expr1)
+    $default  reduzir usando a regra 73 (Expr1)
 
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 110
-    Expr2             ir para o estado 111
+    Expr2             ir para o estado 113
     Expr1             ir para o estado 112
-    Dotlenght         ir para o estado 75
 
 
 Estado66
 
-   47 Expr: NOT . Expr2
+   48 Expr: PLUS . Expr2
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    EQ         fazer shift, e ir para o estado 95
-    DIV        fazer shift, e ir para o estado 96
-    RSHIFT     fazer shift, e ir para o estado 97
-    LSHIFT     fazer shift, e ir para o estado 98
-    XOR        fazer shift, e ir para o estado 99
-    GE         fazer shift, e ir para o estado 100
-    GT         fazer shift, e ir para o estado 101
-    LE         fazer shift, e ir para o estado 102
-    LT         fazer shift, e ir para o estado 103
-    MINUS      fazer shift, e ir para o estado 65
-    MOD        fazer shift, e ir para o estado 104
-    NE         fazer shift, e ir para o estado 105
-    NOT        fazer shift, e ir para o estado 66
-    OR         fazer shift, e ir para o estado 106
-    PLUS       fazer shift, e ir para o estado 67
-    STAR       fazer shift, e ir para o estado 107
-    AND        fazer shift, e ir para o estado 108
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    EQ        fazer shift, e ir para o estado 95
+    DIV       fazer shift, e ir para o estado 96
+    RSHIFT    fazer shift, e ir para o estado 97
+    LSHIFT    fazer shift, e ir para o estado 98
+    XOR       fazer shift, e ir para o estado 99
+    GE        fazer shift, e ir para o estado 100
+    GT        fazer shift, e ir para o estado 101
+    LE        fazer shift, e ir para o estado 102
+    LT        fazer shift, e ir para o estado 103
+    MINUS     fazer shift, e ir para o estado 64
+    MOD       fazer shift, e ir para o estado 104
+    NE        fazer shift, e ir para o estado 105
+    NOT       fazer shift, e ir para o estado 65
+    OR        fazer shift, e ir para o estado 106
+    PLUS      fazer shift, e ir para o estado 66
+    STAR      fazer shift, e ir para o estado 107
+    AND       fazer shift, e ir para o estado 108
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    EQ         [reduzir usando a regra 75 (Dotlenght)]
-    COMMA      reduzir usando a regra 73 (Expr1)
-    COMMA      [reduzir usando a regra 75 (Dotlenght)]
-    DIV        [reduzir usando a regra 75 (Dotlenght)]
-    RSHIFT     [reduzir usando a regra 75 (Dotlenght)]
-    LSHIFT     [reduzir usando a regra 75 (Dotlenght)]
-    XOR        [reduzir usando a regra 75 (Dotlenght)]
-    GE         [reduzir usando a regra 75 (Dotlenght)]
-    GT         [reduzir usando a regra 75 (Dotlenght)]
-    LE         [reduzir usando a regra 75 (Dotlenght)]
-    LT         [reduzir usando a regra 75 (Dotlenght)]
-    MOD        [reduzir usando a regra 75 (Dotlenght)]
-    NE         [reduzir usando a regra 75 (Dotlenght)]
-    OR         [reduzir usando a regra 75 (Dotlenght)]
-    SEMICOLON  reduzir usando a regra 73 (Expr1)
-    SEMICOLON  [reduzir usando a regra 75 (Dotlenght)]
-    STAR       [reduzir usando a regra 75 (Dotlenght)]
-    AND        [reduzir usando a regra 75 (Dotlenght)]
-    RPAR       reduzir usando a regra 73 (Expr1)
-    RPAR       [reduzir usando a regra 75 (Dotlenght)]
-    RSQ        reduzir usando a regra 73 (Expr1)
-    RSQ        [reduzir usando a regra 75 (Dotlenght)]
-    $default   reduzir usando a regra 73 (Expr1)
+    $default  reduzir usando a regra 73 (Expr1)
 
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 110
-    Expr2             ir para o estado 113
+    Expr2             ir para o estado 114
     Expr1             ir para o estado 112
-    Dotlenght         ir para o estado 75
 
 
 Estado67
 
-   48 Expr: PLUS . Expr2
-
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    EQ         fazer shift, e ir para o estado 95
-    DIV        fazer shift, e ir para o estado 96
-    RSHIFT     fazer shift, e ir para o estado 97
-    LSHIFT     fazer shift, e ir para o estado 98
-    XOR        fazer shift, e ir para o estado 99
-    GE         fazer shift, e ir para o estado 100
-    GT         fazer shift, e ir para o estado 101
-    LE         fazer shift, e ir para o estado 102
-    LT         fazer shift, e ir para o estado 103
-    MINUS      fazer shift, e ir para o estado 65
-    MOD        fazer shift, e ir para o estado 104
-    NE         fazer shift, e ir para o estado 105
-    NOT        fazer shift, e ir para o estado 66
-    OR         fazer shift, e ir para o estado 106
-    PLUS       fazer shift, e ir para o estado 67
-    STAR       fazer shift, e ir para o estado 107
-    AND        fazer shift, e ir para o estado 108
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
-
-    EQ         [reduzir usando a regra 75 (Dotlenght)]
-    COMMA      reduzir usando a regra 73 (Expr1)
-    COMMA      [reduzir usando a regra 75 (Dotlenght)]
-    DIV        [reduzir usando a regra 75 (Dotlenght)]
-    RSHIFT     [reduzir usando a regra 75 (Dotlenght)]
-    LSHIFT     [reduzir usando a regra 75 (Dotlenght)]
-    XOR        [reduzir usando a regra 75 (Dotlenght)]
-    GE         [reduzir usando a regra 75 (Dotlenght)]
-    GT         [reduzir usando a regra 75 (Dotlenght)]
-    LE         [reduzir usando a regra 75 (Dotlenght)]
-    LT         [reduzir usando a regra 75 (Dotlenght)]
-    MOD        [reduzir usando a regra 75 (Dotlenght)]
-    NE         [reduzir usando a regra 75 (Dotlenght)]
-    OR         [reduzir usando a regra 75 (Dotlenght)]
-    SEMICOLON  reduzir usando a regra 73 (Expr1)
-    SEMICOLON  [reduzir usando a regra 75 (Dotlenght)]
-    STAR       [reduzir usando a regra 75 (Dotlenght)]
-    AND        [reduzir usando a regra 75 (Dotlenght)]
-    RPAR       reduzir usando a regra 73 (Expr1)
-    RPAR       [reduzir usando a regra 75 (Dotlenght)]
-    RSQ        reduzir usando a regra 73 (Expr1)
-    RSQ        [reduzir usando a regra 75 (Dotlenght)]
-    $default   reduzir usando a regra 73 (Expr1)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
-    Expr              ir para o estado 110
-    Expr2             ir para o estado 114
-    Expr1             ir para o estado 112
-    Dotlenght         ir para o estado 75
-
-
-Estado68
-
    49 Expr: LPAR . Expr2 RPAR
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    EQ         fazer shift, e ir para o estado 95
-    DIV        fazer shift, e ir para o estado 96
-    RSHIFT     fazer shift, e ir para o estado 97
-    LSHIFT     fazer shift, e ir para o estado 98
-    XOR        fazer shift, e ir para o estado 99
-    GE         fazer shift, e ir para o estado 100
-    GT         fazer shift, e ir para o estado 101
-    LE         fazer shift, e ir para o estado 102
-    LT         fazer shift, e ir para o estado 103
-    MINUS      fazer shift, e ir para o estado 65
-    MOD        fazer shift, e ir para o estado 104
-    NE         fazer shift, e ir para o estado 105
-    NOT        fazer shift, e ir para o estado 66
-    OR         fazer shift, e ir para o estado 106
-    PLUS       fazer shift, e ir para o estado 67
-    STAR       fazer shift, e ir para o estado 107
-    AND        fazer shift, e ir para o estado 108
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    EQ        fazer shift, e ir para o estado 95
+    DIV       fazer shift, e ir para o estado 96
+    RSHIFT    fazer shift, e ir para o estado 97
+    LSHIFT    fazer shift, e ir para o estado 98
+    XOR       fazer shift, e ir para o estado 99
+    GE        fazer shift, e ir para o estado 100
+    GT        fazer shift, e ir para o estado 101
+    LE        fazer shift, e ir para o estado 102
+    LT        fazer shift, e ir para o estado 103
+    MINUS     fazer shift, e ir para o estado 64
+    MOD       fazer shift, e ir para o estado 104
+    NE        fazer shift, e ir para o estado 105
+    NOT       fazer shift, e ir para o estado 65
+    OR        fazer shift, e ir para o estado 106
+    PLUS      fazer shift, e ir para o estado 66
+    STAR      fazer shift, e ir para o estado 107
+    AND       fazer shift, e ir para o estado 108
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    EQ        [reduzir usando a regra 75 (Dotlenght)]
-    DIV       [reduzir usando a regra 75 (Dotlenght)]
-    RSHIFT    [reduzir usando a regra 75 (Dotlenght)]
-    LSHIFT    [reduzir usando a regra 75 (Dotlenght)]
-    XOR       [reduzir usando a regra 75 (Dotlenght)]
-    GE        [reduzir usando a regra 75 (Dotlenght)]
-    GT        [reduzir usando a regra 75 (Dotlenght)]
-    LE        [reduzir usando a regra 75 (Dotlenght)]
-    LT        [reduzir usando a regra 75 (Dotlenght)]
-    MOD       [reduzir usando a regra 75 (Dotlenght)]
-    NE        [reduzir usando a regra 75 (Dotlenght)]
-    OR        [reduzir usando a regra 75 (Dotlenght)]
-    STAR      [reduzir usando a regra 75 (Dotlenght)]
-    AND       [reduzir usando a regra 75 (Dotlenght)]
-    RPAR      reduzir usando a regra 73 (Expr1)
-    RPAR      [reduzir usando a regra 75 (Dotlenght)]
     $default  reduzir usando a regra 73 (Expr1)
 
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 110
     Expr2             ir para o estado 115
     Expr1             ir para o estado 112
-    Dotlenght         ir para o estado 75
 
 
-Estado69
+Estado68
 
    51 Expr: INTLIT . Expr1
 
@@ -1166,7 +1049,7 @@ Estado69
     Expr1  ir para o estado 116
 
 
-Estado70
+Estado69
 
    52 Expr: REALLIT . Expr1
 
@@ -1190,14 +1073,14 @@ Estado70
     Expr1  ir para o estado 117
 
 
-Estado71
+Estado70
 
    24 Statement: RETURN Statement3 . SEMICOLON
 
     SEMICOLON  fazer shift, e ir para o estado 118
 
 
-Estado72
+Estado71
 
    54 Expr: MethodInvocation . Expr1
 
@@ -1221,7 +1104,7 @@ Estado72
     Expr1  ir para o estado 119
 
 
-Estado73
+Estado72
 
    56 Expr: ParseArgs . Expr1
 
@@ -1245,16 +1128,239 @@ Estado73
     Expr1  ir para o estado 120
 
 
-Estado74
+Estado73
 
    33 Statement3: Expr .
 
     $default  reduzir usando a regra 33 (Statement3)
 
 
+Estado74
+
+   23 Statement: WHILE LPAR . Expr RPAR Statement
+
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
+
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
+    Expr              ir para o estado 121
+
+
 Estado75
 
-   50 Expr: Dotlenght . Expr1
+   22 Statement: IF LPAR . Expr RPAR Statement2 Statement
+
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
+
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
+    Expr              ir para o estado 122
+
+
+Estado76
+
+   29 Statement1: Statement . Statement1
+
+    ID        fazer shift, e ir para o estado 44
+    PRINT     fazer shift, e ir para o estado 45
+    PARSEINT  fazer shift, e ir para o estado 46
+    RETURN    fazer shift, e ir para o estado 47
+    WHILE     fazer shift, e ir para o estado 48
+    IF        fazer shift, e ir para o estado 49
+    LBRACE    fazer shift, e ir para o estado 50
+
+    $default  reduzir usando a regra 30 (Statement1)
+
+    Statement         ir para o estado 76
+    Statement1        ir para o estado 123
+    MethodInvocation  ir para o estado 54
+    ParseArgs         ir para o estado 55
+
+
+Estado77
+
+   21 Statement: LBRACE Statement1 . RBRACE
+
+    RBRACE  fazer shift, e ir para o estado 124
+
+
+Estado78
+
+   14 MethodBody: LBRACE MethodBody1 RBRACE .
+
+    $default  reduzir usando a regra 14 (MethodBody)
+
+
+Estado79
+
+   16 MethodBody1: VarDecl MethodBody1 .
+
+    $default  reduzir usando a regra 16 (MethodBody1)
+
+
+Estado80
+
+   15 MethodBody1: Statement MethodBody1 .
+
+    $default  reduzir usando a regra 15 (MethodBody1)
+
+
+Estado81
+
+   25 Statement: MethodInvocation SEMICOLON .
+
+    $default  reduzir usando a regra 25 (Statement)
+
+
+Estado82
+
+   27 Statement: ParseArgs SEMICOLON .
+
+    $default  reduzir usando a regra 27 (Statement)
+
+
+Estado83
+
+   18 VarDecl: Type ID . CommaId SEMICOLON
+
+    COMMA  fazer shift, e ir para o estado 22
+
+    $default  reduzir usando a regra 20 (CommaId)
+
+    CommaId  ir para o estado 125
+
+
+Estado84
+
+   12 FormalParams1: COMMA Type ID . FormalParams
+
+    STRING  fazer shift, e ir para o estado 26
+    INT     fazer shift, e ir para o estado 13
+    DOUBLE  fazer shift, e ir para o estado 14
+    BOOL    fazer shift, e ir para o estado 15
+
+    $default  reduzir usando a regra 11 (FormalParams)
+
+    FormalParams  ir para o estado 126
+    Type          ir para o estado 28
+
+
+Estado85
+
+   26 Statement: ID ASSIGN Expr . SEMICOLON
+
+    SEMICOLON  fazer shift, e ir para o estado 127
+
+
+Estado86
+
+   37 MethodInvocation: ID LPAR MethodInvocation1 . RPAR
+
+    RPAR  fazer shift, e ir para o estado 128
+
+
+Estado87
+
+   38 MethodInvocation1: Expr . CommaExpr
+
+    COMMA  fazer shift, e ir para o estado 129
+
+    $default  reduzir usando a regra 41 (CommaExpr)
+
+    CommaExpr  ir para o estado 130
+
+
+Estado88
+
+   36 Statement4: STRLIT .
+
+    $default  reduzir usando a regra 36 (Statement4)
+
+
+Estado89
+
+   28 Statement: PRINT LPAR Statement4 . RPAR SEMICOLON
+
+    RPAR  fazer shift, e ir para o estado 131
+
+
+Estado90
+
+   35 Statement4: Expr .
+
+    $default  reduzir usando a regra 35 (Statement4)
+
+
+Estado91
+
+   42 ParseArgs: PARSEINT LPAR ID . LSQ Expr RSQ LPAR
+
+    LSQ  fazer shift, e ir para o estado 132
+
+
+Estado92
+
+   74 Dotlenght: DOTLENGHT .
+
+    $default  reduzir usando a regra 74 (Dotlenght)
+
+
+Estado93
+
+   55 Expr: ID ASSIGN . Expr2
+
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    EQ        fazer shift, e ir para o estado 95
+    DIV       fazer shift, e ir para o estado 96
+    RSHIFT    fazer shift, e ir para o estado 97
+    LSHIFT    fazer shift, e ir para o estado 98
+    XOR       fazer shift, e ir para o estado 99
+    GE        fazer shift, e ir para o estado 100
+    GT        fazer shift, e ir para o estado 101
+    LE        fazer shift, e ir para o estado 102
+    LT        fazer shift, e ir para o estado 103
+    MINUS     fazer shift, e ir para o estado 64
+    MOD       fazer shift, e ir para o estado 104
+    NE        fazer shift, e ir para o estado 105
+    NOT       fazer shift, e ir para o estado 65
+    OR        fazer shift, e ir para o estado 106
+    PLUS      fazer shift, e ir para o estado 66
+    STAR      fazer shift, e ir para o estado 107
+    AND       fazer shift, e ir para o estado 108
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
+
+    $default  reduzir usando a regra 73 (Expr1)
+
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
+    Expr              ir para o estado 110
+    Expr2             ir para o estado 133
+    Expr1             ir para o estado 112
+
+
+Estado94
+
+   50 Expr: ID Dotlenght . Expr1
 
     EQ      fazer shift, e ir para o estado 95
     DIV     fazer shift, e ir para o estado 96
@@ -1273,577 +1379,273 @@ Estado75
 
     $default  reduzir usando a regra 73 (Expr1)
 
-    Expr1  ir para o estado 121
-
-
-Estado76
-
-   23 Statement: WHILE LPAR . Expr RPAR Statement
-
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
-
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
-    Expr              ir para o estado 122
-    Dotlenght         ir para o estado 75
-
-
-Estado77
-
-   22 Statement: IF LPAR . Expr RPAR Statement Statement2
-
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
-
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
-    Expr              ir para o estado 123
-    Dotlenght         ir para o estado 75
-
-
-Estado78
-
-   29 Statement1: Statement . Statement1
-
-    ID        fazer shift, e ir para o estado 44
-    PRINT     fazer shift, e ir para o estado 45
-    PARSEINT  fazer shift, e ir para o estado 46
-    RETURN    fazer shift, e ir para o estado 47
-    WHILE     fazer shift, e ir para o estado 48
-    IF        fazer shift, e ir para o estado 49
-    LBRACE    fazer shift, e ir para o estado 50
-
-    $default  reduzir usando a regra 30 (Statement1)
-
-    Statement         ir para o estado 78
-    Statement1        ir para o estado 124
-    MethodInvocation  ir para o estado 54
-    ParseArgs         ir para o estado 55
-
-
-Estado79
-
-   21 Statement: LBRACE Statement1 . RBRACE
-
-    RBRACE  fazer shift, e ir para o estado 125
-
-
-Estado80
-
-   14 MethodBody: LBRACE MethodBody1 RBRACE .
-
-    $default  reduzir usando a regra 14 (MethodBody)
-
-
-Estado81
-
-   16 MethodBody1: VarDecl MethodBody1 .
-
-    $default  reduzir usando a regra 16 (MethodBody1)
-
-
-Estado82
-
-   15 MethodBody1: Statement MethodBody1 .
-
-    $default  reduzir usando a regra 15 (MethodBody1)
-
-
-Estado83
-
-   25 Statement: MethodInvocation SEMICOLON .
-
-    $default  reduzir usando a regra 25 (Statement)
-
-
-Estado84
-
-   27 Statement: ParseArgs SEMICOLON .
-
-    $default  reduzir usando a regra 27 (Statement)
-
-
-Estado85
-
-   18 VarDecl: Type ID . CommaId SEMICOLON
-
-    COMMA  fazer shift, e ir para o estado 22
-
-    $default  reduzir usando a regra 20 (CommaId)
-
-    CommaId  ir para o estado 126
-
-
-Estado86
-
-   12 FormalParams1: COMMA Type ID . FormalParams
-
-    STRING  fazer shift, e ir para o estado 26
-    INT     fazer shift, e ir para o estado 13
-    DOUBLE  fazer shift, e ir para o estado 14
-    BOOL    fazer shift, e ir para o estado 15
-
-    $default  reduzir usando a regra 11 (FormalParams)
-
-    FormalParams  ir para o estado 127
-    Type          ir para o estado 28
-
-
-Estado87
-
-   26 Statement: ID ASSIGN Expr . SEMICOLON
-
-    SEMICOLON  fazer shift, e ir para o estado 128
-
-
-Estado88
-
-   37 MethodInvocation: ID LPAR MethodInvocation1 . RPAR
-
-    RPAR  fazer shift, e ir para o estado 129
-
-
-Estado89
-
-   38 MethodInvocation1: Expr . CommaExpr
-
-    COMMA  fazer shift, e ir para o estado 130
-
-    $default  reduzir usando a regra 41 (CommaExpr)
-
-    CommaExpr  ir para o estado 131
-
-
-Estado90
-
-   36 Statement4: STRLIT .
-
-    $default  reduzir usando a regra 36 (Statement4)
-
-
-Estado91
-
-   28 Statement: PRINT LPAR Statement4 . RPAR SEMICOLON
-
-    RPAR  fazer shift, e ir para o estado 132
-
-
-Estado92
-
-   35 Statement4: Expr .
-
-    $default  reduzir usando a regra 35 (Statement4)
-
-
-Estado93
-
-   42 ParseArgs: PARSEINT LPAR ID . LSQ Expr RSQ LPAR
-
-    LSQ  fazer shift, e ir para o estado 133
-
-
-Estado94
-
-   55 Expr: ID ASSIGN . Expr2
-
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    EQ         fazer shift, e ir para o estado 95
-    DIV        fazer shift, e ir para o estado 96
-    RSHIFT     fazer shift, e ir para o estado 97
-    LSHIFT     fazer shift, e ir para o estado 98
-    XOR        fazer shift, e ir para o estado 99
-    GE         fazer shift, e ir para o estado 100
-    GT         fazer shift, e ir para o estado 101
-    LE         fazer shift, e ir para o estado 102
-    LT         fazer shift, e ir para o estado 103
-    MINUS      fazer shift, e ir para o estado 65
-    MOD        fazer shift, e ir para o estado 104
-    NE         fazer shift, e ir para o estado 105
-    NOT        fazer shift, e ir para o estado 66
-    OR         fazer shift, e ir para o estado 106
-    PLUS       fazer shift, e ir para o estado 67
-    STAR       fazer shift, e ir para o estado 107
-    AND        fazer shift, e ir para o estado 108
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
-
-    EQ         [reduzir usando a regra 75 (Dotlenght)]
-    COMMA      reduzir usando a regra 73 (Expr1)
-    COMMA      [reduzir usando a regra 75 (Dotlenght)]
-    DIV        [reduzir usando a regra 75 (Dotlenght)]
-    RSHIFT     [reduzir usando a regra 75 (Dotlenght)]
-    LSHIFT     [reduzir usando a regra 75 (Dotlenght)]
-    XOR        [reduzir usando a regra 75 (Dotlenght)]
-    GE         [reduzir usando a regra 75 (Dotlenght)]
-    GT         [reduzir usando a regra 75 (Dotlenght)]
-    LE         [reduzir usando a regra 75 (Dotlenght)]
-    LT         [reduzir usando a regra 75 (Dotlenght)]
-    MOD        [reduzir usando a regra 75 (Dotlenght)]
-    NE         [reduzir usando a regra 75 (Dotlenght)]
-    OR         [reduzir usando a regra 75 (Dotlenght)]
-    SEMICOLON  reduzir usando a regra 73 (Expr1)
-    SEMICOLON  [reduzir usando a regra 75 (Dotlenght)]
-    STAR       [reduzir usando a regra 75 (Dotlenght)]
-    AND        [reduzir usando a regra 75 (Dotlenght)]
-    RPAR       reduzir usando a regra 73 (Expr1)
-    RPAR       [reduzir usando a regra 75 (Dotlenght)]
-    RSQ        reduzir usando a regra 73 (Expr1)
-    RSQ        [reduzir usando a regra 75 (Dotlenght)]
-    $default   reduzir usando a regra 73 (Expr1)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
-    Expr              ir para o estado 110
-    Expr2             ir para o estado 134
-    Expr1             ir para o estado 112
-    Dotlenght         ir para o estado 75
+    Expr1  ir para o estado 134
 
 
 Estado95
 
    67 Expr1: EQ . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 135
-    Dotlenght         ir para o estado 75
 
 
 Estado96
 
    60 Expr1: DIV . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 136
-    Dotlenght         ir para o estado 75
 
 
 Estado97
 
    66 Expr1: RSHIFT . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 137
-    Dotlenght         ir para o estado 75
 
 
 Estado98
 
    65 Expr1: LSHIFT . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 138
-    Dotlenght         ir para o estado 75
 
 
 Estado99
 
    64 Expr1: XOR . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 139
-    Dotlenght         ir para o estado 75
 
 
 Estado100
 
    68 Expr1: GE . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 140
-    Dotlenght         ir para o estado 75
 
 
 Estado101
 
    69 Expr1: GT . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 141
-    Dotlenght         ir para o estado 75
 
 
 Estado102
 
    70 Expr1: LE . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 142
-    Dotlenght         ir para o estado 75
 
 
 Estado103
 
    71 Expr1: LT . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 143
-    Dotlenght         ir para o estado 75
 
 
 Estado104
 
    61 Expr1: MOD . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 144
-    Dotlenght         ir para o estado 75
 
 
 Estado105
 
    72 Expr1: NE . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 145
-    Dotlenght         ir para o estado 75
 
 
 Estado106
 
    63 Expr1: OR . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 146
-    Dotlenght         ir para o estado 75
 
 
 Estado107
 
    59 Expr1: STAR . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 147
-    Dotlenght         ir para o estado 75
 
 
 Estado108
 
    62 Expr1: AND . Expr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 148
-    Dotlenght         ir para o estado 75
 
 
 Estado109
@@ -1932,132 +1734,124 @@ Estado120
 
 Estado121
 
-   50 Expr: Dotlenght Expr1 .
-
-    $default  reduzir usando a regra 50 (Expr)
-
-
-Estado122
-
    23 Statement: WHILE LPAR Expr . RPAR Statement
 
     RPAR  fazer shift, e ir para o estado 150
 
 
-Estado123
+Estado122
 
-   22 Statement: IF LPAR Expr . RPAR Statement Statement2
+   22 Statement: IF LPAR Expr . RPAR Statement2 Statement
 
     RPAR  fazer shift, e ir para o estado 151
 
 
-Estado124
+Estado123
 
    29 Statement1: Statement Statement1 .
 
     $default  reduzir usando a regra 29 (Statement1)
 
 
-Estado125
+Estado124
 
    21 Statement: LBRACE Statement1 RBRACE .
 
     $default  reduzir usando a regra 21 (Statement)
 
 
-Estado126
+Estado125
 
    18 VarDecl: Type ID CommaId . SEMICOLON
 
     SEMICOLON  fazer shift, e ir para o estado 152
 
 
-Estado127
+Estado126
 
    12 FormalParams1: COMMA Type ID FormalParams .
 
     $default  reduzir usando a regra 12 (FormalParams1)
 
 
-Estado128
+Estado127
 
    26 Statement: ID ASSIGN Expr SEMICOLON .
 
     $default  reduzir usando a regra 26 (Statement)
 
 
-Estado129
+Estado128
 
    37 MethodInvocation: ID LPAR MethodInvocation1 RPAR .
 
     $default  reduzir usando a regra 37 (MethodInvocation)
 
 
-Estado130
+Estado129
 
    40 CommaExpr: COMMA . Expr CommaExpr
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 153
-    Dotlenght         ir para o estado 75
 
 
-Estado131
+Estado130
 
    38 MethodInvocation1: Expr CommaExpr .
 
     $default  reduzir usando a regra 38 (MethodInvocation1)
 
 
-Estado132
+Estado131
 
    28 Statement: PRINT LPAR Statement4 RPAR . SEMICOLON
 
     SEMICOLON  fazer shift, e ir para o estado 154
 
 
-Estado133
+Estado132
 
    42 ParseArgs: PARSEINT LPAR ID LSQ . Expr RSQ LPAR
 
-    ID         fazer shift, e ir para o estado 62
-    BOOLLIT    fazer shift, e ir para o estado 63
-    PARSEINT   fazer shift, e ir para o estado 46
-    DOTLENGHT  fazer shift, e ir para o estado 64
-    MINUS      fazer shift, e ir para o estado 65
-    NOT        fazer shift, e ir para o estado 66
-    PLUS       fazer shift, e ir para o estado 67
-    LPAR       fazer shift, e ir para o estado 68
-    INTLIT     fazer shift, e ir para o estado 69
-    REALLIT    fazer shift, e ir para o estado 70
+    ID        fazer shift, e ir para o estado 62
+    BOOLLIT   fazer shift, e ir para o estado 63
+    PARSEINT  fazer shift, e ir para o estado 46
+    MINUS     fazer shift, e ir para o estado 64
+    NOT       fazer shift, e ir para o estado 65
+    PLUS      fazer shift, e ir para o estado 66
+    LPAR      fazer shift, e ir para o estado 67
+    INTLIT    fazer shift, e ir para o estado 68
+    REALLIT   fazer shift, e ir para o estado 69
 
-    $default  reduzir usando a regra 75 (Dotlenght)
-
-    MethodInvocation  ir para o estado 72
-    ParseArgs         ir para o estado 73
+    MethodInvocation  ir para o estado 71
+    ParseArgs         ir para o estado 72
     Expr              ir para o estado 155
-    Dotlenght         ir para o estado 75
 
 
-Estado134
+Estado133
 
    55 Expr: ID ASSIGN Expr2 .
 
     $default  reduzir usando a regra 55 (Expr)
+
+
+Estado134
+
+   50 Expr: ID Dotlenght Expr1 .
+
+    $default  reduzir usando a regra 50 (Expr)
 
 
 Estado135
@@ -2184,19 +1978,13 @@ Estado150
 
 Estado151
 
-   22 Statement: IF LPAR Expr RPAR . Statement Statement2
+   22 Statement: IF LPAR Expr RPAR . Statement2 Statement
 
-    ID        fazer shift, e ir para o estado 44
-    PRINT     fazer shift, e ir para o estado 45
-    PARSEINT  fazer shift, e ir para o estado 46
-    RETURN    fazer shift, e ir para o estado 47
-    WHILE     fazer shift, e ir para o estado 48
-    IF        fazer shift, e ir para o estado 49
-    LBRACE    fazer shift, e ir para o estado 50
+    ELSE  fazer shift, e ir para o estado 157
 
-    Statement         ir para o estado 157
-    MethodInvocation  ir para o estado 54
-    ParseArgs         ir para o estado 55
+    $default  reduzir usando a regra 32 (Statement2)
+
+    Statement2  ir para o estado 158
 
 
 Estado152
@@ -2210,11 +1998,11 @@ Estado153
 
    40 CommaExpr: COMMA Expr . CommaExpr
 
-    COMMA  fazer shift, e ir para o estado 130
+    COMMA  fazer shift, e ir para o estado 129
 
     $default  reduzir usando a regra 41 (CommaExpr)
 
-    CommaExpr  ir para o estado 158
+    CommaExpr  ir para o estado 159
 
 
 Estado154
@@ -2228,7 +2016,7 @@ Estado155
 
    42 ParseArgs: PARSEINT LPAR ID LSQ Expr . RSQ LPAR
 
-    RSQ  fazer shift, e ir para o estado 159
+    RSQ  fazer shift, e ir para o estado 160
 
 
 Estado156
@@ -2240,33 +2028,14 @@ Estado156
 
 Estado157
 
-   22 Statement: IF LPAR Expr RPAR Statement . Statement2
+   31 Statement2: ELSE .
 
-    ELSE  fazer shift, e ir para o estado 160
-
-    ELSE      [reduzir usando a regra 32 (Statement2)]
-    $default  reduzir usando a regra 32 (Statement2)
-
-    Statement2  ir para o estado 161
+    $default  reduzir usando a regra 31 (Statement2)
 
 
 Estado158
 
-   40 CommaExpr: COMMA Expr CommaExpr .
-
-    $default  reduzir usando a regra 40 (CommaExpr)
-
-
-Estado159
-
-   42 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ . LPAR
-
-    LPAR  fazer shift, e ir para o estado 162
-
-
-Estado160
-
-   31 Statement2: ELSE . Statement
+   22 Statement: IF LPAR Expr RPAR Statement2 . Statement
 
     ID        fazer shift, e ir para o estado 44
     PRINT     fazer shift, e ir para o estado 45
@@ -2276,14 +2045,28 @@ Estado160
     IF        fazer shift, e ir para o estado 49
     LBRACE    fazer shift, e ir para o estado 50
 
-    Statement         ir para o estado 163
+    Statement         ir para o estado 161
     MethodInvocation  ir para o estado 54
     ParseArgs         ir para o estado 55
 
 
+Estado159
+
+   40 CommaExpr: COMMA Expr CommaExpr .
+
+    $default  reduzir usando a regra 40 (CommaExpr)
+
+
+Estado160
+
+   42 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ . LPAR
+
+    LPAR  fazer shift, e ir para o estado 162
+
+
 Estado161
 
-   22 Statement: IF LPAR Expr RPAR Statement Statement2 .
+   22 Statement: IF LPAR Expr RPAR Statement2 Statement .
 
     $default  reduzir usando a regra 22 (Statement)
 
@@ -2293,10 +2076,3 @@ Estado162
    42 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ LPAR .
 
     $default  reduzir usando a regra 42 (ParseArgs)
-
-
-Estado163
-
-   31 Statement2: ELSE Statement .
-
-    $default  reduzir usando a regra 31 (Statement2)

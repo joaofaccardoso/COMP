@@ -150,7 +150,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 11 "jucompiler.y" /* yacc.c:1909  */
+#line 13 "jucompiler.y" /* yacc.c:1909  */
 
 char* charvalue;
 int intvalue;

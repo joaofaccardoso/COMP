@@ -1,7 +1,9 @@
 %{
     #include <stdlib.h>
-    #include <stdio.h>
     #include <string.h>
+    #include <stdio.h>
+    int yylex(void);
+    void yyerror (const char *s);
 %}
 
 %token <charvalue> ID STRLIT BOOLLIT PRINT PARSEINT DOTLENGHT PUBLIC RETURN STATIC STRING VOID WHILE INT DOUBLE IF ELSE BOOL CLASS EQ ASSIGN COMMA DIV RSHIFT LSHIFT XOR GE GT LE LT MINUS MOD NE NOT OR PLUS SEMICOLON STAR ARROW AND LBRACE RBRACE LPAR RPAR LSQ RSQ RESERVED
@@ -47,7 +49,7 @@ CommaId: COMMA ID CommaId
     | %empty;
     
 Statement: LBRACE Statement1 RBRACE;
-    | IF LPAR Expr RPAR Statement Statement2;
+    | IF LPAR Expr RPAR Statement2 Statement;
     | WHILE LPAR Expr RPAR Statement;
     | RETURN Statement3 SEMICOLON;
     | MethodInvocation SEMICOLON 
@@ -57,7 +59,7 @@ Statement: LBRACE Statement1 RBRACE;
 
 Statement1: Statement Statement1
     | %empty;
-Statement2: ELSE Statement
+Statement2: ELSE
     | %empty;
 Statement3: Expr
     | %empty;

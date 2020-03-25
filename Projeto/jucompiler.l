@@ -24,19 +24,19 @@ int flag;
 int first = 1;
 char * printString;
 %}
-%X COMMENT STRING
+%X COMMENT STRINGFLAG
 %%
 <COMMENT>"*/"                   {BEGIN 0; column+=yyleng;}
 <COMMENT>(\n|\r|\r\n)           {column=1; line++;}
 <COMMENT><<EOF>>                {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated comment\n",lComment,cComment); BEGIN 0;}
 <COMMENT>.                      {column+=yyleng;}
 
-<STRING>\"                      {column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0; yylval.charvalue=(char*)strdup(yytext); return STRING;}     
-<STRING>(\n|\r|\r\n)            {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}          
-<STRING><<EOF>>                 {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}
-<STRING>{escape}                {column+=yyleng;}
-<STRING>\\.?                    {if(flag==1 || flag==2) printf("Line %d, col %d: invalid escape sequence (%s)\n",line,column,yytext); column+=yyleng; string=1;}
-<STRING>(.)                     {column+=yyleng;}
+<STRINGFLAG>\"                      {column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0; yylval.charvalue=(char*)strdup(yytext); return STRING;}     
+<STRINGFLAG>(\n|\r|\r\n)            {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}          
+<STRINGFLAG><<EOF>>                 {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}
+<STRINGFLAG>{escape}                {column+=yyleng;}
+<STRINGFLAG>\\.?                    {if(flag==1 || flag==2) printf("Line %d, col %d: invalid escape sequence (%s)\n",line,column,yytext); column+=yyleng; string=1;}
+<STRINGFLAG>(.)                     {column+=yyleng;}
 
 \/\/([^\r\n])*                  {;}
 {whiteSpace}                    {column+=yyleng;}
@@ -85,7 +85,7 @@ class                           {column+=yyleng; if(flag==1) printf("CLASS\n"); 
 "["                             {column+=yyleng; if(flag==1) printf("LSQ\n"); yylval.charvalue=(char*)strdup(yytext); return LSQ;}
 "]"                             {column+=yyleng; if(flag==1) printf("RSQ\n"); yylval.charvalue=(char*)strdup(yytext); return RSQ;}
 {reserved}                      {column+=yyleng; if(flag==1) printf("RESERVED(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return RESERVED;}
-\"                              {BEGIN (STRING); lString=line; cString=column; printString = yytext; column+=yyleng;}
+\"                              {BEGIN (STRINGFLAG); lString=line; cString=column; printString = yytext; column+=yyleng;}
 "/*"                            {lComment = line; cComment = column; BEGIN (COMMENT); column+=yyleng;}
 ("_"|"$"|{letters})("_"|"$"|{letters}|{number0})*           {column+=yyleng; if(flag==1) printf("ID(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return ID;}
 (0|{integer})                                               {column+=yyleng; if(flag==1) printf("INTLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return INTLIT;}
