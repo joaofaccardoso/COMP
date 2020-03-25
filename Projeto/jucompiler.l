@@ -28,14 +28,14 @@ char * printString;
 %%
 <COMMENT>"*/"                   {BEGIN 0; column+=yyleng;}
 <COMMENT>(\n|\r|\r\n)           {column=1; line++;}
-<COMMENT><<EOF>>                {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated comment\n",lComment,cComment); BEGIN 0;}
+<COMMENT><<EOF>>                {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated comment\n",lComment,cComment); BEGIN 0;}
 <COMMENT>.                      {column+=yyleng;}
 
 <STRINGFLAG>\"                      {column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0; yylval.charvalue=(char*)strdup(yytext); return STRING;}     
-<STRINGFLAG>(\n|\r|\r\n)            {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}          
-<STRINGFLAG><<EOF>>                 {if(flag==1 || flag == 2) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}
+<STRINGFLAG>(\n|\r|\r\n)            {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}          
+<STRINGFLAG><<EOF>>                 {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}
 <STRINGFLAG>{escape}                {column+=yyleng;}
-<STRINGFLAG>\\.?                    {if(flag==1 || flag==2) printf("Line %d, col %d: invalid escape sequence (%s)\n",line,column,yytext); column+=yyleng; string=1;}
+<STRINGFLAG>\\.?                    {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: invalid escape sequence (%s)\n",line,column,yytext); column+=yyleng; string=1;}
 <STRINGFLAG>(.)                     {column+=yyleng;}
 
 \/\/([^\r\n])*                  {;}
@@ -94,7 +94,7 @@ class                           {column+=yyleng; if(flag==1) printf("CLASS\n"); 
 {integer0}{exp}                                             {column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return REALLIT;}
 
 
-(.)                             {if (flag==1 || flag==2) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column+=yyleng;}
+(.)                             {if (flag == 1 || flag == 2 || flag == 0) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column+=yyleng;}
 %% 
 
 
@@ -103,16 +103,32 @@ int yywrap(){
 }
 
 void yyerror (const char *s) { 
-     printf ("%s: %s\n", s, yytext);
+    printf ("%s: %s\n", s, yytext);
 }
 
 int main(int argc, char *argv[]){
-    flag = 2;
+    flag == 0;
     if(argc > 1){
         if(strcmp(argv[1],"-l")==0){
             flag = 1;
         }
+        else if(strcmp(argv[1],"-e1")==0){
+            flag = 2;
+        }
+        else if(strcmp(argv[1],"-t")==0){
+            flag = 3;
+        }
+        else if(strcmp(argv[1],"-e2")==0){
+            flag = 4;
+        }
     }
-    yylex();
+    int x = 0;
+    while(1){
+        x = yylex();
+        if(x == 0){
+            break;
+        }
+        yyparse();
+    }
     return 0;
 }
