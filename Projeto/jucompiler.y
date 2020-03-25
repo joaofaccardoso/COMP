@@ -22,11 +22,11 @@ Program1: PUBLIC STATIC MethodField Program1
     | SEMICOLON Program1
     | %empty;
 
-MethodField: MethodHeader MethodBody
-    | Type ID CommaId SEMICOLON;
+MethodField: VOID ID LPAR FormalParams RPAR MethodBody
+    | Type ID Dif;  
 
-MethodHeader: Type ID LPAR FormalParams RPAR
-    | VOID ID LPAR FormalParams RPAR;
+Dif: LPAR FormalParams RPAR MethodBody
+    | CommaId SEMICOLON;
 
 FormalParams: Type ID FormalParams1
     | STRING LSQ RSQ ID;
@@ -51,7 +51,7 @@ Statement: LBRACE Statement1 RBRACE;
     | WHILE LPAR Expr RPAR Statement;
     | RETURN Statement3 SEMICOLON;
     | MethodInvocation SEMICOLON 
-    | Assignment SEMICOLON 
+    | ID ASSIGN Expr SEMICOLON 
     | ParseArgs SEMICOLON;
     | PRINT LPAR Statement4 RPAR SEMICOLON;
 
@@ -71,8 +71,6 @@ MethodInvocation1: Expr CommaExpr
 
 CommaExpr: COMMA Expr CommaExpr
     | %empty;
-    
-Assignment: ID ASSIGN Expr;
 
 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ LPAR;
 
@@ -80,34 +78,36 @@ Type: BOOL
     | INT
     | DOUBLE;
 
-Expr: MINUS Expr11 
-    | PLUS Expr11
-    | NOT Expr11
-    | LPAR Expr11 RPAR
-    | ID Dotlenght
-    | INTLIT 
-    | REALLIT 
-    | BOOLLIT
-    | MethodInvocation
-    | Assignment
-    | ParseArgs;
+Expr: MINUS Expr2 
+    | NOT Expr2
+    | PLUS Expr2
+    | LPAR Expr2 RPAR
+    | ID Dotlenght Expr1
+    | INTLIT Expr1
+    | REALLIT Expr1
+    | BOOLLIT Expr1
+    | MethodInvocation Expr1
+    | ID ASSIGN Expr2
+    | ParseArgs Expr1;
 
-Expr11: Expr
-    | Expr1 Expr;
-Expr1: STAR  
-    | DIV 
-    | MOD
-    | AND
-    | OR 
-    | XOR 
-    | LSHIFT 
-    | RSHIFT
-    | EQ 
-    | GE 
-    | GT 
-    | LE 
-    | LT 
-    | NE;
+Expr2: Expr1
+    | Expr;
+
+Expr1: STAR Expr
+    | DIV Expr
+    | MOD Expr
+    | AND Expr
+    | OR Expr
+    | XOR Expr
+    | LSHIFT Expr
+    | RSHIFT Expr
+    | EQ Expr
+    | GE Expr
+    | GT Expr
+    | LE Expr
+    | LT Expr
+    | NE Expr
+    | %empty;
 Dotlenght: DOTLENGHT
     | %empty;
 %%
