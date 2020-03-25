@@ -124,11 +124,14 @@ int main(int argc, char *argv[]){
     }
     int x = 0;
     while(1){
-        x = yylex();
+        x = yyparse();
         if(x == 0){
             break;
         }
-        yyparse();
+        else{
+            printf("            erro\n");
+            break;
+        }
     }
     return 0;
 }

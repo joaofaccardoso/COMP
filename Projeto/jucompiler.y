@@ -66,7 +66,9 @@ Statement3: Expr
 Statement4: Expr 
     | STRLIT;
 
-MethodInvocation: ID LPAR MethodInvocation1 RPAR;
+MethodInvocation: ID MethodInvocation2;
+
+MethodInvocation2: LPAR MethodInvocation1 RPAR;
 
 MethodInvocation1: Expr CommaExpr
     | %empty;
@@ -81,16 +83,18 @@ Type: BOOL
     | DOUBLE;
 
 Expr: MINUS Expr2 
-    | NOT Expr2
     | PLUS Expr2
+    | NOT Expr2
     | LPAR Expr2 RPAR
-    | ID Dotlenght Expr1
+    | ID Expr3
     | INTLIT Expr1
     | REALLIT Expr1
     | BOOLLIT Expr1
-    | MethodInvocation Expr1
-    | ID ASSIGN Expr2
     | ParseArgs Expr1;
+
+Expr3: Dotlenght Expr1
+    | ASSIGN Expr2
+    | MethodInvocation2 Expr1;
 
 Expr2: Expr1
     | Expr;
