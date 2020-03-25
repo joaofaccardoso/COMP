@@ -84,7 +84,9 @@ Type: BOOL
 
 Expr: MINUS Expr2 
     | PLUS Expr2
-    | NOT Expr2
+    | Expr4;
+
+Expr4: NOT Expr2
     | LPAR Expr2 RPAR
     | ID Expr3
     | INTLIT Expr1
@@ -97,9 +99,11 @@ Expr3: Dotlenght Expr1
     | MethodInvocation2 Expr1;
 
 Expr2: Expr1
-    | Expr;
+    | Expr4;
 
-Expr1: STAR Expr
+Expr1: PLUS Expr
+    | MINUS Expr
+    | STAR Expr
     | DIV Expr
     | MOD Expr
     | AND Expr
