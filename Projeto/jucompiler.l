@@ -103,7 +103,9 @@ int yywrap(){
 }
 
 void yyerror (const char *s) {
+  if (flag != 1 && flag != 2) {
     printf ("Line %d, col %d: syntax error: %s\n",line, column, yytext);
+  }
 }
 
 int main(int argc, char *argv[]){
