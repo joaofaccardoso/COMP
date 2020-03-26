@@ -31,8 +31,8 @@ char * printString;
 <COMMENT><<EOF>>                {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated comment\n",lComment,cComment); BEGIN 0;}
 <COMMENT>.                      {column+=yyleng;}
 
-<STRINGFLAG>\"                      {column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0; yylval.charvalue=(char*)strdup(yytext); return STRING;}     
-<STRINGFLAG>(\n|\r|\r\n)            {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}          
+<STRINGFLAG>\"                      {column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0; yylval.charvalue=(char*)strdup(yytext); return STRING;}
+<STRINGFLAG>(\n|\r|\r\n)            {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}
 <STRINGFLAG><<EOF>>                 {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}
 <STRINGFLAG>{escape}                {column+=yyleng;}
 <STRINGFLAG>\\.?                    {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: invalid escape sequence (%s)\n",line,column,yytext); column+=yyleng; string=1;}
@@ -95,19 +95,18 @@ class                           {column+=yyleng; if(flag==1) printf("CLASS\n"); 
 
 
 (.)                             {if (flag == 1 || flag == 2 || flag == 0) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column+=yyleng;}
-%% 
+%%
 
 
 int yywrap(){
     return 1;
 }
 
-void yyerror (const char *s) { 
-    printf ("%s: %s\n", s, yytext);
+void yyerror (const char *s) {
+    printf ("Line %d, col %d: syntax error: %s\n",line, column, yytext);
 }
 
 int main(int argc, char *argv[]){
-    flag == 0;
     if(argc > 1){
         if(strcmp(argv[1],"-l")==0){
             flag = 1;
@@ -129,7 +128,6 @@ int main(int argc, char *argv[]){
             break;
         }
         else{
-            printf("            erro\n");
             break;
         }
     }

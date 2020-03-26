@@ -993,13 +993,13 @@ YY_RULE_SETUP
 case 4:
 YY_RULE_SETUP
 #line 34 "jucompiler.l"
-{column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0; yylval.charvalue=(char*)strdup(yytext); return STRING;}     
+{column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; string=0; yylval.charvalue=(char*)strdup(yytext); return STRING;}
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
 #line 35 "jucompiler.l"
-{if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}          
+{if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}
 	YY_BREAK
 case YY_STATE_EOF(STRINGFLAG):
 #line 36 "jucompiler.l"
@@ -2314,8 +2314,8 @@ int yywrap(){
     return 1;
 }
 
-void yyerror (const char *s) { 
-    printf ("%s: %s\n", s, yytext);
+void yyerror (const char *s) {
+    printf ("Line %d, col %d: syntax error: %s\n",line, column, yytext);
 }
 
 int main(int argc, char *argv[]){
@@ -2341,9 +2341,9 @@ int main(int argc, char *argv[]){
             break;
         }
         else{
-            printf("            erro\n");
             break;
         }
     }
     return 0;
 }
+

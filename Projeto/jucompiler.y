@@ -18,106 +18,48 @@ float realvalue;
 
 %%
 
-Program: CLASS ID LBRACE Program1 RBRACE;
+Program: CLASS ID LBRACE Declarations RBRACE;
 
-Program1: PUBLIC STATIC MethodField Program1
-    | SEMICOLON Program1
-    | %empty;
+Declarations: MethodDecl Declarations
+            | FieldDecl Declarations
+            | SEMICOLON Declarations
+            | %empty
+            ;
 
-MethodField: VOID ID LPAR FormalParams RPAR MethodBody
-    | Type ID Dif;  
+FieldDecl: PUBLIC STATIC Type ID CommaId SEMICOLON
+        |  error SEMICOLON
+        ;
 
-Dif: LPAR FormalParams RPAR MethodBody
-    | CommaId SEMICOLON;
+MethodDecl: PUBLIC STATIC MethodHeader MethodBody;
 
-FormalParams: Type ID FormalParams1
-    | STRING LSQ RSQ ID;
-    | %empty;
+MethodHeader: Type ID LPAR FormalParams RPAR
+            | VOID ID LPAR FormalParams RPAR
+            ;
 
-FormalParams1: COMMA Type ID FormalParams
-    | %empty;
+FormalParams: Type ID CommaTypeId
+            | STRING LSQ RSQ ID
+            | %empty
+            ;
 
-MethodBody: LBRACE MethodBody1 RBRACE;
+MethodBody: LBRACE MethodBodyContent RBRACE;
 
-MethodBody1: Statement MethodBody1
-    | VarDecl MethodBody1
-    | %empty;
+MethodBodyContent: VarDecl MethodBodyContent
+                |  %empty
+                ;
 
 VarDecl: Type ID CommaId SEMICOLON;
 
 CommaId: COMMA ID CommaId
-    | %empty;
-    
-Statement: LBRACE Statement1 RBRACE;
-    | IF LPAR Expr RPAR Statement2 Statement;
-    | WHILE LPAR Expr RPAR Statement;
-    | RETURN Statement3 SEMICOLON;
-    | MethodInvocation SEMICOLON 
-    | ID ASSIGN Expr SEMICOLON 
-    | ParseArgs SEMICOLON;
-    | PRINT LPAR Statement4 RPAR SEMICOLON;
+      |  %empty
+      ;
 
-Statement1: Statement Statement1
-    | %empty;
-Statement2: ELSE
-    | %empty;
-Statement3: Expr
-    | %empty;
-Statement4: Expr 
-    | STRLIT;
-
-MethodInvocation: ID MethodInvocation2;
-
-MethodInvocation2: LPAR MethodInvocation1 RPAR;
-
-MethodInvocation1: Expr CommaExpr
-    | %empty;
-
-CommaExpr: COMMA Expr CommaExpr
-    | %empty;
-
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ LPAR;
+CommaTypeId: COMMA Type ID CommaTypeId
+          |  %empty
+          ;
 
 Type: BOOL
     | INT
-    | DOUBLE;
+    | DOUBLE
+    ;
 
-Expr: MINUS Expr2 
-    | PLUS Expr2
-    | Expr4;
-
-Expr4: NOT Expr2
-    | LPAR Expr2 RPAR
-    | ID Expr3
-    | INTLIT Expr1
-    | REALLIT Expr1
-    | BOOLLIT Expr1
-    | ParseArgs Expr1;
-
-Expr3: Dotlenght Expr1
-    | ASSIGN Expr2
-    | MethodInvocation2 Expr1;
-
-Expr2: Expr1
-    | Expr4;
-
-Expr1: PLUS Expr
-    | MINUS Expr
-    | STAR Expr
-    | DIV Expr
-    | MOD Expr
-    | AND Expr
-    | OR Expr
-    | XOR Expr
-    | LSHIFT Expr
-    | RSHIFT Expr
-    | EQ Expr
-    | GE Expr
-    | GT Expr
-    | LE Expr
-    | LT Expr
-    | NE Expr
-    | %empty;
-Dotlenght: DOTLENGHT
-    | %empty;
 %%
