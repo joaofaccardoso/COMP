@@ -25,7 +25,7 @@ Program1: PUBLIC STATIC MethodField Program1
     | %empty;
 
 MethodField: VOID ID LPAR FormalParams RPAR MethodBody
-    | Type ID Dif;  
+    | Type ID Dif;
 
 Dif: LPAR FormalParams RPAR MethodBody
     | CommaId SEMICOLON;
@@ -47,13 +47,13 @@ VarDecl: Type ID CommaId SEMICOLON;
 
 CommaId: COMMA ID CommaId
     | %empty;
-    
+
 Statement: LBRACE Statement1 RBRACE;
     | IF LPAR Expr RPAR Statement2 Statement;
     | WHILE LPAR Expr RPAR Statement;
     | RETURN Statement3 SEMICOLON;
-    | MethodInvocation SEMICOLON 
-    | ID ASSIGN Expr SEMICOLON 
+    | MethodInvocation SEMICOLON
+    | ID ASSIGN Expr SEMICOLON
     | ParseArgs SEMICOLON;
     | PRINT LPAR Statement4 RPAR SEMICOLON;
 
@@ -63,7 +63,7 @@ Statement2: ELSE
     | %empty;
 Statement3: Expr
     | %empty;
-Statement4: Expr 
+Statement4: Expr
     | STRLIT;
 
 MethodInvocation: ID MethodInvocation2;
@@ -82,7 +82,7 @@ Type: BOOL
     | INT
     | DOUBLE;
 
-Expr: MINUS Expr2 
+Expr: MINUS Expr2
     | PLUS Expr2
     | Expr4;
 
