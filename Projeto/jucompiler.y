@@ -20,35 +20,41 @@ float realvalue;
 
 Program: CLASS ID LBRACE Program1 RBRACE;
 
-Program1: PUBLIC STATIC MethodHeader MethodBody Program1
+Program1: MethodDecl Program1
     | FieldDecl Program1
     | SEMICOLON Program1
     | %empty;
 
-FieldDecl: PUBLIC STATIC Type ID CommaId SEMICOLON
-    | error SEMICOLON;
+MethodDecl:  PUBLIC STATIC MethodHeader MethodBody;
 
-Type: BOOL
-    | INT
-    | DOUBLE;
+FieldDecl:  PUBLIC STATIC Type ID CommaId SEMICOLON
+    | error SEMICOLON;
 
 CommaId: COMMA ID CommaId
     | %empty;
 
-MethodHeader: Type ID LPAR FormalParams RPAR
-    | VOID ID LPAR FormalParams RPAR;
+Type:  BOOL 
+    | INT 
+    | DOUBLE;
 
-FormalParams: Type ID CommaTypeId
-    | STRING LSQ RSQ ID
+MethodHeader:  Type ID LPAR MethodHeader2 RPAR
+    | VOID ID LPAR MethodHeader2 RPAR;
+
+MethodHeader2: FormalParams
     | %empty;
 
-CommaTypeId: COMMA ID CommaTypeId
+FormalParams:  Type ID CommaTypeId;
+
+CommaTypeId: COMMA Type ID CommaTypeId
     | %empty;
 
-MethodBody: LBRACE MethodBody1 RBRACE;
+FormalParams:  STRING LSQ RSQ ID;
 
-MethodBody1: Type ID CommaId SEMICOLON MethodBody1
+MethodBody:  LBRACE MethodBody1 RBRACE;
+
+MethodBody1: VarDecl MethodBody1
     | %empty;
 
+VarDecl:  Type ID CommaId SEMICOLON;
 
 %%

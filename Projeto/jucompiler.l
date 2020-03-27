@@ -104,7 +104,7 @@ int yywrap(){
 
 void yyerror (const char *s) {
     if (flag == 0 || flag == 3) {
-        printf ("Line %d, col %d: %s: %s\n", line, column-1, s, yytext);
+        printf ("Line %d, col %d: %s: %s\n", line, column - yyleng, s, yytext);
     }
 }
 
