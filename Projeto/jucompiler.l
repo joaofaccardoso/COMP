@@ -129,9 +129,6 @@ int main(int argc, char *argv[]){
         if(x == 0){
             break;
         }
-        else{
-            break;
-        }
     }
     return 0;
 }

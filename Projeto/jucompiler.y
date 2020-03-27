@@ -18,23 +18,32 @@ float realvalue;
 
 %%
 
-Program: CLASS ID LBRACE Program1 RBRACE;
+Program: CLASS ID LBRACE Program1 RBRACE
+    | error;
 
-Program1: PUBLIC STATIC MethodField Program1
+Program1: PUBLIC STATIC MethodHeader MethodBody Program1
+    | FieldDecl Program1
     | SEMICOLON Program1
     | %empty;
 
-MethodField: VOID ID LPAR FormalParams RPAR MethodBody
-    | Type ID Dif;
+FieldDecl: PUBLIC STATIC Type ID CommaId SEMICOLON
+    | error SEMICOLON;
 
-Dif: LPAR FormalParams RPAR MethodBody
-    | CommaId SEMICOLON;
+Type: BOOL
+    | INT
+    | DOUBLE;
 
-FormalParams: Type ID FormalParams1
-    | STRING LSQ RSQ ID;
+CommaId: COMMA ID CommaId
     | %empty;
 
-FormalParams1: COMMA Type ID FormalParams
+MethodHeader: Type ID LPAR FormalParams RPAR
+    | VOID ID LPAR FormalParams RPAR;
+
+FormalParams: Type ID CommaTypeId
+    | STRING LSQ RSQ ID
+    | %empty;
+
+CommaTypeId: COMMA ID CommaTypeId
     | %empty;
 
 MethodBody: LBRACE MethodBody1 RBRACE;
@@ -42,82 +51,49 @@ MethodBody: LBRACE MethodBody1 RBRACE;
 MethodBody1: Statement MethodBody1
     | VarDecl MethodBody1
     | %empty;
-
+    
 VarDecl: Type ID CommaId SEMICOLON;
 
-CommaId: COMMA ID CommaId
-    | %empty;
-
-Statement: LBRACE Statement1 RBRACE;
-    | IF LPAR Expr RPAR Statement2 Statement;
-    | WHILE LPAR Expr RPAR Statement;
-    | RETURN Statement3 SEMICOLON;
-    | MethodInvocation SEMICOLON
-    | ID ASSIGN Expr SEMICOLON
-    | ParseArgs SEMICOLON;
-    | PRINT LPAR Statement4 RPAR SEMICOLON;
+Statement: LBRACE Statement1 RBRACE
+    | IF LPAR Expr RPAR Statement ElseStatement 
+    | WHILE LPAR Expr RPAR 
+    | RETURN SEMICOLON
+    | RETURN Expr SEMICOLON
+    | SEMICOLON
+    | MethodInvocation SEMICOLON 
+    | Assignment SEMICOLON
+    | ParseArgs SEMICOLON
+    | error SEMICOLON;
 
 Statement1: Statement Statement1
     | %empty;
-Statement2: ELSE
-    | %empty;
-Statement3: Expr
-    | %empty;
-Statement4: Expr
-    | STRLIT;
 
-MethodInvocation: ID MethodInvocation2;
+ElseStatement: ELSE Statement;
 
-MethodInvocation2: LPAR MethodInvocation1 RPAR;
-
-MethodInvocation1: Expr CommaExpr
-    | %empty;
+MethodInvocation: ID LPAR RPAR
+    | ID LPAR Expr CommaExpr RPAR
+    | PARSEINT LPAR error RPAR;
 
 CommaExpr: COMMA Expr CommaExpr
     | %empty;
 
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ LPAR;
+Assignment: ID ASSIGN Expr;
 
-Type: BOOL
-    | INT
-    | DOUBLE;
+ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR;
 
-Expr: MINUS Expr2
-    | PLUS Expr2
-    | Expr4;
+Expr: INTLIT
+    | REALLIT 
+    | BOOLLIT
+    | MINUS Expr 
+    | NOT Expr
+    | PLUS Expr
+    | LPAR Expr RPAR
+    | MethodInvocation 
+    | Assignment 
+    | ParseArgs
+    | ID Dotlenght
+    | LPAR error RPAR;
 
-Expr4: NOT Expr2
-    | LPAR Expr2 RPAR
-    | ID Expr3
-    | INTLIT Expr1
-    | REALLIT Expr1
-    | BOOLLIT Expr1
-    | ParseArgs Expr1;
-
-Expr3: Dotlenght Expr1
-    | ASSIGN Expr2
-    | MethodInvocation2 Expr1;
-
-Expr2: Expr1
-    | Expr4;
-
-Expr1: PLUS Expr
-    | MINUS Expr
-    | STAR Expr
-    | DIV Expr
-    | MOD Expr
-    | AND Expr
-    | OR Expr
-    | XOR Expr
-    | LSHIFT Expr
-    | RSHIFT Expr
-    | EQ Expr
-    | GE Expr
-    | GT Expr
-    | LE Expr
-    | LT Expr
-    | NE Expr
-    | %empty;
 Dotlenght: DOTLENGHT
     | %empty;
 %%
