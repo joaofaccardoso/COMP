@@ -1,0 +1,44 @@
+
+Statement: LBRACE Statement1 RBRACE
+    | IF LPAR Expr RPAR Statement ElseStatement 
+    | WHILE LPAR Expr RPAR 
+    | RETURN SEMICOLON
+    | RETURN Expr SEMICOLON
+    | SEMICOLON
+    | MethodInvocation SEMICOLON 
+    | Assignment SEMICOLON
+    | ParseArgs SEMICOLON
+    | error SEMICOLON;
+
+Statement1: Statement Statement1
+    | %empty;
+
+ElseStatement: ELSE Statement;
+
+MethodInvocation: ID LPAR RPAR
+    | ID LPAR Expr CommaExpr RPAR
+    | ID LPAR error RPAR;
+
+CommaExpr: COMMA Expr CommaExpr
+    | %empty;
+
+Assignment: ID ASSIGN Expr;
+
+ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR
+    | PARSEINT LPAR error RPAR;
+
+Expr: INTLIT
+    | REALLIT 
+    | BOOLLIT
+    | MINUS Expr 
+    | NOT Expr
+    | PLUS Expr
+    | LPAR Expr RPAR
+    | MethodInvocation 
+    | Assignment 
+    | ParseArgs
+    | ID Dotlenght
+    | LPAR error RPAR;
+
+Dotlenght: DOTLENGHT
+    | %empty;

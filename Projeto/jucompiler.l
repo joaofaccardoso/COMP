@@ -103,32 +103,40 @@ int yywrap(){
 }
 
 void yyerror (const char *s) {
-  if (flag != 1 && flag != 2) {
-    printf ("Line %d, col %d: syntax error: %s\n",line, column, yytext);
-  }
+    if (flag != 1 && flag != 2) {
+        printf ("Line %d, col %d: %s: %s\n",line, column, s, yytext);
+    }
 }
 
 int main(int argc, char *argv[]){
+    int x;
     if(argc > 1){
         if(strcmp(argv[1],"-l")==0){
             flag = 1;
+            x = -1;
+            while(x!=0){
+                x = yylex();
+            }
         }
         else if(strcmp(argv[1],"-e1")==0){
             flag = 2;
+            x = -1;
+            while(x!=0){
+                x = yylex();
+            }
         }
         else if(strcmp(argv[1],"-t")==0){
             flag = 3;
+            yyparse();
         }
         else if(strcmp(argv[1],"-e2")==0){
             flag = 4;
+            yyparse();
+        }
+        else{
+            yyparse();
         }
     }
-    int x = 0;
-    while(1){
-        x = yyparse();
-        if(x == 0){
-            break;
-        }
-    }
+    
     return 0;
 }
