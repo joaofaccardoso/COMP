@@ -103,8 +103,8 @@ int yywrap(){
 }
 
 void yyerror (const char *s) {
-    if (flag != 1 && flag != 2) {
-        printf ("Line %d, col %d: %s: %s\n",line, column, s, yytext);
+    if (flag == 0 || flag == 3) {
+        printf ("Line %d, col %d: %s: %s\n", line, column-1, s, yytext);
     }
 }
 
@@ -130,12 +130,16 @@ int main(int argc, char *argv[]){
             yyparse();
         }
         else if(strcmp(argv[1],"-e2")==0){
-            flag = 4;
+            flag = 0;
             yyparse();
         }
         else{
             yyparse();
         }
+    }
+    else{
+        flag = 0;
+        yyparse();
     }
     
     return 0;
