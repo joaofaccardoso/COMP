@@ -43,8 +43,7 @@ FormalParams: Type ID CommaTypeId
 
 MethodBody: LBRACE MethodBodyContent RBRACE;
 
-MethodBodyContent: Statement MethodBodyContent
-                |  VarDecl MethodBodyContent
+MethodBodyContent: VarDecl MethodBodyContent
                 |  %empty
                 ;
 
@@ -62,78 +61,5 @@ Type: BOOL
     | INT
     | DOUBLE
     ;
-
-Statement: LBRACE Statement1 RBRACE;
-    | IF LPAR Expr RPAR Statement2 Statement;
-    | WHILE LPAR Expr RPAR Statement;
-    | RETURN Statement3 SEMICOLON;
-    | MethodInvocation SEMICOLON
-    | ID ASSIGN Expr SEMICOLON
-    | ParseArgs SEMICOLON;
-    | PRINT LPAR Statement4 RPAR SEMICOLON;
-
-Statement1: Statement Statement1
-    | %empty;
-Statement2: ELSE
-    | %empty;
-Statement3: Expr
-    | %empty;
-Statement4: Expr
-    | STRLIT;
-
-MethodInvocation: ID MethodInvocation2;
-
-MethodInvocation2: LPAR MethodInvocation1 RPAR;
-
-MethodInvocation1: Expr CommaExpr
-    | %empty;
-
-CommaExpr: COMMA Expr CommaExpr
-    | %empty;
-
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ LPAR;
-
-Type: BOOL
-    | INT
-    | DOUBLE;
-
-Expr: MINUS Expr2
-    | PLUS Expr2
-    | Expr4;
-
-Expr4: NOT Expr2
-    | LPAR Expr2 RPAR
-    | ID Expr3
-    | INTLIT Expr1
-    | REALLIT Expr1
-    | BOOLLIT Expr1
-    | ParseArgs Expr1;
-
-Expr3: Dotlenght Expr1
-    | ASSIGN Expr2
-    | MethodInvocation2 Expr1;
-
-Expr2: Expr1
-    | Expr4;
-
-Expr1: PLUS Expr
-    | MINUS Expr
-    | STAR Expr
-    | DIV Expr
-    | MOD Expr
-    | AND Expr
-    | OR Expr
-    | XOR Expr
-    | LSHIFT Expr
-    | RSHIFT Expr
-    | EQ Expr
-    | GE Expr
-    | GT Expr
-    | LE Expr
-    | LT Expr
-    | NE Expr
-    | %empty;
-Dotlenght: DOTLENGHT
-    | %empty;
 
 %%
