@@ -31,7 +31,7 @@ MethodDecl: PUBLIC STATIC MethodHeader MethodBody;
 FieldDecl:  PUBLIC STATIC Type ID CommaId SEMICOLON
     | error SEMICOLON;
 
-CommaId: COMMA ID CommaId
+CommaId: COMMA ID CommaId 
     | %empty;
 
 Type:  BOOL 

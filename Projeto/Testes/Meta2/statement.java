@@ -1,5 +1,6 @@
 class Factorial{
     public static boolean b;
     public static int factorial(int n){
-        "String"
-    }
+        "string";
+    };{}
+    
