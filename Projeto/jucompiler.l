@@ -96,7 +96,7 @@ class                           {isString=0; initCol=column; column+=yyleng; if(
 {integer0}{exp}                                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return REALLIT;}
 
 
-(.)                             {if (flag == 1 || flag == 2 || flag == 0) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column+=yyleng;}
+(.)                             {if (flag == 1 || flag == 2 || flag == 0) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column+=yyleng; initCol=column;}
 %%
 
 

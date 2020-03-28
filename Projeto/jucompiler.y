@@ -24,9 +24,9 @@ Program: CLASS ID LBRACE Program1 RBRACE;
 Program1: MethodDecl Program1
     | FieldDecl Program1
     | SEMICOLON Program1
-    | %empty;
+    | %empty ;
 
-MethodDecl:  PUBLIC STATIC MethodHeader MethodBody;
+MethodDecl: PUBLIC STATIC MethodHeader MethodBody;
 
 FieldDecl:  PUBLIC STATIC Type ID CommaId SEMICOLON
     | error SEMICOLON;
@@ -38,18 +38,16 @@ Type:  BOOL
     | INT 
     | DOUBLE;
 
-MethodHeader:  Type ID LPAR MethodHeader2 RPAR
-    | VOID ID LPAR MethodHeader2 RPAR;
+MethodHeader:  Type ID LPAR FormalParams RPAR
+    | VOID ID LPAR FormalParams RPAR;
 
-MethodHeader2: FormalParams
+FormalParams:  Type ID CommaTypeId
+    | STRING LSQ RSQ ID
     | %empty;
-
-FormalParams:  Type ID CommaTypeId;
 
 CommaTypeId: COMMA Type ID CommaTypeId
     | %empty;
 
-FormalParams:  STRING LSQ RSQ ID;
 
 MethodBody:  LBRACE MethodBody1 RBRACE;
 
