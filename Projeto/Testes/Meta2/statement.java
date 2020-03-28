@@ -1,13 +1,5 @@
-class Factorial {
-    public static int factorial(int n) {
-        int x, y;
-
-        return ;
+class Factorial{
+    public static boolean b;
+    public static int factorial(int n){
+        "ola";
     }
-
-    public static void main(String[] args) {
-        int argument;
-        argument = Integer.parseInt(args[0]);
-        System.out.print(factorial(argument));
-    }
-}

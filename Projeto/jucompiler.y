@@ -5,11 +5,12 @@
     int yylex(void);
     void yyerror (const char *s);
 %}
+%nonassoc REDUCE 
+%nonassoc ELSE 
 
 %token <charvalue> ID STRLIT BOOLLIT PRINT PARSEINT DOTLENGHT PUBLIC RETURN STATIC STRING VOID WHILE INT DOUBLE IF ELSE BOOL CLASS EQ ASSIGN COMMA DIV RSHIFT LSHIFT XOR GE GT LE LT MINUS MOD NE NOT OR PLUS SEMICOLON STAR ARROW AND LBRACE RBRACE LPAR RPAR LSQ RSQ RESERVED
 %token <intvalue> INTLIT
 %token <realvalue> REALLIT
-
 %union{
     char* charvalue;
     int intvalue;
@@ -59,49 +60,44 @@ MethodBody1: VarDecl MethodBody1
 VarDecl:  Type ID CommaId SEMICOLON;
 
 Statement: LBRACE StatementLoop RBRACE
-    | IF LPAR Expr RPAR Statement ELSE Statement
+    | IF LPAR Expr RPAR Statement %prec REDUCE
+    | IF LPAR RPAR Statement ELSE Statement
     | WHILE LPAR Expr RPAR Statement
-    | RETURN StatementExpr SEMICOLON
+    | RETURN Expr SEMICOLON
+    | RETURN SEMICOLON
     | MethodInvocation SEMICOLON
     | Assignment SEMICOLON
     | ParseArgs SEMICOLON
     | SEMICOLON
-    | PRINT LPAR ExprString RPAR SEMICOLON;
-
+    | PRINT LPAR STRLIT RPAR SEMICOLON;
+    | PRINT LPAR Expr RPAR SEMICOLON;
+    | error SEMICOLON;
+    
 StatementLoop: Statement StatementLoop
     | %empty;
 
-StatementExpr: Expr
-    | %empty;
-
-ExprString: Expr
-    | STRLIT;
-
-MethodInvocation: ID LPAR ExprCommaExpr RPAR;
-
-ExprCommaExpr: Expr CommaExpr
-    | %empty;
+MethodInvocation: ID LPAR Expr CommaExpr RPAR
+    | ID LPAR RPAR
+    | ID LPAR error RPAR;
 
 CommaExpr: COMMA Expr CommaExpr
     | %empty;
 
 Assignment: ID ASSIGN Expr;
 
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR;
+ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR
+    | PARSEINT LPAR error RPAR;
 
-Expr: INTLIT
-    | REALLIT 
-    | BOOLLIT
-    | MINUS Expr 
-    | NOT Expr
-    | PLUS Expr
-    | LPAR Expr RPAR
+Expr: LPAR Expr RPAR
     | MethodInvocation 
     | Assignment 
     | ParseArgs
-    | ID Dotlenght
-    | LPAR error RPAR;
-
-Dotlenght: DOTLENGHT
-    | %empty;
+    | MINUS Expr
+    | NOT Expr
+    | PLUS Expr
+    | ID DOTLENGHT
+    | ID
+    | INTLIT
+    | BOOLLIT
+    | REALLIT;
 %%
