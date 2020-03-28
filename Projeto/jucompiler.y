@@ -48,54 +48,82 @@ FormalParams:  Type ID CommaTypeId
 CommaTypeId: COMMA Type ID CommaTypeId
     | %empty;
 
-
 MethodBody:  LBRACE MethodBody1 RBRACE;
 
 MethodBody1: VarDecl MethodBody1
-    | Statement MethodBody1
+    | Statement MethodBody1 
     | %empty;
 
 VarDecl:  Type ID CommaId SEMICOLON;
 
 Statement: LBRACE StatementLoop RBRACE
-    | IF LPAR Expr RPAR Statement %prec REDUCE
-    | IF LPAR RPAR Statement ELSE Statement
-    | WHILE LPAR Expr RPAR Statement
-    | RETURN Expr SEMICOLON
+    | IF LPAR Expr1 RPAR Statement %prec REDUCE
+    | IF LPAR Expr1 RPAR Statement ELSE Statement
+    | WHILE LPAR Expr1 RPAR Statement
+    | RETURN Expr1 SEMICOLON
     | RETURN SEMICOLON
     | MethodInvocation SEMICOLON
-    | Assignment SEMICOLON
+    | ID ASSIGN Expr1 SEMICOLON
     | ParseArgs SEMICOLON
     | SEMICOLON
     | PRINT LPAR STRLIT RPAR SEMICOLON;
-    | PRINT LPAR Expr RPAR SEMICOLON;
+    | PRINT LPAR Expr1 RPAR SEMICOLON;
     | error SEMICOLON;
     
 StatementLoop: Statement StatementLoop
     | %empty;
 
-MethodInvocation: ID LPAR Expr CommaExpr RPAR
+MethodInvocation: ID LPAR Expr1 CommaExpr RPAR
     | ID LPAR RPAR
     | ID LPAR error RPAR;
 
-CommaExpr: COMMA Expr CommaExpr
+CommaExpr: COMMA Expr1 CommaExpr
     | %empty;
 
-Assignment: ID ASSIGN Expr;
-
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR
+ParseArgs: PARSEINT LPAR ID LSQ Expr1 RSQ RPAR
     | PARSEINT LPAR error RPAR;
 
-Expr: LPAR Expr RPAR
-    | MethodInvocation 
-    | Assignment 
-    | ParseArgs
-    | MINUS Expr
-    | NOT Expr
-    | PLUS Expr
-    | ID DOTLENGHT
-    | ID
-    | INTLIT
-    | BOOLLIT
-    | REALLIT;
+PlusMinus: PLUS Expr3
+    | MINUS Expr3
+    ;
+
+Expr1: PlusMinus
+    | ExprAux1
+    ;
+
+Expr2: PlusMinus
+    | ExprAux2
+    ;
+
+Expr3: ExprAux1
+    | PlusMinus
+    ;
+
+ExprAux1: NOT Expr3
+    | LPAR Expr3 RPAR Expr2
+    | MethodInvocation Expr2
+    | ID ASSIGN Expr3
+    | ParseArgs Expr2
+    | ID Expr2
+    | ID DOTLENGHT Expr2
+    | INTLIT Expr2
+    | REALLIT Expr2
+    | BOOLLIT Expr2;
+
+
+ExprAux2: LSHIFT Expr3
+    | RSHIFT Expr3
+    | STAR Expr3
+    | DIV Expr3
+    | MOD Expr3
+    | AND Expr3
+    | OR Expr3
+    | XOR Expr3
+    | EQ Expr3
+    | GE Expr3
+    | GT Expr3
+    | LE Expr3
+    | LT Expr3
+    | NE Expr3
+    | %empty;
 %%

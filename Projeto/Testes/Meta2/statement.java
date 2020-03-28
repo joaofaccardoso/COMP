@@ -1,6 +1,10 @@
-class Factorial{
-    public static boolean b;
-    public static int factorial(int n){
-        "string";
-    };{}
-    
+class assign_error {
+    public static void main(String[] args) {
+        if(x == 0){
+
+        }
+        else{
+            
+        }
+    }
+}
