@@ -10,54 +10,76 @@
 %nonassoc REDUCE 
 %nonassoc ELSE 
 
-%token <charvalue> ID STRLIT BOOLLIT PRINT PARSEINT DOTLENGHT PUBLIC RETURN STATIC STRING VOID WHILE INT DOUBLE IF ELSE BOOL CLASS EQ ASSIGN COMMA DIV RSHIFT LSHIFT XOR GE GT LE LT MINUS MOD NE NOT OR PLUS SEMICOLON STAR ARROW AND LBRACE RBRACE LPAR RPAR LSQ RSQ RESERVED
-%token <intvalue> INTLIT
-%token <realvalue> REALLIT
+%token <charvalue> ID STRLIT BOOLLIT PRINT PARSEINT DOTLENGHT PUBLIC RETURN STATIC STRING VOID WHILE INT DOUBLE IF ELSE BOOL CLASS EQ ASSIGN COMMA DIV RSHIFT LSHIFT XOR GE GT LE LT MINUS MOD NE NOT OR PLUS SEMICOLON STAR ARROW AND LBRACE RBRACE LPAR RPAR LSQ RSQ RESERVED INTLIT REALLIT
+
+%type <ip> Program
+%type <imfdl> ProgramContent
+%type <imfd> MethodDecl FieldDecl
+%type <imh> MethodHeader
+%type <imb> MethodBody
+%type <ipdl> FormalParamsList
+%type <charvalue> Type
+
 %union{
     char* charvalue;
     int intvalue;
     float realvalue;
+    is_program* ip;
+    is_mf_decl_list* imfdl;
+    is_mf_decl* imfd;
+    is_method_header* imh;
+    is_method_body* imb;
+    is_param_decl_list* ipdl;
 }
 
 %%
 
-Program: CLASS ID LBRACE Program1 RBRACE
+Program: CLASS ID LBRACE Program1 RBRACE                    {$$=my_program=insert_program($2, $4);}
         ;
 
-Program1: MethodDecl Program1
-    | FieldDecl Program1
+Program1: MethodDecl Program1                               {$$=insert_mf_decl_list($2, $1);}
+    | FieldDecl Program1                                    {$$=insert_mf_decl_list($2, $1);}
     | SEMICOLON Program1
-    | %empty ;
+    | %empty                                                {$$=NULL;}
+    ;
 
-MethodDecl: PUBLIC STATIC MethodHeader MethodBody;
+MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {$$=insert_method($3, $4);}
+    ;
 
-FieldDecl:  PUBLIC STATIC Type ID CommaId SEMICOLON
-    | error SEMICOLON;
+FieldDecl:  PUBLIC STATIC Type ID CommaId SEMICOLON         {$$=insert_field($3, $4);}
+    | error SEMICOLON
+    ;
 
 CommaId: COMMA ID CommaId 
-    | %empty;
+    | %empty
+    ;
 
-Type:  BOOL 
-    | INT 
-    | DOUBLE;
+Type:  BOOL                                                 {$$=$1;}
+    | INT                                                   {$$=$1;}
+    | DOUBLE                                                {$$=$1;}
+    ;
 
-MethodHeader:  Type ID LPAR FormalParams RPAR
-    | VOID ID LPAR FormalParams RPAR;
+MethodHeader: Type ID LPAR FormalParams RPAR                {$$=insert_method_header($1, $2, $4);}
+    | VOID ID LPAR FormalParams RPAR                        {$$=insert_method_header($1, $2, $4);}
+    ;
 
-FormalParams:  Type ID CommaTypeId
-    | STRING LSQ RSQ ID
-    | %empty;
+FormalParams: Type ID CommaTypeId                           {$$=insert_method_param_list($3,$1,$2)}
+    | STRING LSQ RSQ ID                                     {$$=insert_method_param_list(NULL,$1,$4)}
+    | %empty                                                {$$=NULL;}
+    ;
 
-CommaTypeId: COMMA Type ID CommaTypeId
-    | %empty;
+CommaTypeId: COMMA Type ID CommaTypeId                      {$$=insert_method_param_list($4,$2,$3)}
+    | %empty                                                {$$=NULL;}
+    ;
 
-MethodBody:  LBRACE MethodBody1 RBRACE;
+MethodBody:  LBRACE MethodBody1 RBRACE                      {$$=insert_method_body($1);}
+    ;
 
-MethodBody1: VarDecl MethodBody1
+MethodBody1: VarDecl MethodBody1                            {$$=insert_var_decl_list($2,$1);}
     | Statement MethodBody1 
     | %empty;
 
-VarDecl:  Type ID CommaId SEMICOLON;
+VarDecl:  Type ID CommaId SEMICOLON                         {$$=insert_var_decl($1,$2);};
 
 Statement: LBRACE StatementLoop RBRACE
     | IF LPAR Expr1 RPAR Statement %prec REDUCE

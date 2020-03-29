@@ -9,16 +9,9 @@ is_vs_decl_list* insert_vs_decl_list(is_vs_decl_list* head, is_vs_decl* ivd) {
     is_vs_decl_list* tmp;
 
     ivsdl->decl = ivd;
-    ivsdl->next = NULL;
 
-    if (head==NULL) {
-        return ivsdl;
-    }
-
-    for(tmp=head; tmp->next; tmp=tmp->next);
-    tmp->next = ivsdl;
-
-    return head;
+    ivd->next = head;
+    return ivd;
 }
 
 //      STATEMENT INSERT FUNCTION TO BE WRITTEN
@@ -44,30 +37,13 @@ is_method_body* insert_method_body(is_vs_decl_list* ivdl) {
     return imb;
 }
 
-is_method_param* insert_method_param(char* type, char* id) {
-    is_method_param* imp = (is_method_param*)malloc(sizeof(is_method_param));
-
-    imp->type = type;
-    imp->id = id;
-
-    return imp;
-}
-
-is_param_decl_list* insert_method_param_list(is_param_decl_list* head, is_method_param* imp) {
+is_param_decl_list* insert_method_param_list(is_param_decl_list* head, char* type, char* id) {
     is_param_decl_list* ipdl = (is_param_decl_list*)malloc(sizeof(is_param_decl_list));
-    is_param_decl_list* tmp;
+    ipdl->type = type;
+    ipdl->id = id;
 
-    ipdl->param = imp;
-    ipdl->next = NULL;
-
-    if (head==NULL) {
-        return ipdl;
-    }
-
-    for(tmp=head; tmp->next; tmp=tmp->next);
-    tmp->next = ipdl;
-
-    return head;
+    ivd->next = head;
+    return ivd;
 }
 
 is_method_header* insert_method_header(char* type, char* id, is_param_decl_list* ipdl) {
@@ -85,16 +61,9 @@ is_mf_decl_list* insert_mf_decl_list(is_mf_decl_list* head, is_mf_decl* imfd) {
     is_mf_decl_list* tmp;
 
     imfdl->method_field_decl = imfd;
-    imfdl->next=NULL;
-
-    if(head==NULL) {
-        return imfdl;
-    }
-
-    for(tmp = head; tmp->next; tmp = tmp->next);
-    tmp->next = imfdl;
-
-    return head;
+    
+    ivd->next = head;
+    return ivd;
 }
 
 is_mf_decl* insert_method(is_method_header* imh, is_method_body* imb) {
