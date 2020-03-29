@@ -10,6 +10,7 @@ whiteSpace              (" "|\t|\f)
 %{
 #include <string.h>
 #include <stdio.h>
+#include "structures.h"
 #include "y.tab.h"
 int line = 1;
 int column = 1;

@@ -6,8 +6,6 @@
     int yylex(void);
     void yyerror (const char *s);
 
-    is_program* my_program;
-
 %}
 %nonassoc REDUCE 
 %nonassoc ELSE 
@@ -23,7 +21,7 @@
 
 %%
 
-Program: CLASS ID LBRACE Program1 RBRACE        {$$=my_program=insert_program($2, $4);}
+Program: CLASS ID LBRACE Program1 RBRACE
         ;
 
 Program1: MethodDecl Program1
