@@ -17,6 +17,14 @@
 %token <charvalue> ID STRLIT BOOLLIT PRINT PARSEINT DOTLENGHT PUBLIC RETURN STATIC STRING VOID WHILE INT DOUBLE IF ELSE BOOL CLASS EQ ASSIGN COMMA DIV RSHIFT LSHIFT XOR GE GT LE LT MINUS MOD NE NOT OR PLUS SEMICOLON STAR ARROW AND LBRACE RBRACE LPAR RPAR LSQ RSQ RESERVED
 %token <intvalue> INTLIT
 %token <realvalue> REALLIT
+
+%type <ip> Program
+%type <imfdl> ProgramContent
+%type <imfd> MethodDecl FieldDecl
+%type <imh> MethodHeader
+%type <imb> MethodBody
+%type <ipdl> FormalParamsList
+
 %union{
     char* charvalue;
     int intvalue;
@@ -29,17 +37,10 @@
     is_param_decl_list* ipdl;
 }
 
-%type <ip> Program
-%type <imfdl> ProgramContent
-%type <imfd> MethodDecl FieldDecl
-%type <imh> MethodHeader
-%type <imb> MethodBody
-%type <ipdl> FormalParamsList
-
 %%
 
 Program: CLASS ID LBRACE ProgramContent RBRACE              {$$=my_program=insert_program($2, $4);}
-        ;
+    ;
 
 ProgramContent: ProgramContent FieldDecl                    {$$=insert_mf_decl_list($1, $2);}
     | ProgramContent MethodDecl                             {$$=insert_mf_decl_list($1, $2);}
@@ -64,7 +65,7 @@ MethodHeader:  BOOL ID LPAR FormalParamsList RPAR            {$$=insert_method_h
     | VOID ID LPAR FormalParamsList RPAR                     {$$=insert_method_header($1, $2, $4);}
     ;
 
-FormalParamsList: FormalParamsList COMMA FormalParams
+FormalParamsList: FormalParamsList COMMA FormalParams        
     | FormalParams
     | %empty
     ;
@@ -73,11 +74,6 @@ FormalParams: BOOL ID
     | INT ID
     | DOUBLE ID
     ;
-
-CommaTypeId: COMMA BOOL ID CommaTypeId
-    | COMMA INT ID CommaTypeId
-    | COMMA DOUBLE ID CommaTypeId
-    | %empty;
 
 MethodBody:  LBRACE MethodBody1 RBRACE;
 
