@@ -2,8 +2,12 @@
     #include <stdlib.h>
     #include <string.h>
     #include <stdio.h>
+    #include "functions.h"
     int yylex(void);
     void yyerror (const char *s);
+
+    is_program* my_program;
+
 %}
 %nonassoc REDUCE 
 %nonassoc ELSE 
@@ -19,7 +23,8 @@
 
 %%
 
-Program: CLASS ID LBRACE Program1 RBRACE;
+Program: CLASS ID LBRACE Program1 RBRACE        {$$=my_program=insert_program($2, $4);}
+        ;
 
 Program1: MethodDecl Program1
     | FieldDecl Program1

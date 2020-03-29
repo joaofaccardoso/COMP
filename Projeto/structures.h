@@ -1,29 +1,49 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
-typedef struct _s10 {
+typedef struct _s14 {
+    is_vs_decl* decl;
+    is_vs_decl_list* next;
+} is_vs_decl_list;
+
+
+typedef enum {d_var, d_statement} d_body;
+
+typedef struct _s13 {
+    d_body wich_decl;
+    union {
+        is_var_decl* var_decl;
+        is_statement* statement_decl;
+    } decl_val;  
+} is_vs_decl;
+
+typedef struct _s12 {
+
+} is_statement;
+
+typedef struct _s11 {
     char* type;
     char* id;
 } is_var_decl;
 
-typedef struct _s9 {
-    is_var_decl var_decl;
+typedef struct _s10 {
+    is_vs_decl_list* var_statement_list;
 } is_method_body;
 
-typedef struct _s8 {
+typedef struct _s9 {
     char* type;
     char* id;
+} is_method_param;
+
+typedef struct _s8 {
+    is_method_param* param;
     struct _s8* next;
 } is_param_decl_list;
-
-typedef struct _s7 {
-    is_param_decl_list* param_list;
-} is_method_params;
 
 typedef struct _s6 {
     char* type;
     char* id;
-    is_method_params* method_params;
+    is_param_decl_list* param_list;
 } is_method_header;
 
 typedef struct _s5 {
