@@ -1,11 +1,7 @@
 class Factorial {
     public static int factorial(int n) {
-        int x, y;
-        if(){
-
-        }
-        else{}
-
+        if (n == 0)
+            return 1;
         return n * factorial(n-1);
     }
 

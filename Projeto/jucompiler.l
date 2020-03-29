@@ -26,6 +26,7 @@ int first = 1;
 int initCol = 1;
 int isString = 0;
 char * printString;
+extern IsProgram* myProgram;
 %}
 %X COMMENT STRINGFLAG
 %%
@@ -116,6 +117,41 @@ void yyerror (const char *s) {
     }
 }
 
+void printPoints(int count) {
+    for (int i=0; i<count; i++) {
+        printf(".");
+    }
+}
+
+void printTree() {
+    int count = 0;
+    if (myProgram!=NULL) {
+        printf("Program\n..Id(%s)\n", myProgram->id);
+        count += 2;
+        IsMethodField* mfIterator = myProgram->methodFieldList;
+        while(mfIterator!=NULL) {
+            if (mfIterator->mf == isMethod) {
+                printMethod(count, mfIterator->mfType.methodDecl);
+            } else {
+                printField(count, mfIterator->mfType.fieldDecl);
+            }
+            mf = mf->next;
+        }
+    }
+}
+
+void printMethod(int count, IsMethodDecl* methodDecl) {
+    printPoints(count);
+    printf("MethodDecl\n");
+    count += 2;
+}
+
+void printField(int count, IsFieldDecl* fieldDecl) {
+    printPoints(count);
+    printf("FieldDecl\n");
+    count += 2;
+}
+
 int main(int argc, char *argv[]){
     int x;
     if(argc > 1){
@@ -136,6 +172,7 @@ int main(int argc, char *argv[]){
         else if(strcmp(argv[1],"-t")==0){
             flag = 3;
             yyparse();
+            printTree();
         }
         else if(strcmp(argv[1],"-e2")==0){
             flag = 0;
