@@ -16,6 +16,12 @@
 
 %type <ip> Program
 %type <imf> Program1 MethodDecl FieldDecl
+%type <imh> MethodHeader
+%type <imb> MethodBody
+%type <ipd> FormalParams CommaTypeId
+%type <charvalue> Type
+%type <ivi> CommaId
+%type <ivds> VarDecl Statement MethodBody1
 
 %union{
     char* charvalue;
@@ -23,6 +29,11 @@
     IsMethodField* imf;
     IsMethodDecl* imd;
     IsFieldDecl* ifd;
+    IsMethodHeader* imh;
+    IsMethodBody* imb;
+    IsParamDecl* ipd;
+    IsVarId* ivi;
+    IsVarDeclStatement* ivds;
 }
 
 %%
@@ -36,77 +47,73 @@ Program1: MethodDecl Program1                               {$$=insertMethodFiel
     | %empty                                                {$$=NULL;}
     ;
 
-MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {$$=NULL;}         
+MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {$$=insertMethod($3, $4);}         
     ;
 
-FieldDecl:  PUBLIC STATIC Type ID CommaId SEMICOLON         {$$=NULL;}
+FieldDecl:  PUBLIC STATIC Type ID CommaId SEMICOLON         {$$=insertField($3,$4,$5);}
     | error SEMICOLON                                       {$$=NULL;}
     ;
 
-CommaId: COMMA ID CommaId 
-    | %empty
+CommaId: COMMA ID CommaId                                   {$$=insertVarId($2,$3);}
+    | %empty                                                {$$=NULL;}
     ;
 
-Type:  BOOL                                                 
-    | INT                                                   
-    | DOUBLE                                                
+Type: BOOL                                                  {$$="Bool";}
+    | INT                                                   {$$="Int";}
+    | DOUBLE                                                {$$="Double";}
     ;
 
-MethodHeader: Type ID LPAR FormalParams RPAR                
-    | VOID ID LPAR FormalParams RPAR                        
+MethodHeader: Type ID LPAR FormalParams RPAR                {$$=insertMethodHeader($1,$2,$4);}            
+    | VOID ID LPAR FormalParams RPAR                        {$$=insertMethodHeader("Void",$2,$4);}
     ;
 
-FormalParams: Type ID CommaTypeId                           
-    | STRING LSQ RSQ ID                                     
-    | %empty                                                
+FormalParams: Type ID CommaTypeId                           {$$=insertParamDecl($1,$2,$3);}                     
+    | STRING LSQ RSQ ID                                     {$$=insertParamDecl("StringArray",$4,NULL);}
+    | %empty                                                {$$=NULL;}
     ;
 
-CommaTypeId: COMMA Type ID CommaTypeId                      
-    | %empty                                                
+CommaTypeId: COMMA Type ID CommaTypeId                      {$$=insertParamDecl($2, $3, $4);}
+    | %empty                                                {$$=NULL;}
     ;
 
-MethodBody:  LBRACE MethodBody1 RBRACE                      
+MethodBody:  LBRACE MethodBody1 RBRACE                      {$$=insertMethodBody($2);}                  
     ;
 
-MethodBody1: VarDecl MethodBody1                            
-    | Statement MethodBody1 
-    | %empty
+MethodBody1: VarDecl MethodBody1                            {$$=insertVarDeclStatement($1,$2);}
+    | Statement MethodBody1                                 {$$=insertVarDeclStatement($1,$2);}
+    | %empty                                                {$$=NULL;}
     ;
-
-VarDecl:  Type ID CommaId SEMICOLON   
+            
+VarDecl:  Type ID CommaId SEMICOLON                         {$$=insertVarDecl($1,$2,$3);}                     
     ;                      
 
-Statement: LBRACE StatementLoop RBRACE
-    | IF LPAR Expr1 RPAR Statement %prec REDUCE
-    | IF LPAR Expr1 RPAR Statement ELSE Statement
-    | WHILE LPAR Expr1 RPAR Statement
-    | RETURN Expr1 SEMICOLON
-    | RETURN SEMICOLON
-    | MethodInvocation SEMICOLON
-    | ID ASSIGN Expr1 SEMICOLON
-    | ParseArgs SEMICOLON
-    | SEMICOLON
-    | PRINT LPAR STRLIT RPAR SEMICOLON
-    | PRINT LPAR Expr1 RPAR SEMICOLON
-    | error SEMICOLON
+Statement: LBRACE StatementLoop RBRACE                      {$$=NULL;}
+    | IF LPAR Expr1 RPAR Statement %prec REDUCE             {$$=NULL;}
+    | IF LPAR Expr1 RPAR Statement ELSE Statement           {$$=NULL;}
+    | WHILE LPAR Expr1 RPAR Statement                       {$$=NULL;}
+    | RETURN Expr1 SEMICOLON                                {$$=NULL;}
+    | RETURN SEMICOLON                                      {$$=NULL;}
+    | MethodInvocation SEMICOLON                            {$$=NULL;}
+    | ID ASSIGN Expr1 SEMICOLON                             {$$=NULL;}
+    | ParseArgs SEMICOLON                                   {$$=NULL;}
+    | SEMICOLON                                             {$$=NULL;}
+    | PRINT LPAR STRLIT RPAR SEMICOLON                      {$$=NULL;}
+    | PRINT LPAR Expr1 RPAR SEMICOLON                       {$$=NULL;}
+    | error SEMICOLON                                       {$$=NULL;}
     ;
     
 StatementLoop: Statement StatementLoop
-    | %empty
-    ;
+    | %empty;
 
 MethodInvocation: ID LPAR Expr1 CommaExpr RPAR
     | ID LPAR RPAR
-    | ID LPAR error RPAR
-    ;
+    | ID LPAR error RPAR;
 
 CommaExpr: COMMA Expr1 CommaExpr
-    | %empty
-    ;
+    | %empty;
 
 ParseArgs: PARSEINT LPAR ID LSQ Expr1 RSQ RPAR
-    | PARSEINT LPAR error RPAR
-    ;
+    | PARSEINT LPAR error RPAR;
 
 PlusMinus: PLUS Expr3
     | MINUS Expr3

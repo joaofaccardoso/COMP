@@ -12,6 +12,14 @@ whiteSpace              (" "|\t|\f)
 #include <stdio.h>
 #include "structures.h"
 #include "y.tab.h"
+
+void printPoints(int count);
+void printTree(); 
+void printMethod(int count, IsMethodDecl* methodDecl);
+void printMethodHeader(int count, IsMethodHeader* methodHeader);
+void printMethodBody(int count, IsMethodBody* methodBody);
+void printFieldDecl(int count, IsFieldDecl* fieldDecl);
+
 int line = 1;
 int column = 1;
 int lError = 0;
@@ -133,9 +141,9 @@ void printTree() {
             if (mfIterator->mf == isMethod) {
                 printMethod(count, mfIterator->mfType.methodDecl);
             } else {
-                printField(count, mfIterator->mfType.fieldDecl);
+                printFieldDecl(count, mfIterator->mfType.fieldDecl);
             }
-            mf = mf->next;
+            mfIterator = mfIterator->next;
         }
     }
 }
@@ -144,12 +152,73 @@ void printMethod(int count, IsMethodDecl* methodDecl) {
     printPoints(count);
     printf("MethodDecl\n");
     count += 2;
+    if(methodDecl->methodHeader!=NULL){
+        printMethodHeader(count, methodDecl->methodHeader);
+        printMethodBody(count, methodDecl->methodBody);
+    }
 }
 
-void printField(int count, IsFieldDecl* fieldDecl) {
+void printFieldDecl(int count, IsFieldDecl* fieldDecl) {
     printPoints(count);
     printf("FieldDecl\n");
     count += 2;
+    
+    printPoints(count);
+    printf("%s\n",fieldDecl->type);
+
+    printPoints(count);
+    printf("Id(%s)\n",fieldDecl->id);    
+}
+
+void printMethodHeader(int count, IsMethodHeader* methodHeader){
+    printPoints(count);
+    printf("MethodHeader\n");
+    count += 2;
+    printPoints(count);
+    printf("%s\n",methodHeader->type);
+    printPoints(count);
+    printf("Id(%s)\n",methodHeader->id);
+    if(methodHeader->paramDeclList != NULL){
+        IsParamDecl* paramDeclIt = methodHeader->paramDeclList;
+        printPoints(count);
+        printf("MethodParams\n");
+        count += 2;
+        while(paramDeclIt != NULL){
+            printPoints(count);
+            printf("ParamDecl\n");
+
+            printPoints(count+2);
+            printf("%s\n",paramDeclIt->type);
+            
+            printPoints(count+2);
+            printf("Id(%s)\n",paramDeclIt->id);
+            
+            paramDeclIt = paramDeclIt->next;
+        }
+    }
+}
+
+void printMethodBody(int count, IsMethodBody* methodBody){
+    printPoints(count);
+    printf("MethodBody\n");
+    count += 2;
+
+    IsVarDeclStatement* ivdsIterator = methodBody->vardDeclSatetmentList;
+    while(ivdsIterator){
+        if(ivdsIterator->vds == varDecl){
+            printPoints(count);
+            printf("VarDecl\n");
+
+            printPoints(count+2);
+            printf("%s\n",ivdsIterator->vdsType.varDecl->type);
+
+            printPoints(count+2);
+            printf("Id(%s)\n",ivdsIterator->vdsType.varDecl->id);
+        }
+        // STATEMENT
+
+        ivdsIterator = ivdsIterator->next;
+    }
 }
 
 int main(int argc, char *argv[]){
