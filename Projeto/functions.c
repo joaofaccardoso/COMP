@@ -144,6 +144,10 @@ IsVarDeclStatement* insertVarDecl(char* type, char* id, IsVarId* idList) {
 IsVarDeclStatement* insertVarDeclStatement(IsVarDeclStatement* varDeclStatement, IsVarDeclStatement* head){
     IsVarDeclStatement* temp;
 
+    if(varDeclStatement == NULL){
+        return head;
+    }
+
     for (temp = varDeclStatement; temp->next; temp = temp->next);
     
     temp->next = head;

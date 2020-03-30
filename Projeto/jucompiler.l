@@ -115,7 +115,7 @@ int yywrap(){
 }
 
 void yyerror (const char *s) {
-    if (flag == 0 || flag == 3) {
+    if (flag == 0) {
         if(isString == 0){
             printf ("Line %d, col %d: %s: %s\n", line, initCol, s, yytext);
         }
