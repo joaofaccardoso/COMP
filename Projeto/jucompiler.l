@@ -178,10 +178,10 @@ void printMethodHeader(int count, IsMethodHeader* methodHeader){
     printf("%s\n",methodHeader->type);
     printPoints(count);
     printf("Id(%s)\n",methodHeader->id);
+    printPoints(count);
+    printf("MethodParams\n");
     if(methodHeader->paramDeclList != NULL){
         IsParamDecl* paramDeclIt = methodHeader->paramDeclList;
-        printPoints(count);
-        printf("MethodParams\n");
         count += 2;
         while(paramDeclIt != NULL){
             printPoints(count);

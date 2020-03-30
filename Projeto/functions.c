@@ -46,8 +46,8 @@ IsMethodField* insertField(char* type, char* id, IsVarId* idsList) {
         tempFree = temp;
         temp = temp->next;
         free(tempFree);
-
     }
+    
     return head;
 }
 
@@ -55,8 +55,11 @@ IsMethodField* insertMethodField(IsMethodField* head, IsMethodField* new) {
     if (new==NULL) {
         return head;
     }
+    IsMethodField* imfIterator = NULL;
     
-    new->next = head;
+    for (imfIterator = new; imfIterator->next; imfIterator=imfIterator->next);
+    
+    imfIterator->next = head;
 
     return new;
 }

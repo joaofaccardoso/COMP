@@ -12,6 +12,17 @@
 %nonassoc REDUCE 
 %nonassoc ELSE 
 
+%right ASSIGN
+%left OR
+%left AND
+%left XOR
+%left EQ NE
+%left GE LT GT LE
+%left LSHIFT RSHIFT
+%left PLUS MINUS
+%left STAR DIV MOD
+%right NOT PRE
+
 %token <charvalue> ID STRLIT BOOLLIT PRINT PARSEINT DOTLENGHT PUBLIC RETURN STATIC STRING VOID WHILE INT DOUBLE IF ELSE BOOL CLASS EQ ASSIGN COMMA DIV RSHIFT LSHIFT XOR GE GT LE LT MINUS MOD NE NOT OR PLUS SEMICOLON STAR ARROW AND LBRACE RBRACE LPAR RPAR LSQ RSQ RESERVED INTLIT REALLIT
 
 %type <ip> Program
@@ -88,74 +99,72 @@ VarDecl:  Type ID CommaId SEMICOLON                         {$$=insertVarDecl($1
     ;                      
 
 Statement: LBRACE StatementLoop RBRACE                      {$$=NULL;}
-    | IF LPAR Expr1 RPAR Statement %prec REDUCE             {$$=NULL;}
-    | IF LPAR Expr1 RPAR Statement ELSE Statement           {$$=NULL;}
-    | WHILE LPAR Expr1 RPAR Statement                       {$$=NULL;}
-    | RETURN Expr1 SEMICOLON                                {$$=NULL;}
+    | IF LPAR Expr RPAR Statement %prec REDUCE              {$$=NULL;}
+    | IF LPAR Expr RPAR Statement ELSE Statement            {$$=NULL;}
+    | WHILE LPAR Expr RPAR Statement                        {$$=NULL;}
+    | RETURN Expr SEMICOLON                                 {$$=NULL;}
     | RETURN SEMICOLON                                      {$$=NULL;}
     | MethodInvocation SEMICOLON                            {$$=NULL;}
-    | ID ASSIGN Expr1 SEMICOLON                             {$$=NULL;}
+    | Assignment SEMICOLON                                  {$$=NULL;}
     | ParseArgs SEMICOLON                                   {$$=NULL;}
     | SEMICOLON                                             {$$=NULL;}
     | PRINT LPAR STRLIT RPAR SEMICOLON                      {$$=NULL;}
-    | PRINT LPAR Expr1 RPAR SEMICOLON                       {$$=NULL;}
+    | PRINT LPAR Expr RPAR SEMICOLON                        {$$=NULL;}
     | error SEMICOLON                                       {$$=NULL;}
     ;
     
 StatementLoop: Statement StatementLoop
     | %empty;
 
-MethodInvocation: ID LPAR Expr1 CommaExpr RPAR
+MethodInvocation: ID LPAR Expr CommaExpr RPAR
     | ID LPAR RPAR
     | ID LPAR error RPAR;
 
-CommaExpr: COMMA Expr1 CommaExpr
+Assignment: ID ASSIGN Expr;
+
+CommaExpr: COMMA Expr CommaExpr
     | %empty;
 
-ParseArgs: PARSEINT LPAR ID LSQ Expr1 RSQ RPAR
+ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR
     | PARSEINT LPAR error RPAR;
 
-PlusMinus: PLUS Expr3
-    | MINUS Expr3
+Expr: Assignment
+    | Expr1;
+
+Expr1: Expr1 PLUS Expr1
+    | Expr1 MINUS Expr1
+    | Expr1 STAR Expr1
+    | Expr1 DIV Expr1
+    | Expr1 MOD Expr1
+    | Expr1 AND Expr1
+    | Expr1 OR Expr1
+    | Expr1 XOR Expr1
+    | Expr1 LSHIFT Expr1
+    | Expr1 RSHIFT Expr1
+    | Expr1 EQ Expr1
+    | Expr1 GE Expr1
+    | Expr1 GT Expr1
+    | Expr1 LE Expr1
+    | Expr1 LT Expr1
+    | Expr1 NE Expr1
+    | Expr2
     ;
 
-Expr1: PlusMinus
-    | ExprAux1
+Expr2: NOT Expr2 %prec PRE
+    | PLUS Expr2 %prec PRE
+    | MINUS Expr2 %prec PRE
+    | Expr3
     ;
 
-Expr2: PlusMinus
-    | ExprAux2
+Expr3: MethodInvocation 
+    | ParseArgs
+    | LPAR Expr RPAR
+    | LPAR error RPAR
+    | ID
+    | ID DOTLENGHT
+    | INTLIT 
+    | REALLIT 
+    | BOOLLIT
     ;
 
-Expr3: ExprAux1
-    | PlusMinus
-    ;
-
-ExprAux1: NOT Expr3
-    | LPAR Expr3 RPAR Expr2
-    | MethodInvocation Expr2
-    | ID ASSIGN Expr3
-    | ParseArgs Expr2
-    | ID Expr2
-    | ID DOTLENGHT Expr2
-    | INTLIT Expr2
-    | REALLIT Expr2
-    | BOOLLIT Expr2;
-
-
-ExprAux2: LSHIFT Expr3
-    | RSHIFT Expr3
-    | STAR Expr3
-    | DIV Expr3
-    | MOD Expr3
-    | AND Expr3
-    | OR Expr3
-    | XOR Expr3
-    | EQ Expr3
-    | GE Expr3
-    | GT Expr3
-    | LE Expr3
-    | LT Expr3
-    | NE Expr3
-    | %empty;
 %%
