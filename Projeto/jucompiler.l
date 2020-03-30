@@ -19,6 +19,11 @@ void printMethod(int count, IsMethodDecl* methodDecl);
 void printMethodHeader(int count, IsMethodHeader* methodHeader);
 void printMethodBody(int count, IsMethodBody* methodBody);
 void printFieldDecl(int count, IsFieldDecl* fieldDecl);
+void printStatement(IsStatement* statement, int count);
+void printIfStatement(IsIfStatement* ifStatement, int count);
+void printWhileStatement(IsWhileStatement* whileStatement, int count);
+void printReturnStatement(IsReturnStatement* returnStatement, int count);
+void printCallStatement(IsCallStatement* callStatement, int count);
 
 int line = 1;
 int column = 1;
@@ -215,9 +220,117 @@ void printMethodBody(int count, IsMethodBody* methodBody){
             printPoints(count+2);
             printf("Id(%s)\n",ivdsIterator->vdsType.varDecl->id);
         }
-        // STATEMENT
+        else{
+            printStatement(ivdsIterator->vdsType.statement, count);
+        }
 
         ivdsIterator = ivdsIterator->next;
+    }
+}
+
+void printStatement(IsStatement* statement, int count){
+    if(statement->sm == sIf){
+        printIfStatement(statement->smType.ifStatement, count);
+    }
+    else if(statement->sm == sWhile){
+        printWhileStatement(statement->smType.whileStatement, count);
+    }
+    else if(statement->sm == sReturn){
+        printReturnStatement(statement->smType.returnStatement, count);
+    }
+    else if(statement->sm == sCall){
+        printCallStatement(statement->smType.callStatement, count);
+    }
+}
+
+void printIfStatement(IsIfStatement* ifStatement, int count){
+    int newCount;
+    
+    printPoints(count);
+    printf("If\n");
+    count += 2;
+    newCount = count;
+
+    printPoints(count);
+    printf("Expr\n");
+    //Expr
+
+    IsVarDeclStatement* ivdsIterator;
+    
+    ivdsIterator = ifStatement->thenStatement;
+    if(ivdsIterator==NULL || ivdsIterator->next){
+        printPoints(count);
+        printf("Block\n");
+    }
+        newCount = count+2;
+    while(ivdsIterator){
+        printStatement(ivdsIterator->vdsType.statement, newCount);
+        ivdsIterator = ivdsIterator->next;
+    }
+
+    if(ifStatement->hasElse){
+        ivdsIterator = ifStatement->elseStatement;
+        if(ivdsIterator==NULL || ivdsIterator->next){
+            printPoints(count);
+            printf("Block\n");
+            newCount = count+2;
+        }
+        while(ivdsIterator){
+            printStatement(ivdsIterator->vdsType.statement, newCount);
+            ivdsIterator = ivdsIterator->next;
+        }
+    }
+}
+
+void printWhileStatement(IsWhileStatement* whileStatement, int count){
+    int newCount;
+    
+    printPoints(count);
+    printf("While\n");
+    count += 2;
+    newCount = count;
+
+    printPoints(count);
+    printf("Expr\n");
+    //Expr
+
+    IsVarDeclStatement* ivdsIterator;
+    
+    ivdsIterator = whileStatement->whileStatement;
+    if(ivdsIterator==NULL || ivdsIterator->next){
+        printPoints(count);
+        printf("Block\n");
+        newCount = count+2;
+    }
+    while(ivdsIterator){
+        printStatement(ivdsIterator->vdsType.statement, newCount);
+        ivdsIterator = ivdsIterator->next;
+    }
+}
+
+void printReturnStatement(IsReturnStatement* returnStatement, int count){
+    printPoints(count);
+    printf("Return\n");
+    count+=2;
+
+    if(returnStatement->returnExpr){
+        printPoints(count);
+        printf("Expr\n");
+        //print Expr quando for feito
+    }
+}
+
+void printCallStatement(IsCallStatement* callStatement, int count){
+    printPoints(count);
+    printf("Call\n");
+    count+=2;
+
+    printPoints(count);
+    printf("Id(%s)\n",callStatement->id);
+
+    if(callStatement->callExpr){
+        printPoints(count);
+        printf("Expr\n");
     }
 }
 

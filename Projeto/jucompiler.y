@@ -33,6 +33,8 @@
 %type <charvalue> Type
 %type <ivi> CommaId
 %type <ivds> VarDecl Statement MethodBody1
+%type <ie> Expr CommaExpr
+%type <ics> MethodInvocation
 
 %union{
     char* charvalue;
@@ -45,6 +47,8 @@
     IsParamDecl* ipd;
     IsVarId* ivi;
     IsVarDeclStatement* ivds;
+    IsExpr* ie;
+    IsCallStatement* ics;
 }
 
 %%
@@ -99,12 +103,12 @@ VarDecl:  Type ID CommaId SEMICOLON                         {$$=insertVarDecl($1
     ;                      
 
 Statement: LBRACE StatementLoop RBRACE                      {$$=NULL;}
-    | IF LPAR Expr RPAR Statement %prec REDUCE              {$$=NULL;}
-    | IF LPAR Expr RPAR Statement ELSE Statement            {$$=NULL;}
-    | WHILE LPAR Expr RPAR Statement                        {$$=NULL;}
-    | RETURN Expr SEMICOLON                                 {$$=NULL;}
-    | RETURN SEMICOLON                                      {$$=NULL;}
-    | MethodInvocation SEMICOLON                            {$$=NULL;}
+    | IF LPAR Expr RPAR Statement %prec REDUCE              {$$=insertIfStatement($3,$5,NULL,0);}
+    | IF LPAR Expr RPAR Statement ELSE Statement            {$$=insertIfStatement($3,$5,$7,1);}
+    | WHILE LPAR Expr RPAR Statement                        {$$=insertWhileStatement($3, $5);}
+    | RETURN Expr SEMICOLON                                 {$$=insertReturnStatement($2);}
+    | RETURN SEMICOLON                                      {$$=insertReturnStatement(NULL);}
+    | MethodInvocation SEMICOLON                            {$$=insertCallStatement($1);}
     | Assignment SEMICOLON                                  {$$=NULL;}
     | ParseArgs SEMICOLON                                   {$$=NULL;}
     | SEMICOLON                                             {$$=NULL;}
@@ -116,20 +120,23 @@ Statement: LBRACE StatementLoop RBRACE                      {$$=NULL;}
 StatementLoop: Statement StatementLoop
     | %empty;
 
-MethodInvocation: ID LPAR Expr CommaExpr RPAR
-    | ID LPAR RPAR
-    | ID LPAR error RPAR;
+MethodInvocation: ID LPAR Expr CommaExpr RPAR               {$$=createCallStatement($1, $3, $4);}
+    | ID LPAR RPAR                                          {$$=createCallStatement($1, NULL, NULL);}
+    | ID LPAR error RPAR                                    {$$=NULL;}
+    ;
 
 Assignment: ID ASSIGN Expr;
 
-CommaExpr: COMMA Expr CommaExpr
-    | %empty;
+CommaExpr: COMMA Expr CommaExpr                             {$$=insertCallExpr($2, $3);}
+    | %empty                                                {$$=NULL;}
+    ;
 
 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR
     | PARSEINT LPAR error RPAR;
 
-Expr: Assignment
-    | Expr1;
+Expr: Assignment                                            {$$=NULL;}
+    | Expr1                                                 {$$=NULL;}
+    ;
 
 Expr1: Expr1 PLUS Expr1
     | Expr1 MINUS Expr1

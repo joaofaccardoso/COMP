@@ -165,3 +165,91 @@ IsMethodBody* insertMethodBody(IsVarDeclStatement* head) {
 
     return imb;
 }
+
+IsVarDeclStatement* insertIfStatement(IsExpr* ifExpr, IsVarDeclStatement* thenStatement, IsVarDeclStatement* elseStatement, int hasElse){
+    IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
+    IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
+    IsIfStatement* iifs = (IsIfStatement*)malloc(sizeof(IsIfStatement));
+
+    iifs->ifExpr = ifExpr;
+    iifs->thenStatement = thenStatement;
+    iifs->elseStatement = elseStatement;
+    iifs->hasElse = hasElse;
+    
+    is->sm=sIf;
+    is->smType.ifStatement = iifs;
+
+    ivds->vds = statement;
+    ivds->vdsType.statement = is;
+
+    return ivds;
+}
+
+IsVarDeclStatement* insertWhileStatement(IsExpr* whileExpr, IsVarDeclStatement* whileStatement){
+    IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
+    IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
+    IsWhileStatement* iws = (IsWhileStatement*)malloc(sizeof(IsWhileStatement));
+
+    iws->whileExpr = whileExpr;
+    iws->whileStatement = whileStatement;
+    
+    is->sm=sWhile;
+    is->smType.whileStatement = iws;
+
+    ivds->vds = statement;
+    ivds->vdsType.statement = is;
+
+    return ivds;
+}
+
+IsVarDeclStatement* insertReturnStatement(IsExpr* returnExpr) {
+    IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
+    IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
+    IsReturnStatement* irs = (IsReturnStatement*)malloc(sizeof(IsReturnStatement));
+
+    irs->returnExpr = returnExpr;
+
+    is->sm = sReturn;
+    is->smType.returnStatement = irs;
+
+    ivds->vds = statement;
+    ivds->vdsType.statement = is;
+
+    return ivds;
+}
+
+IsVarDeclStatement* insertCallStatement(IsCallStatement* ics) {
+    IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
+    IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
+
+    is->sm = sCall;
+    is->smType.callStatement = ics;
+
+    ivds->vds = statement;
+    ivds->vdsType.statement = is;
+    return ivds;
+}
+
+IsExpr* insertCallExpr(IsExpr* newExpr, IsExpr* head) {
+    if(newExpr==NULL){
+        return head;
+    }
+    newExpr->next = head;
+
+    return newExpr;
+}
+
+IsCallStatement* createCallStatement(char* id, IsExpr* newExpr, IsExpr* head) {
+    if(newExpr != NULL){
+        newExpr->next = head;
+        head = newExpr;
+    }
+
+    
+    IsCallStatement* ics = (IsCallStatement*)malloc(sizeof(IsCallStatement));
+
+    ics->id = id;
+    ics->callExpr = head;
+
+    return ics;
+}
