@@ -25,6 +25,7 @@ void printWhileStatement(IsWhileStatement* whileStatement, int count);
 void printReturnStatement(IsReturnStatement* returnStatement, int count);
 void printCallStatement(IsCallStatement* callStatement, int count);
 void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count);
+void printPrintStatement(IsPrintStatement* ips, int count);
 
 int line = 1;
 int column = 1;
@@ -245,6 +246,9 @@ void printStatement(IsStatement* statement, int count){
     else if(statement->sm == sParseArgs) {
         printParseArgsStatement(statement->smType.parseArgsStatement, count);
     }
+    else if(statement->sm == sPrint) {
+        printPrintStatement(statement->smType.printStatement, count);
+    }
 }
 
 void printIfStatement(IsIfStatement* ifStatement, int count){
@@ -347,6 +351,21 @@ void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count
     printf("Id(%s)\n", parseArgsStatement->id);
 
     if(parseArgsStatement->parseArgsExpr) {
+        printPoints(count);
+        printf("Expr\n");
+    }
+}
+
+void printPrintStatement(IsPrintStatement* ips, int count) {
+    printPoints(count);
+    printf("Print\n");
+    count+=2;
+
+    if (ips->p == stringLiteral) {
+        printPoints(count);
+        printf("StrLit(%s)\n", ips->pType.printString);
+    }
+    else {
         printPoints(count);
         printf("Expr\n");
     }
