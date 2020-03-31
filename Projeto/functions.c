@@ -166,14 +166,45 @@ IsMethodBody* insertMethodBody(IsVarDeclStatement* head) {
     return imb;
 }
 
+IsVarDeclStatement* insertBlockStatement(IsVarDeclStatement* statementList) {
+    if (statementList == NULL) {
+        return NULL;
+    }
+    else if (statementList->next) {
+        IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
+        IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
+        
+        is->sm = sBlock;
+        is->smType.blockStatement = statementList;
+
+        ivds->vds = statement;
+        ivds->vdsType.statement = is;
+
+        return ivds;
+    }
+    else {
+        return statementList;
+    }
+}
+
+IsVarDeclStatement* createBlockStatement(IsVarDeclStatement* newStatement, IsVarDeclStatement* head) {
+    if (newStatement == NULL) {
+        return head;
+    }
+    
+    newStatement->next = head;
+
+    return newStatement;
+}
+
 IsVarDeclStatement* insertIfStatement(IsExpr* ifExpr, IsVarDeclStatement* thenStatement, IsVarDeclStatement* elseStatement, int hasElse){
     IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
     IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
     IsIfStatement* iifs = (IsIfStatement*)malloc(sizeof(IsIfStatement));
 
     iifs->ifExpr = ifExpr;
-    iifs->thenStatement = thenStatement;
-    iifs->elseStatement = elseStatement;
+    iifs->thenBlock = thenStatement;
+    iifs->elseBlock = elseStatement;
     iifs->hasElse = hasElse;
     
     is->sm=sIf;
@@ -235,7 +266,6 @@ IsExpr* insertCallExpr(IsExpr* newExpr, IsExpr* head) {
         return head;
     }
     newExpr->next = head;
-
     return newExpr;
 }
 
@@ -244,7 +274,6 @@ IsCallStatement* createCallStatement(char* id, IsExpr* newExpr, IsExpr* head) {
         newExpr->next = head;
         head = newExpr;
     }
-
     
     IsCallStatement* ics = (IsCallStatement*)malloc(sizeof(IsCallStatement));
 
@@ -254,9 +283,33 @@ IsCallStatement* createCallStatement(char* id, IsExpr* newExpr, IsExpr* head) {
     return ics;
 }
 
-/*      FAZER ASSIGNMENT        */
+IsVarDeclStatement* insertAssignStatement(IsAssign* assignStatement) {
+    IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
+    IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
+
+    is->sm = sAssign;
+    is->smType.assignStatement = assignStatement;
+
+    ivds->vds = statement;
+    ivds->vdsType.statement = is;
+
+    return ivds;
+}
+
+IsAssign* createAssign(char* id, IsExpr* assignExpr) {
+    IsAssign* ia = (IsAssign*)malloc(sizeof(IsAssign));
+
+    ia->id = id;
+    ia->assignExpr = assignExpr;
+
+    return ia;
+}
 
 IsVarDeclStatement* insertParseArgsStatement(IsParseArgsStatement* ipas) {
+    if (ipas==NULL) {
+        return NULL;
+    }
+    
     IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
     IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
 
@@ -299,3 +352,70 @@ IsVarDeclStatement* insertPrintStatement(dPrint p, char* printString, IsExpr* pr
 
     return ivds;
 }
+
+IsExpr* insertAssignExpr(IsAssign* assignExpr) {
+    IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
+
+    ie->e = eAssign;
+    ie->eType.exprAssign = assignExpr;
+
+    return ie;
+}
+
+IsExpr* insertOp(IsExpr* opExprLeft, char* op, IsExpr* opExprRight) {
+    IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
+    IsOp* io = (IsOp*)malloc(sizeof(IsOp));
+
+    io->opExprLeft = opExprLeft;
+    io->op = op;
+    io->opExprRight = opExprRight;
+    
+    ie->e = eOp;
+    ie->eType.exprOp = io;
+
+    return ie;
+}
+
+IsExpr* insertUnit(char* op, IsExpr* unitExpr) {
+    IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
+    IsUnit* iu = (IsUnit*)malloc(sizeof(IsUnit));
+
+    iu->op = op;
+    iu->unitExpr = unitExpr;
+
+    ie->e = eUnit;
+    ie->eType.exprUnit = iu;
+
+    return ie;
+}
+
+IsExpr* insertExprCall(IsCallStatement* ics) {
+    IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
+
+    ie->e = eCall;
+    ie->eType.exprCall = ics;
+
+    return ie;
+}
+
+IsExpr* insertExprParseArgs(IsParseArgsStatement* ipas) {
+    IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
+
+    ie->e = eParseArgs;
+    ie->eType.expParseArgs = ipas;
+
+    return ie;
+}
+
+IsExpr* insertTerminal(char* type, char* value){
+    IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
+    IsTerminal* it = (IsTerminal*)malloc(sizeof(IsTerminal));
+    
+    it->type = type;
+    it->value = value;
+
+    ie->e = eTerminal;
+    ie->eType.exprTerminal = it;
+
+    return ie;
+}   

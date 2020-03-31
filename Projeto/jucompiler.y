@@ -32,10 +32,11 @@
 %type <ipd> FormalParams CommaTypeId
 %type <charvalue> Type
 %type <ivi> CommaId
-%type <ivds> VarDecl Statement MethodBody1
-%type <ie> Expr CommaExpr
+%type <ivds> VarDecl Statement MethodBody1 StatementLoop
+%type <ie> Expr CommaExpr Expr1 Expr2
 %type <ics> MethodInvocation
 %type <ipas> ParseArgs
+%type <ia> Assignment
 
 %union{
     char* charvalue;
@@ -51,6 +52,7 @@
     IsExpr* ie;
     IsCallStatement* ics;
     IsParseArgsStatement* ipas;
+    IsAssign* ia;
 }
 
 %%
@@ -104,14 +106,14 @@ MethodBody1: VarDecl MethodBody1                            {$$=insertVarDeclSta
 VarDecl:  Type ID CommaId SEMICOLON                         {$$=insertVarDecl($1,$2,$3);}                     
     ;                      
 
-Statement: LBRACE StatementLoop RBRACE                      {$$=NULL;}
+Statement: LBRACE StatementLoop RBRACE                      {$$=insertBlockStatement($2);}
     | IF LPAR Expr RPAR Statement %prec REDUCE              {$$=insertIfStatement($3,$5,NULL,0);}
     | IF LPAR Expr RPAR Statement ELSE Statement            {$$=insertIfStatement($3,$5,$7,1);}
     | WHILE LPAR Expr RPAR Statement                        {$$=insertWhileStatement($3, $5);}
     | RETURN Expr SEMICOLON                                 {$$=insertReturnStatement($2);}
     | RETURN SEMICOLON                                      {$$=insertReturnStatement(NULL);}
     | MethodInvocation SEMICOLON                            {$$=insertCallStatement($1);}
-    | Assignment SEMICOLON                                  {$$=NULL;}
+    | Assignment SEMICOLON                                  {$$=insertAssignStatement($1);}
     | ParseArgs SEMICOLON                                   {$$=insertParseArgsStatement($1);}
     | SEMICOLON                                             {$$=NULL;}
     | PRINT LPAR STRLIT RPAR SEMICOLON                      {$$=insertPrintStatement(stringLiteral, $3, NULL);}
@@ -119,15 +121,17 @@ Statement: LBRACE StatementLoop RBRACE                      {$$=NULL;}
     | error SEMICOLON                                       {$$=NULL;}
     ;
     
-StatementLoop: Statement StatementLoop
-    | %empty;
+StatementLoop: Statement StatementLoop                      {$$=createBlockStatement($1, $2);}
+    | %empty                                                {$$=NULL;}
+    ;
 
 MethodInvocation: ID LPAR Expr CommaExpr RPAR               {$$=createCallStatement($1, $3, $4);}
     | ID LPAR RPAR                                          {$$=createCallStatement($1, NULL, NULL);}
     | ID LPAR error RPAR                                    {$$=NULL;}
     ;
 
-Assignment: ID ASSIGN Expr;
+Assignment: ID ASSIGN Expr                                  {$$=createAssign($1, $3);}
+    ;
 
 CommaExpr: COMMA Expr CommaExpr                             {$$=insertCallExpr($2, $3);}
     | %empty                                                {$$=NULL;}
@@ -137,44 +141,41 @@ ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR               {$$=createParseArgsS
     | PARSEINT LPAR error RPAR                              {$$=NULL;}
     ;
 
-Expr: Assignment                                            {$$=NULL;}
-    | Expr1                                                 {$$=NULL;}
+Expr: Assignment                                            {$$=insertAssignExpr($1);}
+    | Expr1                                                 {$$=$1;}
     ;
 
-Expr1: Expr1 PLUS Expr1
-    | Expr1 MINUS Expr1
-    | Expr1 STAR Expr1
-    | Expr1 DIV Expr1
-    | Expr1 MOD Expr1
-    | Expr1 AND Expr1
-    | Expr1 OR Expr1
-    | Expr1 XOR Expr1
-    | Expr1 LSHIFT Expr1
-    | Expr1 RSHIFT Expr1
-    | Expr1 EQ Expr1
-    | Expr1 GE Expr1
-    | Expr1 GT Expr1
-    | Expr1 LE Expr1
-    | Expr1 LT Expr1
-    | Expr1 NE Expr1
-    | Expr2
+Expr1: Expr1 PLUS Expr1                                     {$$=insertOp($1,"Add",$3);} 
+    | Expr1 MINUS Expr1                                     {$$=insertOp($1,"Sub",$3);}
+    | Expr1 STAR Expr1                                      {$$=insertOp($1,"Mul",$3);}
+    | Expr1 DIV Expr1                                       {$$=insertOp($1,"Div",$3);}
+    | Expr1 MOD Expr1                                       {$$=insertOp($1,"Mod",$3);}
+    | Expr1 AND Expr1                                       {$$=insertOp($1,"And",$3);}
+    | Expr1 OR Expr1                                        {$$=insertOp($1,"Or",$3);}
+    | Expr1 XOR Expr1                                       {$$=insertOp($1,"Xor",$3);}
+    | Expr1 LSHIFT Expr1                                    {$$=insertOp($1,"Lshift",$3);}
+    | Expr1 RSHIFT Expr1                                    {$$=insertOp($1,"Rshift",$3);}
+    | Expr1 EQ Expr1                                        {$$=insertOp($1,"Eq",$3);}
+    | Expr1 GE Expr1                                        {$$=insertOp($1,"Ge",$3);}
+    | Expr1 GT Expr1                                        {$$=insertOp($1,"Gt",$3);}
+    | Expr1 LE Expr1                                        {$$=insertOp($1,"Le",$3);}
+    | Expr1 LT Expr1                                        {$$=insertOp($1,"Lt",$3);}
+    | Expr1 NE Expr1                                        {$$=insertOp($1,"Ne",$3);}
+    | Expr2                                                 {$$=$1;}
     ;
 
-Expr2: NOT Expr2 %prec PRE
-    | PLUS Expr2 %prec PRE
-    | MINUS Expr2 %prec PRE
-    | Expr3
-    ;
-
-Expr3: MethodInvocation 
-    | ParseArgs
-    | LPAR Expr RPAR
-    | LPAR error RPAR
-    | ID
-    | ID DOTLENGHT
-    | INTLIT 
-    | REALLIT 
-    | BOOLLIT
+Expr2: NOT Expr2 %prec PRE                                  {$$=insertUnit("Not",$2);}
+    | PLUS Expr2 %prec PRE                                  {$$=insertUnit("Plus",$2);}
+    | MINUS Expr2 %prec PRE                                 {$$=insertUnit("Minus",$2);}
+    | MethodInvocation                                      {$$=insertExprCall($1);}
+    | ParseArgs                                             {$$=insertExprParseArgs($1);}
+    | LPAR Expr RPAR                                        {$$=$2;}
+    | LPAR error RPAR                                       {$$=NULL;}
+    | ID                                                    {$$=insertTerminal("Id",$1);}
+    | ID DOTLENGHT                                          {$$=insertTerminal("Length",$1);}
+    | INTLIT                                                {$$=insertTerminal("DecLit",$1);}
+    | REALLIT                                               {$$=insertTerminal("RealLit",$1);}
+    | BOOLLIT                                               {$$=insertTerminal("BoolLit",$1);}
     ;
 
 %%

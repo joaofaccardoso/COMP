@@ -26,6 +26,12 @@ void printReturnStatement(IsReturnStatement* returnStatement, int count);
 void printCallStatement(IsCallStatement* callStatement, int count);
 void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count);
 void printPrintStatement(IsPrintStatement* ips, int count);
+void printAssign(IsAssign* assignStatement, int count);
+void printBlockStatement(IsVarDeclStatement* blockHead, int count);
+void printExpression(IsExpr* expression, int count);
+void printOp(IsOp* operation, int count);
+void printTerminal(IsTerminal* terminal, int count);
+void printUnit(IsUnit* unit, int count);
 
 int line = 1;
 int column = 1;
@@ -231,7 +237,10 @@ void printMethodBody(int count, IsMethodBody* methodBody){
 }
 
 void printStatement(IsStatement* statement, int count){
-    if(statement->sm == sIf){
+    if (statement->sm == sBlock) {
+        printBlockStatement(statement->smType.blockStatement, count);
+    }
+    else if(statement->sm == sIf){
         printIfStatement(statement->smType.ifStatement, count);
     }
     else if(statement->sm == sWhile){
@@ -249,70 +258,76 @@ void printStatement(IsStatement* statement, int count){
     else if(statement->sm == sPrint) {
         printPrintStatement(statement->smType.printStatement, count);
     }
+    else if(statement->sm == sAssign) {
+        printAssign(statement->smType.assignStatement, count);
+    }
+}
+
+void printBlockStatement(IsVarDeclStatement* blockHead, int count) {
+    IsVarDeclStatement* blockIterator = blockHead;
+    
+    printPoints(count);
+    printf("Block\n");
+    count+=2;
+    
+    while(blockIterator) {
+        printStatement(blockIterator->vdsType.statement, count);
+        blockIterator = blockIterator->next;
+    }
 }
 
 void printIfStatement(IsIfStatement* ifStatement, int count){
-    int newCount;
-    
     printPoints(count);
     printf("If\n");
     count += 2;
-    newCount = count;
 
-    printPoints(count);
-    printf("Expr\n");
-    //Expr
+    printExpression(ifStatement->ifExpr,count);
 
     IsVarDeclStatement* ivdsIterator;
     
-    ivdsIterator = ifStatement->thenStatement;
-    if(ivdsIterator==NULL || ivdsIterator->next){
+    ivdsIterator = ifStatement->thenBlock;
+    if(ivdsIterator==NULL){
         printPoints(count);
         printf("Block\n");
     }
-        newCount = count+2;
-    while(ivdsIterator){
-        printStatement(ivdsIterator->vdsType.statement, newCount);
-        ivdsIterator = ivdsIterator->next;
+    else {
+        printStatement(ivdsIterator->vdsType.statement, count);
     }
 
     if(ifStatement->hasElse){
-        ivdsIterator = ifStatement->elseStatement;
-        if(ivdsIterator==NULL || ivdsIterator->next){
+        ivdsIterator = ifStatement->elseBlock;
+        if(ivdsIterator==NULL){
             printPoints(count);
             printf("Block\n");
-            newCount = count+2;
         }
-        while(ivdsIterator){
-            printStatement(ivdsIterator->vdsType.statement, newCount);
-            ivdsIterator = ivdsIterator->next;
+        else {
+            printStatement(ivdsIterator->vdsType.statement, count);
         }
     }
+    else {
+        printPoints(count);
+        printf("Block\n");
+    }
+
 }
 
 void printWhileStatement(IsWhileStatement* whileStatement, int count){
-    int newCount;
-    
     printPoints(count);
     printf("While\n");
     count += 2;
-    newCount = count;
 
-    printPoints(count);
-    printf("Expr\n");
-    //Expr
+    printExpression(whileStatement->whileExpr,count);
+
 
     IsVarDeclStatement* ivdsIterator;
     
     ivdsIterator = whileStatement->whileStatement;
-    if(ivdsIterator==NULL || ivdsIterator->next){
+    if(ivdsIterator==NULL){
         printPoints(count);
         printf("Block\n");
-        newCount = count+2;
     }
-    while(ivdsIterator){
-        printStatement(ivdsIterator->vdsType.statement, newCount);
-        ivdsIterator = ivdsIterator->next;
+    else {
+        printStatement(ivdsIterator->vdsType.statement, count);
     }
 }
 
@@ -322,9 +337,7 @@ void printReturnStatement(IsReturnStatement* returnStatement, int count){
     count+=2;
 
     if(returnStatement->returnExpr){
-        printPoints(count);
-        printf("Expr\n");
-        //print Expr quando for feito
+        printExpression(returnStatement->returnExpr, count);
     }
 }
 
@@ -336,9 +349,10 @@ void printCallStatement(IsCallStatement* callStatement, int count){
     printPoints(count);
     printf("Id(%s)\n",callStatement->id);
 
-    if(callStatement->callExpr){
-        printPoints(count);
-        printf("Expr\n");
+    IsExpr* iterator = callStatement->callExpr;
+    while(iterator){
+        printExpression(iterator, count);
+        iterator = iterator->next;
     }
 }
 
@@ -350,9 +364,10 @@ void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count
     printPoints(count);
     printf("Id(%s)\n", parseArgsStatement->id);
 
-    if(parseArgsStatement->parseArgsExpr) {
-        printPoints(count);
-        printf("Expr\n");
+    IsExpr* iterator = parseArgsStatement->parseArgsExpr;
+    if(iterator) {
+        printExpression(iterator, count);
+        iterator = iterator->next;
     }
 }
 
@@ -366,9 +381,63 @@ void printPrintStatement(IsPrintStatement* ips, int count) {
         printf("StrLit(%s)\n", ips->pType.printString);
     }
     else {
-        printPoints(count);
-        printf("Expr\n");
+        printExpression(ips->pType.printExpr, count);
     }
+}
+
+void printAssign(IsAssign* assignStatement, int count) {
+    printPoints(count);
+    printf("Assign\n");
+    count+=2;
+
+    printPoints(count);
+    printf("Id(%s)\n", assignStatement->id);
+
+    printExpression(assignStatement->assignExpr, count);
+}
+
+void printExpression(IsExpr* expression, int count) {
+    if (expression->e == eAssign) {
+        printAssign(expression->eType.exprAssign, count);
+    }
+    else if (expression->e == eOp) {
+        printOp(expression->eType.exprOp,count);
+    }
+    else if (expression->e == eCall) {
+        printCallStatement(expression->eType.exprCall,count);
+    }
+    else if (expression->e == eParseArgs) {
+        printParseArgsStatement(expression->eType.expParseArgs,count);
+    }
+    else if (expression->e == eTerminal) {
+        printTerminal(expression->eType.exprTerminal,count);
+    }
+    else if (expression->e   == eUnit) {
+        printUnit(expression->eType.exprUnit,count);
+    }
+}
+
+void printOp(IsOp* operation, int count) {
+    printPoints(count);
+    printf("%s\n",operation->op);
+    count+=2;
+
+    printExpression(operation->opExprLeft,count);
+
+    printExpression(operation->opExprRight,count);
+}
+
+void printTerminal(IsTerminal* terminal, int count) {
+    printPoints(count);
+    printf("%s(%s)\n", terminal->type, terminal->value);
+}
+
+void printUnit(IsUnit* unit, int count) {
+    printPoints(count);
+    printf("%s\n", unit->op);
+    count+=2;
+
+    printExpression(unit->unitExpr, count);
 }
 
 int main(int argc, char *argv[]){

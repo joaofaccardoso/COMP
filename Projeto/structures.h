@@ -1,7 +1,34 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
+typedef struct s23 {
+    char* type;    
+    char* value;
+} IsTerminal;
+
+typedef struct s22 {
+    char* op;    
+    struct s20* unitExpr;
+} IsUnit;
+
+typedef struct s21 {
+    struct s20* opExprLeft;
+    char* op;
+    struct s20* opExprRight;
+} IsOp;
+
+typedef enum {eAssign, eOp, eCall, eParseArgs, eTerminal, eUnit} dExpr;
+
 typedef struct s20 {
+    dExpr e;
+    union{
+        struct s19* exprAssign;
+        IsOp* exprOp;
+        IsUnit* exprUnit;
+        struct s16* exprCall;
+        struct s18* expParseArgs;
+        IsTerminal* exprTerminal;
+    } eType;
     struct s20* next;
 } IsExpr;
 
@@ -21,7 +48,8 @@ typedef struct s18 {
 } IsParseArgsStatement;
 
 typedef struct s19 {
-    
+    char* id;
+    IsExpr* assignExpr;
 } IsAssign;
 
 typedef struct s16 {
@@ -41,13 +69,9 @@ typedef struct s14 {
 typedef struct s13 {
     int hasElse;
     IsExpr* ifExpr;
-    struct s8* thenStatement;
-    struct s8* elseStatement;
+    struct s8* thenBlock;
+    struct s8* elseBlock;
 } IsIfStatement;
-
-typedef struct s12 {
-
-} IsStatementBlock;
 
 typedef struct s11 {
     char* id;
@@ -59,7 +83,7 @@ typedef enum {sBlock, sIf, sWhile, sReturn, sCall, sPrint, sParseArgs, sAssign} 
 typedef struct s10 {
     dStatement sm;
     union {
-        IsStatementBlock* blockStatement;
+        struct s8* blockStatement;
         IsIfStatement* ifStatement;
         IsWhileStatement* whileStatement;
         IsReturnStatement* returnStatement;
