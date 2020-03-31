@@ -16,3 +16,6 @@ IsVarDeclStatement* insertReturnStatement(IsExpr* returnExpr);
 IsVarDeclStatement* insertCallStatement(IsCallStatement* callStatement);
 IsExpr* insertCallExpr(IsExpr* newExpr, IsExpr* head);
 IsCallStatement* createCallStatement(char* id, IsExpr* newExpr, IsExpr* head);
+IsVarDeclStatement* insertParseArgsStatement(IsParseArgsStatement* ipas);
+IsParseArgsStatement* createParseArgsStatement(char* id, IsExpr* parseArgsExpr);
+IsVarDeclStatement* insertPrintStatement(dPrint p, char* printString, IsExpr* printExpr);

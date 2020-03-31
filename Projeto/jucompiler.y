@@ -35,6 +35,7 @@
 %type <ivds> VarDecl Statement MethodBody1
 %type <ie> Expr CommaExpr
 %type <ics> MethodInvocation
+%type <ipas> ParseArgs
 
 %union{
     char* charvalue;
@@ -49,6 +50,7 @@
     IsVarDeclStatement* ivds;
     IsExpr* ie;
     IsCallStatement* ics;
+    IsParseArgsStatement* ipas;
 }
 
 %%
@@ -110,10 +112,10 @@ Statement: LBRACE StatementLoop RBRACE                      {$$=NULL;}
     | RETURN SEMICOLON                                      {$$=insertReturnStatement(NULL);}
     | MethodInvocation SEMICOLON                            {$$=insertCallStatement($1);}
     | Assignment SEMICOLON                                  {$$=NULL;}
-    | ParseArgs SEMICOLON                                   {$$=NULL;}
+    | ParseArgs SEMICOLON                                   {$$=insertParseArgsStatement($1);}
     | SEMICOLON                                             {$$=NULL;}
-    | PRINT LPAR STRLIT RPAR SEMICOLON                      {$$=NULL;}
-    | PRINT LPAR Expr RPAR SEMICOLON                        {$$=NULL;}
+    | PRINT LPAR STRLIT RPAR SEMICOLON                      {$$=insertPrintStatement(stringLiteral, $3, NULL);}
+    | PRINT LPAR Expr RPAR SEMICOLON                        {$$=insertPrintStatement(expression, NULL, $3);}
     | error SEMICOLON                                       {$$=NULL;}
     ;
     
@@ -131,8 +133,9 @@ CommaExpr: COMMA Expr CommaExpr                             {$$=insertCallExpr($
     | %empty                                                {$$=NULL;}
     ;
 
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR
-    | PARSEINT LPAR error RPAR;
+ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR               {$$=createParseArgsStatement($3, $5);}
+    | PARSEINT LPAR error RPAR                              {$$=NULL;}
+    ;
 
 Expr: Assignment                                            {$$=NULL;}
     | Expr1                                                 {$$=NULL;}

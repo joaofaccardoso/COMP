@@ -8,11 +8,16 @@ typedef struct s20 {
 typedef enum {expression, stringLiteral} dPrint;
 
 typedef struct s17 {
-    
+    dPrint p;
+    union {
+        char* printString;
+        IsExpr* printExpr;
+    } pType;
 } IsPrintStatement;
 
 typedef struct s18 {
-
+    char* id;
+    IsExpr* parseArgsExpr;
 } IsParseArgsStatement;
 
 typedef struct s19 {

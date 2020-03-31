@@ -253,3 +253,49 @@ IsCallStatement* createCallStatement(char* id, IsExpr* newExpr, IsExpr* head) {
 
     return ics;
 }
+
+/*      FAZER ASSIGNMENT        */
+
+IsVarDeclStatement* insertParseArgsStatement(IsParseArgsStatement* ipas) {
+    IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
+    IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
+
+    is->sm = sParseArgs;
+    is->smType.parseArgsStatement = ipas;
+
+    ivds->vds = statement;
+    ivds->vdsType.statement = is;
+
+    return ivds;
+}
+
+IsParseArgsStatement* createParseArgsStatement(char* id, IsExpr* parseArgsExpr) {
+    IsParseArgsStatement* ipas = (IsParseArgsStatement*)malloc(sizeof(IsParseArgsStatement));
+
+    ipas->id = id;
+    ipas->parseArgsExpr = parseArgsExpr;
+
+    return ipas;
+}
+
+IsVarDeclStatement* insertPrintStatement(dPrint p, char* printString, IsExpr* printExpr) {
+    IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
+    IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
+    IsPrintStatement* ips = (IsPrintStatement*)malloc(sizeof(IsPrintStatement));
+
+    if (p==stringLiteral) {
+        ips->p = p;
+        ips->pType.printString = printString;
+    } else {
+        ips->p = expression;
+        ips->pType.printExpr = printExpr;
+    }
+
+    is->sm = sPrint;
+    is->smType.printStatement = ips;
+
+    ivds->vds = statement;
+    ivds->vdsType.statement = is;
+
+    return ivds;
+}
