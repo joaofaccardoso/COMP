@@ -48,6 +48,7 @@ int initCol = 1;
 int isString = 0;
 char * printString;
 extern IsProgram* myProgram;
+int error = 0;
 %}
 %X COMMENT STRINGFLAG
 %%
@@ -128,6 +129,7 @@ int yywrap(){
 }
 
 void yyerror (const char *s) {
+    error = 1;
     if (flag == 0) {
         if(isString == 0){
             printf ("Line %d, col %d: %s: %s\n", line, initCol, s, yytext);
@@ -458,9 +460,11 @@ int main(int argc, char *argv[]){
             }
         }
         else if(strcmp(argv[1],"-t")==0){
-            flag = 3;
+            flag = 0;
             yyparse();
-            printTree();
+            if(error == 0){
+                printTree();
+            }
         }
         else if(strcmp(argv[1],"-e2")==0){
             flag = 0;

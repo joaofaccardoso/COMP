@@ -164,15 +164,15 @@ Expr1: Expr1 PLUS Expr1                                     {$$=insertOp($1,"Add
     | Expr2                                                 {$$=$1;}
     ;
 
-Expr2: NOT Expr2 %prec PRE                                  {$$=insertUnit("Not",$2);}
-    | PLUS Expr2 %prec PRE                                  {$$=insertUnit("Plus",$2);}
-    | MINUS Expr2 %prec PRE                                 {$$=insertUnit("Minus",$2);}
+Expr2: NOT Expr2 %prec PRE                                  {$$=insertUnit("Not",$2,NULL);}
+    | PLUS Expr2 %prec PRE                                  {$$=insertUnit("Plus",$2,NULL);}
+    | MINUS Expr2 %prec PRE                                 {$$=insertUnit("Minus",$2,NULL);}
     | MethodInvocation                                      {$$=insertExprCall($1);}
     | ParseArgs                                             {$$=insertExprParseArgs($1);}
     | LPAR Expr RPAR                                        {$$=$2;}
     | LPAR error RPAR                                       {$$=NULL;}
     | ID                                                    {$$=insertTerminal("Id",$1);}
-    | ID DOTLENGHT                                          {$$=insertTerminal("Length",$1);}
+    | ID DOTLENGHT                                          {$$=insertUnit("Length",NULL,$1);}
     | INTLIT                                                {$$=insertTerminal("DecLit",$1);}
     | REALLIT                                               {$$=insertTerminal("RealLit",$1);}
     | BOOLLIT                                               {$$=insertTerminal("BoolLit",$1);}

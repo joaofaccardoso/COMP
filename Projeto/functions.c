@@ -376,12 +376,18 @@ IsExpr* insertOp(IsExpr* opExprLeft, char* op, IsExpr* opExprRight) {
     return ie;
 }
 
-IsExpr* insertUnit(char* op, IsExpr* unitExpr) {
+IsExpr* insertUnit(char* op, IsExpr* unitExpr, char* id) {
     IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
     IsUnit* iu = (IsUnit*)malloc(sizeof(IsUnit));
-
     iu->op = op;
-    iu->unitExpr = unitExpr;
+
+    if(id!=NULL){
+        iu->unitExpr = insertTerminal("Id",id);
+    }
+    else{
+        iu->unitExpr = unitExpr;
+    }
+
 
     ie->e = eUnit;
     ie->eType.exprUnit = iu;
