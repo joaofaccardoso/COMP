@@ -32,6 +32,24 @@ void printExpression(IsExpr* expression, int count);
 void printOp(IsOp* operation, int count);
 void printTerminal(IsTerminal* terminal, int count);
 void printUnit(IsUnit* unit, int count);
+void cleanTree();
+void cleanMethodFieldList(IsMethodField* temp);
+void cleanMethod(IsMethodDecl* temp);
+void cleanHeader(IsMethodHeader* temp);
+void cleanParams(IsParamDecl* temp);
+void cleanBody(IsMethodBody* temp);
+void cleanVarDeclList(IsVarDeclStatement* temp);
+void cleanStatement(IsStatement* temp);
+void cleanIf(IsIfStatement* temp);
+void cleanWhile(IsWhileStatement* temp);
+void cleanReturn(IsReturnStatement* temp);
+void cleanCall(IsCallStatement* temp);
+void cleanParseArgs(IsParseArgsStatement* temp);
+void cleanPrint(IsPrintStatement* temp);
+void cleanAssign(IsAssign* temp);
+void cleanExpr(IsExpr* temp);
+void cleanOp(IsOp* temp);
+void cleanUnit(IsUnit* temp);
 
 int line = 1;
 int column = 1;
@@ -163,6 +181,25 @@ void printTree() {
     }
 }
 
+void cleanTree() {
+    if (myProgram->methodFieldList)
+        cleanMethodFieldList(myProgram->methodFieldList);
+
+    free(myProgram);
+}
+
+void cleanMethodFieldList(IsMethodField* temp) {
+    if (temp->mf == isMethod)
+        cleanMethod(temp->mfType.methodDecl);
+    else
+        free(temp->mfType.fieldDecl);
+    
+    if (temp->next)
+        cleanMethodFieldList(temp->next);
+
+    free(temp);
+}
+
 void printMethod(int count, IsMethodDecl* methodDecl) {
     printPoints(count);
     printf("MethodDecl\n");
@@ -171,6 +208,15 @@ void printMethod(int count, IsMethodDecl* methodDecl) {
         printMethodHeader(count, methodDecl->methodHeader);
         printMethodBody(count, methodDecl->methodBody);
     }
+}
+
+void cleanMethod(IsMethodDecl* temp) {
+    if (temp->methodHeader)
+        cleanHeader(temp->methodHeader);
+    if (temp->methodBody)
+        cleanBody(temp->methodBody);
+
+    free(temp);
 }
 
 void printFieldDecl(int count, IsFieldDecl* fieldDecl) {
@@ -213,6 +259,20 @@ void printMethodHeader(int count, IsMethodHeader* methodHeader){
     }
 }
 
+void cleanHeader(IsMethodHeader* temp) {
+    if (temp->paramDeclList)
+        cleanParams(temp->paramDeclList);
+
+    free(temp);
+}
+
+void cleanParams(IsParamDecl* temp) {
+    if (temp->next)
+        cleanParams(temp->next);
+
+    free(temp);
+}
+
 void printMethodBody(int count, IsMethodBody* methodBody){
     printPoints(count);
     printf("MethodBody\n");
@@ -236,6 +296,25 @@ void printMethodBody(int count, IsMethodBody* methodBody){
 
         ivdsIterator = ivdsIterator->next;
     }
+}
+
+void cleanBody(IsMethodBody* temp) {
+    if (temp->vardDeclSatetmentList)
+        cleanVarDeclList(temp->vardDeclSatetmentList);
+    
+    free(temp);
+}
+
+void cleanVarDeclList(IsVarDeclStatement* temp) {
+    if (temp->vds == statement)
+        cleanStatement(temp->vdsType.statement);
+    else
+        free(temp->vdsType.varDecl);
+
+    if (temp->next)
+        cleanVarDeclList(temp->next);
+
+    free(temp);
 }
 
 void printStatement(IsStatement* statement, int count){
@@ -263,6 +342,35 @@ void printStatement(IsStatement* statement, int count){
     else if(statement->sm == sAssign) {
         printAssign(statement->smType.assignStatement, count);
     }
+}
+
+void cleanStatement(IsStatement* temp) {
+    if (temp->sm == sBlock) {
+        cleanVarDeclList(temp->smType.blockStatement);
+    }
+    else if(temp->sm == sIf){
+        cleanIf(temp->smType.ifStatement);
+    }
+    else if(temp->sm == sWhile){
+        cleanWhile(temp->smType.whileStatement);
+    }
+    else if(temp->sm == sReturn){
+        cleanReturn(temp->smType.returnStatement);
+    }
+    else if(temp->sm == sCall){
+        cleanCall(temp->smType.callStatement);
+    }
+    else if(temp->sm == sParseArgs) {
+        cleanParseArgs(temp->smType.parseArgsStatement);
+    }
+    else if(temp->sm == sPrint) {
+        cleanPrint(temp->smType.printStatement);
+    }
+    else if(temp->sm == sAssign) {
+        cleanAssign(temp->smType.assignStatement);
+    }
+
+    free(temp);
 }
 
 void printBlockStatement(IsVarDeclStatement* blockHead, int count) {
@@ -313,6 +421,17 @@ void printIfStatement(IsIfStatement* ifStatement, int count){
 
 }
 
+void cleanIf(IsIfStatement* temp) {
+    if (temp->ifExpr)
+        cleanExpr(temp->ifExpr);
+    if (temp->thenBlock)
+        cleanVarDeclList(temp->thenBlock);
+    if (temp->elseBlock)
+        cleanVarDeclList(temp->elseBlock);
+    
+    free(temp);
+}
+
 void printWhileStatement(IsWhileStatement* whileStatement, int count){
     printPoints(count);
     printf("While\n");
@@ -333,6 +452,15 @@ void printWhileStatement(IsWhileStatement* whileStatement, int count){
     }
 }
 
+void cleanWhile(IsWhileStatement* temp) {
+    if(temp->whileExpr)
+        cleanExpr(temp->whileExpr);
+    if(temp->whileStatement)
+        cleanVarDeclList(temp->whileStatement);
+
+    free(temp);
+}
+
 void printReturnStatement(IsReturnStatement* returnStatement, int count){
     printPoints(count);
     printf("Return\n");
@@ -341,6 +469,13 @@ void printReturnStatement(IsReturnStatement* returnStatement, int count){
     if(returnStatement->returnExpr){
         printExpression(returnStatement->returnExpr, count);
     }
+}
+
+void cleanReturn(IsReturnStatement* temp) {
+    if (temp->returnExpr)
+        cleanExpr(temp->returnExpr);
+
+    free(temp);
 }
 
 void printCallStatement(IsCallStatement* callStatement, int count){
@@ -358,6 +493,13 @@ void printCallStatement(IsCallStatement* callStatement, int count){
     }
 }
 
+void cleanCall(IsCallStatement* temp) {
+    if (temp->callExpr)
+        cleanExpr(temp->callExpr);
+
+    free(temp);
+}
+
 void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count) {
     printPoints(count);
     printf("ParseArgs\n");
@@ -371,6 +513,13 @@ void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count
         printExpression(iterator, count);
         iterator = iterator->next;
     }
+}
+
+void cleanParseArgs(IsParseArgsStatement* temp) {
+    if (temp->parseArgsExpr)
+        cleanExpr(temp->parseArgsExpr);
+
+    free(temp);
 }
 
 void printPrintStatement(IsPrintStatement* ips, int count) {
@@ -387,6 +536,13 @@ void printPrintStatement(IsPrintStatement* ips, int count) {
     }
 }
 
+void cleanPrint(IsPrintStatement* temp) {
+    if (temp->p == expression)
+        cleanExpr(temp->pType.printExpr);
+
+    free(temp);
+}
+
 void printAssign(IsAssign* assignStatement, int count) {
     printPoints(count);
     printf("Assign\n");
@@ -396,6 +552,13 @@ void printAssign(IsAssign* assignStatement, int count) {
     printf("Id(%s)\n", assignStatement->id);
 
     printExpression(assignStatement->assignExpr, count);
+}
+
+void cleanAssign(IsAssign* temp) {
+    if (temp->assignExpr)
+        cleanExpr(temp->assignExpr);
+
+    free(temp);
 }
 
 void printExpression(IsExpr* expression, int count) {
@@ -419,6 +582,32 @@ void printExpression(IsExpr* expression, int count) {
     }
 }
 
+void cleanExpr(IsExpr* temp) {
+    if (temp->e == eAssign) {
+        cleanAssign(temp->eType.exprAssign);
+    }
+    else if (temp->e == eOp) {
+        cleanOp(temp->eType.exprOp);
+    }
+    else if (temp->e == eCall) {
+        cleanCall(temp->eType.exprCall);
+    }
+    else if (temp->e == eParseArgs) {
+        cleanParseArgs(temp->eType.expParseArgs);
+    }
+    else if (temp->e == eTerminal) {
+        free(temp->eType.exprTerminal);
+    }
+    else if (temp->e == eUnit) {
+        cleanUnit(temp->eType.exprUnit);
+    }
+
+    if (temp->next)
+        cleanExpr(temp->next);
+    
+    free(temp);
+}
+
 void printOp(IsOp* operation, int count) {
     printPoints(count);
     printf("%s\n",operation->op);
@@ -427,6 +616,15 @@ void printOp(IsOp* operation, int count) {
     printExpression(operation->opExprLeft,count);
 
     printExpression(operation->opExprRight,count);
+}
+
+void cleanOp(IsOp* temp) {
+    if (temp->opExprLeft)
+        cleanExpr(temp->opExprLeft);
+    if (temp->opExprRight)
+        cleanExpr(temp->opExprRight);
+
+    free(temp);
 }
 
 void printTerminal(IsTerminal* terminal, int count) {
@@ -440,6 +638,13 @@ void printUnit(IsUnit* unit, int count) {
     count+=2;
 
     printExpression(unit->unitExpr, count);
+}
+
+void cleanUnit(IsUnit* temp) {
+    if (temp->unitExpr)
+        cleanExpr(temp->unitExpr);
+
+    free(temp);
 }
 
 int main(int argc, char *argv[]){
@@ -479,5 +684,7 @@ int main(int argc, char *argv[]){
         yyparse();
     }
     
+    if (myProgram)
+        cleanTree();
     return 0;
 }
