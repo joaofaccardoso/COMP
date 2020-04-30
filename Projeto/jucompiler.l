@@ -8,9 +8,16 @@ exp                     (e|E)("+"|"-")?{integer0}+
 reserved                float|Integer|System|null|"++"|"--"|abstract|assert|break|byte|case|catch|char|const|continue|default|do|enum|extends|final|finally|for|goto|implements|import|instanceof|interface|long|native|new|package|private|protected|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|volatile
 whiteSpace              (" "|\t|\f)
 %{
+/*
+*   authors:
+*       - João Francisco Albuquerque de Campos Cardoso - nº 2017247458
+*       - Maria Leonor Inês Coelho - nº 2017254568
+*/
 #include <string.h>
 #include <stdio.h>
 #include "structures.h"
+#include "symbol_table.h"
+#include "semantics.h"
 #include "y.tab.h"
 
 void printPoints(int count);
@@ -32,6 +39,10 @@ void printExpression(IsExpr* expression, int count);
 void printOp(IsOp* operation, int count);
 void printTerminal(IsTerminal* terminal, int count);
 void printUnit(IsUnit* unit, int count);
+
+void printTable();
+void printMethodFieldTable(TableElement* tableElement);
+
 void cleanTree();
 void cleanMethodFieldList(IsMethodField* temp);
 void cleanMethod(IsMethodDecl* temp);
@@ -67,6 +78,7 @@ int isString = 0;
 char * printString;
 extern IsProgram* myProgram;
 int error = 0;
+TableHead* symHead = NULL;
 %}
 %X COMMENT STRINGFLAG
 %%
@@ -460,6 +472,23 @@ void printUnit(IsUnit* unit, int count) {
     printExpression(unit->unitExpr, count);
 }
 
+void printTable(){
+    printf("===== Class %s Symbol Table =====\n",symHead->id);
+
+    printMethodFieldTable(symHead->table);
+}
+
+void printMethodFieldTable(TableElement* tableElement){
+    for(;tableElement;tableElement=tableElement->next){
+        if(tableElement->elem_type == var_decl){
+            printf("%s\t\t%s\n",tableElement->id,tableElement->type);
+        }
+        else{
+            printf("%s\t\t%s\n",tableElement->id,tableElement->type);
+        }
+    }
+}
+
 void cleanTree() {
     if(myProgram == NULL){
         return;
@@ -740,6 +769,12 @@ int main(int argc, char *argv[]){
         else if(strcmp(argv[1],"-e2")==0){
             flag = 0;
             yyparse();
+        }
+        else if(strcmp(argv[1],"-s")==0){
+            flag = 0;
+            yyparse();
+            checkProgram(myProgram);
+            printTable();
         }
         else{
             yyparse();
