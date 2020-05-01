@@ -1,9 +1,29 @@
 #include "symbol_table.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include <ctype.h>
 
 extern TableHead* symHead;
+
+char* lower(char* type){
+    if(strcmp(type,"StringArray") == 0){
+        type = "String[]";
+    }
+    else if(strcmp(type,"Int") == 0){
+        type = "int";
+    }
+    else if(strcmp(type,"Double") == 0){
+        type = "double";
+    }
+    else if(strcmp(type,"Void") == 0){
+        type = "void";
+    }
+    else if(strcmp(type,"Bool") == 0){
+        type = "boolean";
+    }
+    return type;
+}
 
 TableHead* insertHead(char* id) {
 	TableHead* head=(TableHead*) malloc(sizeof(TableHead));
@@ -16,13 +36,13 @@ TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType) {
     TableElement* elem = (TableElement*)malloc(sizeof(TableElement));
 
     elem->elem_type = elemType;
-    elem->type = type;
+    elem->type = lower(type);
     elem->id = id;
     TableElement* prev, *aux;
     for(aux=symHead->table;aux;prev=aux,aux=aux->next){
-        if(strcmp(aux->id,id)==0){
-            return NULL;
-        }
+        // if(strcmp(aux->id,id)==0){
+        //     return NULL;
+        // }
     }
 
     if(symHead->table == NULL){
@@ -36,24 +56,22 @@ TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType) {
 
 TableElement* insertParamBody(TableElement* elem, char* type, char* id, element_method_type methType) {
     MethodElement* paramElem = (MethodElement*) malloc(sizeof(MethodElement));
-
-    paramElem->type = type;
+    paramElem->type = lower(type);
     paramElem->id = id;
     paramElem->meth_type = methType;
 
     MethodElement* prev, *aux;
-    if(methType == param){
-        aux=elem->paramsList;
+    for(aux=elem->elements;aux;prev=aux,aux=aux->next){
+        // if(strcmp(aux->id,id)==0){
+        //     return NULL;
+        // }
+    }
+    
+    if(elem->elements == NULL){
+        elem->elements = paramElem;
     }
     else{
-        aux=elem->body;
+        prev->next = paramElem;
     }
-    for(;aux;prev=aux,aux=aux->next){
-        if(strcmp(aux->id,elem->id)==0){
-            return NULL;
-        }
-    }
-
-    prev->next = paramElem;
     return elem;
 }

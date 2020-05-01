@@ -42,6 +42,7 @@ void printUnit(IsUnit* unit, int count);
 
 void printTable();
 void printMethodFieldTable(TableElement* tableElement);
+void printMethodParamsBodyTable(MethodElement* elements);
 
 void cleanTree();
 void cleanMethodFieldList(IsMethodField* temp);
@@ -475,16 +476,55 @@ void printUnit(IsUnit* unit, int count) {
 void printTable(){
     printf("===== Class %s Symbol Table =====\n",symHead->id);
 
-    printMethodFieldTable(symHead->table);
-}
+    TableElement* tableElement = symHead->table;
 
-void printMethodFieldTable(TableElement* tableElement){
     for(;tableElement;tableElement=tableElement->next){
         if(tableElement->elem_type == var_decl){
             printf("%s\t\t%s\n",tableElement->id,tableElement->type);
         }
         else{
-            printf("%s\t\t%s\n",tableElement->id,tableElement->type);
+            printf("%s\t(",tableElement->id);
+
+            if(tableElement->elements != NULL && tableElement->elements->meth_type == param){
+                printf("%s",tableElement->elements->type);
+                MethodElement* aux = tableElement->elements->next;
+                for(;aux && aux->meth_type==param;aux=aux->next){
+                    printf(",%s",aux->type);
+                }
+            }
+            printf(")\t%s\n",tableElement->type);
+        }
+    }
+
+    printMethodFieldTable(symHead->table);
+}
+
+void printMethodFieldTable(TableElement* tableElement){
+    for(;tableElement;tableElement=tableElement->next){
+        if(tableElement->elem_type == method_decl){
+            printf("\n===== Method %s(",tableElement->id);
+            if(tableElement->elements != NULL && tableElement->elements->meth_type == param){
+                printf("%s",tableElement->elements->type);
+                MethodElement* aux = tableElement->elements->next;
+                for(;aux && aux->meth_type==param;aux=aux->next){
+                    printf(",%s",aux->type);
+                }
+            }
+            printf(") Symbol Table =====\nreturn\t\t%s\n",tableElement->type);
+            
+            printMethodParamsBodyTable(tableElement->elements);
+
+        }
+    }
+}
+
+void printMethodParamsBodyTable(MethodElement* elements){
+    for(;elements;elements=elements->next){
+        if(elements->meth_type == param){
+            printf("%s\t\t%s\tparam\n",elements->id,elements->type);
+        }
+        else{
+            printf("%s\t\t%s\n",elements->id,elements->type);
         }
     }
 }
@@ -771,10 +811,12 @@ int main(int argc, char *argv[]){
             yyparse();
         }
         else if(strcmp(argv[1],"-s")==0){
-            flag = 0;
+            flag = 3;
             yyparse();
             checkProgram(myProgram);
             printTable();
+            printf("\n");
+            printTree();
         }
         else{
             yyparse();

@@ -16,8 +16,7 @@ typedef struct t2 {
     element_type elem_type;
     char* type;
     char* id;
-    MethodElement* paramsList;
-    MethodElement* body;
+    MethodElement* elements;
     struct t2* next;
 } TableElement;
 
@@ -29,5 +28,6 @@ typedef struct t1 {
 TableElement* insertParamBody(TableElement* elem, char* type, char* id, element_method_type methType);
 TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType);
 TableHead* insertHead(char* id);
+char *strlwr(char *str);
 
 #endif

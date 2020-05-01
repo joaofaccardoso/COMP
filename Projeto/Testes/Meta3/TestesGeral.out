@@ -1,0 +1,10 @@
+===== Class ClassTeste Symbol Table =====
+teste0		int
+teste1		int
+teste2		int
+main	(String[])	void
+
+===== Method main(String[]) Symbol Table =====
+return		void
+args		String[]	param
+argument		int

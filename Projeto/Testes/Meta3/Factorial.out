@@ -1,0 +1,12 @@
+===== Class Factorial Symbol Table =====
+factorial	(int)	int
+main	(String[])	void
+
+===== Method factorial(int) Symbol Table =====
+return		int
+n		int	param
+
+===== Method main(String[]) Symbol Table =====
+return		void
+args		String[]	param
+argument		int
