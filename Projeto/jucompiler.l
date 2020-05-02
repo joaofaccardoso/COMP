@@ -237,7 +237,7 @@ void printMethodHeader(int count, IsMethodHeader* methodHeader){
             printf("%s\n",paramDeclIt->type);
             
             printPoints(count+2);
-            printf("Id(%s)\n",paramDeclIt->id);
+            printf("Id(%s), (%d,%d)\n",paramDeclIt->id);
             
             paramDeclIt = paramDeclIt->next;
         }
@@ -480,7 +480,7 @@ void printTable(){
 
     for(;tableElement;tableElement=tableElement->next){
         if(tableElement->elem_type == var_decl){
-            printf("%s\t\t%s\n",tableElement->id,tableElement->type);
+            printf("%s\t\t%s\t(%d, %d)\n",tableElement->id,tableElement->type, tableElement->line, tableElement->col);
         }
         else{
             printf("%s\t(",tableElement->id);
@@ -492,7 +492,7 @@ void printTable(){
                     printf(",%s",aux->type);
                 }
             }
-            printf(")\t%s\n",tableElement->type);
+            printf(")\t%s\t(%d, %d)\n",tableElement->type, tableElement->line, tableElement->col);
         }
     }
 
@@ -521,10 +521,10 @@ void printMethodFieldTable(TableElement* tableElement){
 void printMethodParamsBodyTable(MethodElement* elements){
     for(;elements;elements=elements->next){
         if(elements->meth_type == param){
-            printf("%s\t\t%s\tparam\n",elements->id,elements->type);
+            printf("%s\t\t%s\tparam\t(%d, %d)\n",elements->id,elements->type, elements->line, elements->col);
         }
         else{
-            printf("%s\t\t%s\n",elements->id,elements->type);
+            printf("%s\t\t%s\t(%d, %d)\n",elements->id,elements->type, elements->line, elements->col);
         }
     }
 }

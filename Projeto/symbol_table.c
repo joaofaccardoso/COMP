@@ -25,19 +25,23 @@ char* lower(char* type){
     return type;
 }
 
-TableHead* insertHead(char* id) {
+TableHead* insertHead(char* id, int line, int col) {
 	TableHead* head=(TableHead*) malloc(sizeof(TableHead));
     head->id = id;  
+    head->line = line;
+    head->col = col;
     symHead = head; 
     return head; 
 }
 
-TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType) {
+TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType, int line, int col) {
     TableElement* elem = (TableElement*)malloc(sizeof(TableElement));
 
     elem->elem_type = elemType;
     elem->type = lower(type);
     elem->id = id;
+    elem->line = line;
+    elem->col = col;
     TableElement* prev, *aux;
     for(aux=symHead->table;aux;prev=aux,aux=aux->next){
         // if(strcmp(aux->id,id)==0){
@@ -54,11 +58,13 @@ TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType) {
     return elem;
 }
 
-TableElement* insertParamBody(TableElement* elem, char* type, char* id, element_method_type methType) {
+TableElement* insertParamBody(TableElement* elem, char* type, char* id, element_method_type methType, int line, int col) {
     MethodElement* paramElem = (MethodElement*) malloc(sizeof(MethodElement));
     paramElem->type = lower(type);
     paramElem->id = id;
     paramElem->meth_type = methType;
+    paramElem->line = line;
+    paramElem->col = col;
 
     MethodElement* prev, *aux;
     for(aux=elem->elements;aux;prev=aux,aux=aux->next){
