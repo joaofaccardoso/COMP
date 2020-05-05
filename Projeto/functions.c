@@ -4,10 +4,21 @@
 #include <string.h>
 #include <stdio.h>
 
+IsTerminal* insertIdType(char* type, char* value, int line, int col){
+    IsTerminal* it = (IsTerminal*)malloc(sizeof(IsTerminal));
+    
+    it->type = type;
+    it->value = value;
+    it->line = line;
+    it->col = col;
+
+    return it;
+}
+
 IsProgram* insertProgram(char* id, IsMethodField* list, int line, int col) {
     IsProgram* ip = (IsProgram*)malloc(sizeof(IsProgram));
 
-    ip->id = id;
+    ip->id = insertIdType("Id",id, line, col);
     ip->methodFieldList = list;
     ip->line = line;
     ip->col = col;
@@ -18,7 +29,7 @@ IsProgram* insertProgram(char* id, IsMethodField* list, int line, int col) {
 IsMethodField* insertField(char* type, char* id, IsVarId* idsList, int line, int col) {
     IsVarId* ivi = (IsVarId*)malloc(sizeof(IsVarId));
 
-    ivi->id = id;
+    ivi->id = insertIdType("Id",id, line, col);
     ivi->next = idsList;
     ivi->line = line;
     ivi->col = col;
@@ -34,7 +45,7 @@ IsMethodField* insertField(char* type, char* id, IsVarId* idsList, int line, int
         IsMethodField* imf = (IsMethodField*)malloc(sizeof(IsMethodField));
         IsFieldDecl* ifd = (IsFieldDecl*)malloc(sizeof(IsFieldDecl));
 
-        ifd->type = type;
+        ifd->type = insertIdType("Type",type, line, col);
         ifd->id = temp->id;
         ifd->line = temp->line;
         ifd->col = temp->col;
@@ -92,8 +103,8 @@ IsMethodField* insertMethod(IsMethodHeader* methodHeader, IsMethodBody* methodBo
 IsMethodHeader* insertMethodHeader(char* type, char* id, IsParamDecl* paramDeclList, int line, int col) {
     IsMethodHeader* imh = (IsMethodHeader*)malloc(sizeof(IsMethodHeader));
 
-    imh->type = type;
-    imh->id = id;
+    imh->type = insertIdType("Type",type, line, col);
+    imh->id = insertIdType("Id",id, line, col);
     imh->paramDeclList = paramDeclList;
     imh->line = line;
     imh->col = col;
@@ -104,8 +115,8 @@ IsMethodHeader* insertMethodHeader(char* type, char* id, IsParamDecl* paramDeclL
 IsParamDecl* insertParamDecl(char* type, char* id, IsParamDecl* head, int line, int col) {
     IsParamDecl* ipd = (IsParamDecl*)malloc(sizeof(IsParamDecl));
 
-    ipd->type = type;
-    ipd->id = id;
+    ipd->type = insertIdType("Type",type, line, col);
+    ipd->id = insertIdType("Id",id, line, col);
     ipd->next = head;
     ipd->line = line;
     ipd->col = col;
@@ -116,7 +127,7 @@ IsParamDecl* insertParamDecl(char* type, char* id, IsParamDecl* head, int line, 
 IsVarId* insertVarId(char* id, IsVarId* head, int line, int col){
     IsVarId* ivi = (IsVarId*)malloc(sizeof(IsVarId));
 
-    ivi->id = id;
+    ivi->id = insertIdType("Id",id, line, col);
     ivi->next = head;
     ivi->line = line;
     ivi->col = col;
@@ -127,7 +138,7 @@ IsVarId* insertVarId(char* id, IsVarId* head, int line, int col){
 IsVarDeclStatement* insertVarDecl(char* type, char* id, IsVarId* idList, int line, int col) {
     IsVarId* ivi = (IsVarId*)malloc(sizeof(IsVarId));
 
-    ivi->id = id;
+    ivi->id = insertIdType("Id",id, line, col);
     ivi->next = idList;
     ivi->line = line;
     ivi->col = col;
@@ -143,7 +154,7 @@ IsVarDeclStatement* insertVarDecl(char* type, char* id, IsVarId* idList, int lin
         IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
         IsVarDecl* ivd = (IsVarDecl*)malloc(sizeof(IsVarDecl));
 
-        ivd->type = type;
+        ivd->type = insertIdType("Type",type, line, col);
         ivd->id = temp->id;
         ivd->line = temp->line;
         ivd->col = temp->col;
@@ -329,7 +340,7 @@ IsCallStatement* createCallStatement(char* id, IsExpr* newExpr, IsExpr* head, in
     
     IsCallStatement* ics = (IsCallStatement*)malloc(sizeof(IsCallStatement));
 
-    ics->id = id;
+    ics->id = insertIdType("Id",id, line, col);
     ics->callExpr = head;
     ics->line = line;
     ics->col = col;
@@ -357,7 +368,7 @@ IsVarDeclStatement* insertAssignStatement(IsAssign* assignStatement) {
 IsAssign* createAssign(char* id, IsExpr* assignExpr, int line, int col) {
     IsAssign* ia = (IsAssign*)malloc(sizeof(IsAssign));
 
-    ia->id = id;
+    ia->id = insertIdType("Id",id, line, col);
     ia->assignExpr = assignExpr;
     ia->line = line;
     ia->col = col;
@@ -389,7 +400,7 @@ IsVarDeclStatement* insertParseArgsStatement(IsParseArgsStatement* ipas) {
 IsParseArgsStatement* createParseArgsStatement(char* id, IsExpr* parseArgsExpr, int line, int col) {
     IsParseArgsStatement* ipas = (IsParseArgsStatement*)malloc(sizeof(IsParseArgsStatement));
 
-    ipas->id = id;
+    ipas->id = insertIdType("Id",id, line, col);
     ipas->parseArgsExpr = parseArgsExpr;
     ipas->line = line;
     ipas->col = col;

@@ -137,7 +137,7 @@ char* findIdTable(char* id, int line, int col, TableElement* methodTable) {
 
 char* findExprTypeTable(IsExpr* expr, int line, int col, TableElement* methodTable) {
     if (expr->e == eAssign) {
-        return findIdTable(expr->eType.exprAssign->id, expr->eType.exprAssign->line, expr->eType.exprAssign->col, methodTable);
+        return findIdTable(expr->eType.exprAssign->id->value, expr->eType.exprAssign->line, expr->eType.exprAssign->col, methodTable);
     }
     else if (expr->e == eOp) {
         char* leftResult = findExprTypeTable(expr->eType.exprOp->opExprLeft, expr->eType.exprOp->line, expr->eType.exprOp->col, methodTable);
@@ -160,7 +160,7 @@ char* findExprTypeTable(IsExpr* expr, int line, int col, TableElement* methodTab
         }
     }
     else if (expr->e == eCall) {
-        TableElement* elem = findTableMethod(expr->eType.exprCall->id, expr->eType.exprCall->callExpr, expr->eType.exprCall->line, expr->eType.exprCall->col, methodTable);
+        TableElement* elem = findTableMethod(expr->eType.exprCall->id->value, expr->eType.exprCall->callExpr, expr->eType.exprCall->line, expr->eType.exprCall->col, methodTable);
         return elem->type;
     }
     else if (expr->e == eParseArgs) {

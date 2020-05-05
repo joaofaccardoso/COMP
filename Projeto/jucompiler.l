@@ -181,7 +181,7 @@ void printTree() {
     int count = 0;
     TableElement* mfTableElement = symHead->table;
     if (myProgram!=NULL) {
-        printf("Program\n..Id(%s)\n", myProgram->id);
+        printf("Program\n..Id(%s)\n", myProgram->id->value);
         count += 2;
         IsMethodField* mfIterator = myProgram->methodFieldList;
         while(mfIterator!=NULL) {
@@ -212,10 +212,10 @@ void printFieldDecl(int count, IsFieldDecl* fieldDecl) {
     count += 2;
     
     printPoints(count);
-    printf("%s\n",fieldDecl->type);
+    printf("%s\n",fieldDecl->type->value);
 
     printPoints(count);
-    printf("Id(%s)\n",fieldDecl->id);    
+    printf("Id(%s)\n",fieldDecl->id->value);    
 }
 
 void printMethodHeader(int count, IsMethodHeader* methodHeader){
@@ -223,9 +223,9 @@ void printMethodHeader(int count, IsMethodHeader* methodHeader){
     printf("MethodHeader\n");
     count += 2;
     printPoints(count);
-    printf("%s\n",methodHeader->type);
+    printf("%s\n",methodHeader->type->value);
     printPoints(count);
-    printf("Id(%s)\n",methodHeader->id);
+    printf("Id(%s)\n",methodHeader->id->value);
     printPoints(count);
     printf("MethodParams\n");
     if(methodHeader->paramDeclList != NULL){
@@ -236,10 +236,10 @@ void printMethodHeader(int count, IsMethodHeader* methodHeader){
             printf("ParamDecl\n");
 
             printPoints(count+2);
-            printf("%s\n",paramDeclIt->type);
+            printf("%s\n",paramDeclIt->type->value);
             
             printPoints(count+2);
-            printf("Id(%s)\n",paramDeclIt->id);
+            printf("Id(%s)\n",paramDeclIt->id->value);
             
             paramDeclIt = paramDeclIt->next;
         }
@@ -258,10 +258,10 @@ void printMethodBody(int count, IsMethodBody* methodBody, TableElement* methodTa
             printf("VarDecl\n");
 
             printPoints(count+2);
-            printf("%s\n",ivdsIterator->vdsType.varDecl->type);
+            printf("%s\n",ivdsIterator->vdsType.varDecl->type->value);
 
             printPoints(count+2);
-            printf("Id(%s)\n",ivdsIterator->vdsType.varDecl->id);
+            printf("Id(%s)\n",ivdsIterator->vdsType.varDecl->id->value);
         }
         else{
             printStatement(ivdsIterator->vdsType.statement, count, methodTable);
@@ -379,7 +379,7 @@ void printReturnStatement(IsReturnStatement* returnStatement, int count, TableEl
 void printCallStatement(IsCallStatement* callStatement, int count, TableElement* methodTable){
     TableElement* elem = NULL;
     if (flag == 3){
-        elem = findTableMethod(callStatement->id, callStatement->callExpr, callStatement->line, callStatement->col, methodTable);
+        elem = findTableMethod(callStatement->id->value, callStatement->callExpr, callStatement->line, callStatement->col, methodTable);
     }
     printPoints(count);
     printf("Call");
@@ -395,7 +395,7 @@ void printCallStatement(IsCallStatement* callStatement, int count, TableElement*
     count+=2;
 
     printPoints(count);
-    printf("Id(%s)",callStatement->id);
+    printf("Id(%s)",callStatement->id->value);
     if (flag == 3) {
         if (elem) {
             printf(" - (");
@@ -432,7 +432,7 @@ void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count
     count+=2;
 
     printPoints(count);
-    printf("Id(%s)\n", parseArgsStatement->id);
+    printf("Id(%s)\n", parseArgsStatement->id->value);
 
     IsExpr* iterator = parseArgsStatement->parseArgsExpr;
     if(iterator) {
@@ -459,15 +459,15 @@ void printAssign(IsAssign* assignStatement, int count, TableElement* methodTable
     printPoints(count);
     printf("Assign");
     if (flag == 3) {
-        printf(" - %s",findIdTable(assignStatement->id, assignStatement->line, assignStatement->col, methodTable));
+        printf(" - %s",findIdTable(assignStatement->id->value, assignStatement->line, assignStatement->col, methodTable));
     }
     printf("\n");
     count+=2;
 
     printPoints(count);
-    printf("Id(%s)", assignStatement->id);
+    printf("Id(%s)", assignStatement->id->value);
     if (flag == 3) {
-        printf(" - %s",findIdTable(assignStatement->id, assignStatement->line, assignStatement->col, methodTable));
+        printf(" - %s",findIdTable(assignStatement->id->value, assignStatement->line, assignStatement->col, methodTable));
     }
     printf("\n");
 

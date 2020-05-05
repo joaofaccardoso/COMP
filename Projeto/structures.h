@@ -48,19 +48,19 @@ typedef struct s17 {
 } IsPrintStatement;
 
 typedef struct s18 {
-    char* id;
+    IsTerminal* id;
     IsExpr* parseArgsExpr;
     int line, col;
 } IsParseArgsStatement;
 
 typedef struct s19 {
-    char* id;
+    IsTerminal* id;
     IsExpr* assignExpr;
     int line, col;
 } IsAssign;
 
 typedef struct s16 {
-    char* id;
+    IsTerminal* id;
     IsExpr* callExpr;
     int line, col;
 } IsCallStatement;
@@ -85,7 +85,7 @@ typedef struct s13 {
 } IsIfStatement;
 
 typedef struct s11 {
-    char* id;
+    IsTerminal* id;
     int line, col;
     struct s11* next;
 } IsVarId;
@@ -108,8 +108,8 @@ typedef struct s10 {
 } IsStatement;
 
 typedef struct s9 {
-    char* type;
-    char* id;
+    IsTerminal* type;
+    IsTerminal* id;
     int line, col;
 } IsVarDecl;
 
@@ -126,8 +126,8 @@ typedef struct s8 {
 } IsVarDeclStatement;
 
 typedef struct s7 {
-    char* type;
-    char* id;
+    IsTerminal* type;
+    IsTerminal* id;
     int line, col;
     struct s7* next;
 } IsParamDecl;
@@ -138,15 +138,15 @@ typedef struct s6 {
 } IsMethodBody;
 
 typedef struct s5 {
-    char* type;
-    char* id;
+    IsTerminal* type;
+    IsTerminal* id;
     IsParamDecl* paramDeclList;
     int line, col;
 } IsMethodHeader;
 
 typedef struct s4 {
-    char* type;
-    char* id;
+    IsTerminal* type;
+    IsTerminal* id;
     int line, col;
 } IsFieldDecl;
 
@@ -169,7 +169,7 @@ typedef struct s2 {
 } IsMethodField;
 
 typedef struct s1 {
-    char* id;
+    IsTerminal* id;
     IsMethodField* methodFieldList;
     int line, col;
 } IsProgram;
