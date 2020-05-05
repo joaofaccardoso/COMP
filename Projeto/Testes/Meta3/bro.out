@@ -97,11 +97,11 @@ Program
 ......Call - boolean
 ........Id(f) - (double)
 ........RealLit(0e0) - double
-......Call - double
-........Id(f) - (int)
+......Call - int
+........Id(f) - (boolean)
 ........DecLit(123) - int
-......Call - void
-........Id(f) - (String[])
+......Call - boolean
+........Id(f) - (double)
 ........Id(args) - String[]
 ......Call - boolean
 ........Id(f) - (int,double)
@@ -133,7 +133,7 @@ Program
 ......Call - boolean
 ........Id(f) - (int,double)
 ........Id(i) - int
-........Id(i) - int
+........RealLit(0.2) - double
 ......Call - boolean
 ........Id(f) - (int,double,boolean)
 ........Id(i) - int
@@ -157,8 +157,8 @@ Program
 ........DecLit(1) - int
 ........RealLit(2.) - double
 ........DecLit(3) - int
-......Call - double
-........Id(f) - (int,double,int,double)
+......Call - boolean
+........Id(f) - (int,double,boolean,int)
 ........DecLit(0) - int
 ........RealLit(.1) - double
 ........DecLit(2) - int
@@ -171,24 +171,24 @@ Program
 ........RealLit(.3) - double
 ......Call - int
 ........Id(f) - (boolean)
-........Call - boolean
-..........Id(f) - (double)
-..........Call - double
-............Id(f) - (int)
+........Call - int
+..........Id(f) - (boolean)
+..........Call - int
+............Id(f) - (boolean)
 ............Call - int
 ..............Id(f) - (boolean)
-..............Call - boolean
-................Id(f) - (double)
-................Call - double
-..................Id(f) - (int)
+..............Call - int
+................Id(f) - (boolean)
+................Call - int
+..................Id(f) - (boolean)
 ..................DecLit(0) - int
 ......Call - boolean
 ........Id(f) - (int,double,boolean)
 ........Call - int
 ..........Id(f) - (boolean)
 ..........BoolLit(true) - boolean
-........Call - double
-..........Id(f) - (int)
+........Call - int
+..........Id(f) - (boolean)
 ..........DecLit(0) - int
 ........Call - boolean
 ..........Id(f) - (double)
@@ -207,16 +207,16 @@ Program
 ......Print
 ........Call - int
 ..........Id(f) - (boolean)
-..........Call - boolean
-............Id(f) - (double)
-............Call - double
-..............Id(f) - (int)
+..........Call - int
+............Id(f) - (boolean)
+............Call - int
+..............Id(f) - (boolean)
 ..............Call - int
 ................Id(f) - (boolean)
-................Call - boolean
-..................Id(f) - (double)
-..................Call - double
-....................Id(f) - (int)
+................Call - int
+..................Id(f) - (boolean)
+..................Call - int
+....................Id(f) - (boolean)
 ....................DecLit(0) - int
 ......Print
 ........Call - boolean
@@ -224,8 +224,8 @@ Program
 ..........Call - int
 ............Id(f) - (boolean)
 ............BoolLit(true) - boolean
-..........Call - double
-............Id(f) - (int)
+..........Call - int
+............Id(f) - (boolean)
 ............DecLit(0) - int
 ..........Call - boolean
 ............Id(f) - (double)
@@ -235,8 +235,8 @@ Program
 ..........Id(f) - (double)
 ..........RealLit(0e0) - double
 ......Print
-........Call - double
-..........Id(f) - (int)
+........Call - int
+..........Id(f) - (boolean)
 ..........DecLit(123) - int
 ..MethodDecl
 ....MethodHeader

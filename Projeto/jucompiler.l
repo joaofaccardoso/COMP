@@ -22,23 +22,23 @@ whiteSpace              (" "|\t|\f)
 
 void printPoints(int count);
 void printTree(); 
-void printMethod(int count, IsMethodDecl* methodDecl);
+void printMethod(int count, IsMethodDecl* methodDecl, TableElement* methodTable);
 void printMethodHeader(int count, IsMethodHeader* methodHeader);
-void printMethodBody(int count, IsMethodBody* methodBody);
+void printMethodBody(int count, IsMethodBody* methodBody, TableElement* methodTable);
 void printFieldDecl(int count, IsFieldDecl* fieldDecl);
-void printStatement(IsStatement* statement, int count);
-void printIfStatement(IsIfStatement* ifStatement, int count);
-void printWhileStatement(IsWhileStatement* whileStatement, int count);
-void printReturnStatement(IsReturnStatement* returnStatement, int count);
-void printCallStatement(IsCallStatement* callStatement, int count);
-void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count);
-void printPrintStatement(IsPrintStatement* ips, int count);
-void printAssign(IsAssign* assignStatement, int count);
-void printBlockStatement(IsVarDeclStatement* blockHead, int count);
-void printExpression(IsExpr* expression, int count);
-void printOp(IsOp* operation, int count);
-void printTerminal(IsTerminal* terminal, int count);
-void printUnit(IsUnit* unit, int count);
+void printStatement(IsStatement* statement, int count, TableElement* methodTable);
+void printIfStatement(IsIfStatement* ifStatement, int count, TableElement* methodTable);
+void printWhileStatement(IsWhileStatement* whileStatement, int count, TableElement* methodTable);
+void printReturnStatement(IsReturnStatement* returnStatement, int count, TableElement* methodTable);
+void printCallStatement(IsCallStatement* callStatement, int count, TableElement* methodTable);
+void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count, TableElement* methodTable);
+void printPrintStatement(IsPrintStatement* ips, int count, TableElement* methodTable);
+void printAssign(IsAssign* assignStatement, int count, TableElement* methodTable);
+void printBlockStatement(IsVarDeclStatement* blockHead, int count, TableElement* methodTable);
+void printExpression(IsExpr* expression, int count, TableElement* methodTable);
+void printOp(IsOp* operation, int count, TableElement* methodTable);
+void printTerminal(IsTerminal* terminal, int count, TableElement* methodTable);
+void printUnit(IsUnit* unit, int count, TableElement* methodTable);
 
 void printTable();
 void printMethodFieldTable(TableElement* tableElement);
@@ -179,28 +179,30 @@ void printPoints(int count) {
 
 void printTree() {
     int count = 0;
+    TableElement* mfTableElement = symHead->table;
     if (myProgram!=NULL) {
         printf("Program\n..Id(%s)\n", myProgram->id);
         count += 2;
         IsMethodField* mfIterator = myProgram->methodFieldList;
         while(mfIterator!=NULL) {
             if (mfIterator->mf == isMethod) {
-                printMethod(count, mfIterator->mfType.methodDecl);
+                printMethod(count, mfIterator->mfType.methodDecl, mfTableElement);
             } else {
                 printFieldDecl(count, mfIterator->mfType.fieldDecl);
             }
             mfIterator = mfIterator->next;
+            mfTableElement = mfTableElement->next;
         }
     }
 }
 
-void printMethod(int count, IsMethodDecl* methodDecl) {
+void printMethod(int count, IsMethodDecl* methodDecl, TableElement* methodTable) {
     printPoints(count);
     printf("MethodDecl\n");
     count += 2;
     if(methodDecl->methodHeader!=NULL){
         printMethodHeader(count, methodDecl->methodHeader);
-        printMethodBody(count, methodDecl->methodBody);
+        printMethodBody(count, methodDecl->methodBody, methodTable);
     }
 }
 
@@ -237,14 +239,14 @@ void printMethodHeader(int count, IsMethodHeader* methodHeader){
             printf("%s\n",paramDeclIt->type);
             
             printPoints(count+2);
-            printf("Id(%s), (%d,%d)\n",paramDeclIt->id);
+            printf("Id(%s)\n",paramDeclIt->id);
             
             paramDeclIt = paramDeclIt->next;
         }
     }
 }
 
-void printMethodBody(int count, IsMethodBody* methodBody){
+void printMethodBody(int count, IsMethodBody* methodBody, TableElement* methodTable){
     printPoints(count);
     printf("MethodBody\n");
     count += 2;
@@ -262,41 +264,41 @@ void printMethodBody(int count, IsMethodBody* methodBody){
             printf("Id(%s)\n",ivdsIterator->vdsType.varDecl->id);
         }
         else{
-            printStatement(ivdsIterator->vdsType.statement, count);
+            printStatement(ivdsIterator->vdsType.statement, count, methodTable);
         }
 
         ivdsIterator = ivdsIterator->next;
     }
 }
 
-void printStatement(IsStatement* statement, int count){
+void printStatement(IsStatement* statement, int count, TableElement* methodTable){
     if (statement->sm == sBlock) {
-        printBlockStatement(statement->smType.blockStatement, count);
+        printBlockStatement(statement->smType.blockStatement, count, methodTable);
     }
     else if(statement->sm == sIf){
-        printIfStatement(statement->smType.ifStatement, count);
+        printIfStatement(statement->smType.ifStatement, count, methodTable);
     }
     else if(statement->sm == sWhile){
-        printWhileStatement(statement->smType.whileStatement, count);
+        printWhileStatement(statement->smType.whileStatement, count, methodTable);
     }
     else if(statement->sm == sReturn){
-        printReturnStatement(statement->smType.returnStatement, count);
+        printReturnStatement(statement->smType.returnStatement, count, methodTable);
     }
     else if(statement->sm == sCall){
-        printCallStatement(statement->smType.callStatement, count);
+        printCallStatement(statement->smType.callStatement, count, methodTable);
     }
     else if(statement->sm == sParseArgs) {
-        printParseArgsStatement(statement->smType.parseArgsStatement, count);
+        printParseArgsStatement(statement->smType.parseArgsStatement, count, methodTable);
     }
     else if(statement->sm == sPrint) {
-        printPrintStatement(statement->smType.printStatement, count);
+        printPrintStatement(statement->smType.printStatement, count, methodTable);
     }
     else if(statement->sm == sAssign) {
-        printAssign(statement->smType.assignStatement, count);
+        printAssign(statement->smType.assignStatement, count, methodTable);
     }
 }
 
-void printBlockStatement(IsVarDeclStatement* blockHead, int count) {
+void printBlockStatement(IsVarDeclStatement* blockHead, int count, TableElement* methodTable) {
     IsVarDeclStatement* blockIterator = blockHead;
     
     printPoints(count);
@@ -304,17 +306,17 @@ void printBlockStatement(IsVarDeclStatement* blockHead, int count) {
     count+=2;
     
     while(blockIterator) {
-        printStatement(blockIterator->vdsType.statement, count);
+        printStatement(blockIterator->vdsType.statement, count, methodTable);
         blockIterator = blockIterator->next;
     }
 }
 
-void printIfStatement(IsIfStatement* ifStatement, int count){
+void printIfStatement(IsIfStatement* ifStatement, int count, TableElement* methodTable){
     printPoints(count);
     printf("If\n");
     count += 2;
 
-    printExpression(ifStatement->ifExpr,count);
+    printExpression(ifStatement->ifExpr,count, methodTable);
 
     IsVarDeclStatement* ivdsIterator;
     
@@ -324,7 +326,7 @@ void printIfStatement(IsIfStatement* ifStatement, int count){
         printf("Block\n");
     }
     else {
-        printStatement(ivdsIterator->vdsType.statement, count);
+        printStatement(ivdsIterator->vdsType.statement, count, methodTable);
     }
 
     if(ifStatement->hasElse){
@@ -334,7 +336,7 @@ void printIfStatement(IsIfStatement* ifStatement, int count){
             printf("Block\n");
         }
         else {
-            printStatement(ivdsIterator->vdsType.statement, count);
+            printStatement(ivdsIterator->vdsType.statement, count, methodTable);
         }
     }
     else {
@@ -344,12 +346,12 @@ void printIfStatement(IsIfStatement* ifStatement, int count){
 
 }
 
-void printWhileStatement(IsWhileStatement* whileStatement, int count){
+void printWhileStatement(IsWhileStatement* whileStatement, int count, TableElement* methodTable){
     printPoints(count);
     printf("While\n");
     count += 2;
 
-    printExpression(whileStatement->whileExpr,count);
+    printExpression(whileStatement->whileExpr,count, methodTable);
 
 
     IsVarDeclStatement* ivdsIterator;
@@ -360,38 +362,73 @@ void printWhileStatement(IsWhileStatement* whileStatement, int count){
         printf("Block\n");
     }
     else {
-        printStatement(ivdsIterator->vdsType.statement, count);
+        printStatement(ivdsIterator->vdsType.statement, count, methodTable);
     }
 }
 
-void printReturnStatement(IsReturnStatement* returnStatement, int count){
+void printReturnStatement(IsReturnStatement* returnStatement, int count, TableElement* methodTable){
     printPoints(count);
     printf("Return\n");
     count+=2;
 
     if(returnStatement->returnExpr){
-        printExpression(returnStatement->returnExpr, count);
+        printExpression(returnStatement->returnExpr, count, methodTable);
     }
 }
 
-void printCallStatement(IsCallStatement* callStatement, int count){
+void printCallStatement(IsCallStatement* callStatement, int count, TableElement* methodTable){
+    TableElement* elem = NULL;
+    if (flag == 3){
+        elem = findTableMethod(callStatement->id, callStatement->callExpr, callStatement->line, callStatement->col, methodTable);
+    }
     printPoints(count);
-    printf("Call\n");
+    printf("Call");
+    if (flag == 3){
+        if (elem) {
+            printf(" - %s", elem->type);
+        }
+        else {
+            printf(" - undef");
+        }
+    }
+    printf("\n");
     count+=2;
 
     printPoints(count);
-    printf("Id(%s)\n",callStatement->id);
+    printf("Id(%s)",callStatement->id);
+    if (flag == 3) {
+        if (elem) {
+            printf(" - (");
+            MethodElement* paramIterator = elem->elements;
+            while (paramIterator && paramIterator->meth_type == param) {
+                printf("%s", paramIterator->type);
+                if (paramIterator->next && paramIterator->next->meth_type == param) {
+                    printf(",");
+                }
+                paramIterator = paramIterator->next;
+            }
+            printf(")");
+        }
+        else {
+            printf(" - undef");
+        }
+    }
+    printf("\n");
 
     IsExpr* iterator = callStatement->callExpr;
     while(iterator){
-        printExpression(iterator, count);
+        printExpression(iterator, count, methodTable);
         iterator = iterator->next;
     }
 }
 
-void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count) {
+void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count, TableElement* methodTable) {
     printPoints(count);
-    printf("ParseArgs\n");
+    printf("ParseArgs");
+    if (flag == 3) {
+        printf(" - int");
+    }
+    printf("\n");
     count+=2;
 
     printPoints(count);
@@ -399,12 +436,12 @@ void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count
 
     IsExpr* iterator = parseArgsStatement->parseArgsExpr;
     if(iterator) {
-        printExpression(iterator, count);
+        printExpression(iterator, count, methodTable);
         iterator = iterator->next;
     }
 }
 
-void printPrintStatement(IsPrintStatement* ips, int count) {
+void printPrintStatement(IsPrintStatement* ips, int count, TableElement* methodTable) {
     printPoints(count);
     printf("Print\n");
     count+=2;
@@ -414,63 +451,121 @@ void printPrintStatement(IsPrintStatement* ips, int count) {
         printf("StrLit(%s)\n", ips->pType.printString);
     }
     else {
-        printExpression(ips->pType.printExpr, count);
+        printExpression(ips->pType.printExpr, count, methodTable);
     }
 }
 
-void printAssign(IsAssign* assignStatement, int count) {
+void printAssign(IsAssign* assignStatement, int count, TableElement* methodTable) {
     printPoints(count);
-    printf("Assign\n");
+    printf("Assign");
+    if (flag == 3) {
+        printf(" - %s",findIdTable(assignStatement->id, assignStatement->line, assignStatement->col, methodTable));
+    }
+    printf("\n");
     count+=2;
 
     printPoints(count);
-    printf("Id(%s)\n", assignStatement->id);
+    printf("Id(%s)", assignStatement->id);
+    if (flag == 3) {
+        printf(" - %s",findIdTable(assignStatement->id, assignStatement->line, assignStatement->col, methodTable));
+    }
+    printf("\n");
 
-    printExpression(assignStatement->assignExpr, count);
+    printExpression(assignStatement->assignExpr, count, methodTable);
 }
 
-void printExpression(IsExpr* expression, int count) {
+void printExpression(IsExpr* expression, int count, TableElement* methodTable) {
     if (expression->e == eAssign) {
-        printAssign(expression->eType.exprAssign, count);
+        printAssign(expression->eType.exprAssign, count, methodTable);
     }
     else if (expression->e == eOp) {
-        printOp(expression->eType.exprOp,count);
+        printOp(expression->eType.exprOp,count, methodTable);
     }
     else if (expression->e == eCall) {
-        printCallStatement(expression->eType.exprCall,count);
+        printCallStatement(expression->eType.exprCall,count, methodTable);
     }
     else if (expression->e == eParseArgs) {
-        printParseArgsStatement(expression->eType.expParseArgs,count);
+        printParseArgsStatement(expression->eType.expParseArgs,count, methodTable);
     }
     else if (expression->e == eTerminal) {
-        printTerminal(expression->eType.exprTerminal,count);
+        printTerminal(expression->eType.exprTerminal,count, methodTable);
     }
     else if (expression->e   == eUnit) {
-        printUnit(expression->eType.exprUnit,count);
+        printUnit(expression->eType.exprUnit,count, methodTable);
     }
 }
 
-void printOp(IsOp* operation, int count) {
+void printOp(IsOp* operation, int count, TableElement* methodTable) {
     printPoints(count);
-    printf("%s\n",operation->op);
+    printf("%s",operation->op);
+    if (flag == 3) {
+        if (!strcmp(operation->op, "EQ") || !strcmp(operation->op, "GE") || !strcmp(operation->op, "GT") || !strcmp(operation->op, "LE") || !strcmp(operation->op, "LT") || !strcmp(operation->op, "NE") || !strcmp(operation->op, "AND") || !strcmp(operation->op, "OR")  || !strcmp(operation->op, "XOR")) {
+            printf(" - boolean");
+        }
+        else {
+            char* leftResult = findExprTypeTable(operation->opExprLeft, operation->line, operation->col, methodTable);
+            char* rightResult = findExprTypeTable(operation->opExprRight, operation->line, operation->col, methodTable);
+
+            if (!strcmp(leftResult, "undef") || !strcmp(rightResult, "undef")) {
+                printf(" - undef");
+            }
+            else if ((!strcmp(leftResult, "int") && !strcmp(rightResult, "double")) || (!strcmp(leftResult, "double") && !strcmp(rightResult, "int"))) {
+                printf(" - double");
+            }
+            else if ((!strcmp(leftResult, "int") && !strcmp(rightResult, "boolean")) || (!strcmp(leftResult, "boolean") && !strcmp(rightResult, "int"))) {
+                printf(" - undef");
+            }
+            else if ((!strcmp(leftResult, "double") && !strcmp(rightResult, "boolean")) || (!strcmp(leftResult, "boolean") && !strcmp(rightResult, "double"))) {
+                printf(" - undef");
+            }
+            else {
+                printf(" - %s", leftResult);
+            }
+        }
+    }
+    printf("\n");
     count+=2;
+    
+    printExpression(operation->opExprLeft,count, methodTable);
 
-    printExpression(operation->opExprLeft,count);
-
-    printExpression(operation->opExprRight,count);
+    printExpression(operation->opExprRight,count, methodTable);
 }
 
-void printTerminal(IsTerminal* terminal, int count) {
+void printTerminal(IsTerminal* terminal, int count, TableElement* methodTable) {
     printPoints(count);
-    printf("%s(%s)\n", terminal->type, terminal->value);
+    printf("%s(%s)", terminal->type, terminal->value);
+    if (flag == 3) {
+        if (!strcmp(terminal->type, "DecLit")) {
+            printf(" - int");
+        }
+        else if (!strcmp(terminal->type, "RealLit")) {
+            printf(" - double");
+        }
+        else if (!strcmp(terminal->type, "BoolLit")) {
+            printf(" - boolean");
+        }
+        else if (!strcmp(terminal->type, "Id")) {
+            printf(" - %s", findIdTable(terminal->value, terminal->line, terminal->col, methodTable));
+        }
+    }
+    printf("\n");
 }
 
-void printUnit(IsUnit* unit, int count) {
+void printUnit(IsUnit* unit, int count, TableElement* methodTable) {
     printPoints(count);
-    printf("%s\n", unit->op);
+    printf("%s", unit->op);
+    if (flag==3) {
+        if (strcmp(unit->op, "Length")==0) {
+            printf(" - int");
+        }
+        else {
+            printf(" - %s",findExprTypeTable(unit->unitExpr, unit->line, unit->col, methodTable));
+        }
+    }
+    printf("\n");
     count+=2;
 
-    printExpression(unit->unitExpr, count);
+    printExpression(unit->unitExpr, count, methodTable);
 }
 
 void printTable(){
@@ -480,7 +575,7 @@ void printTable(){
 
     for(;tableElement;tableElement=tableElement->next){
         if(tableElement->elem_type == var_decl){
-            printf("%s\t\t%s\t(%d, %d)\n",tableElement->id,tableElement->type, tableElement->line, tableElement->col);
+            printf("%s\t\t%s\n",tableElement->id,tableElement->type);
         }
         else{
             printf("%s\t(",tableElement->id);
@@ -492,7 +587,7 @@ void printTable(){
                     printf(",%s",aux->type);
                 }
             }
-            printf(")\t%s\t(%d, %d)\n",tableElement->type, tableElement->line, tableElement->col);
+            printf(")\t%s\n",tableElement->type);
         }
     }
 
@@ -521,10 +616,10 @@ void printMethodFieldTable(TableElement* tableElement){
 void printMethodParamsBodyTable(MethodElement* elements){
     for(;elements;elements=elements->next){
         if(elements->meth_type == param){
-            printf("%s\t\t%s\tparam\t(%d, %d)\n",elements->id,elements->type, elements->line, elements->col);
+            printf("%s\t\t%s\tparam\n",elements->id,elements->type);
         }
         else{
-            printf("%s\t\t%s\t(%d, %d)\n",elements->id,elements->type, elements->line, elements->col);
+            printf("%s\t\t%s\n",elements->id,elements->type);
         }
     }
 }
