@@ -11,6 +11,7 @@ void checkProgram(IsProgram* program) {
 }
 
 void checkMethodField(IsMethodField* mfList) {
+    int count = 0;
     while (mfList) {
         if (mfList->mf==isField) {
             insertMethodVarDecl(mfList->mfType.fieldDecl->type->value, mfList->mfType.fieldDecl->id->value, var_decl, mfList->mfType.fieldDecl->line, mfList->mfType.fieldDecl->col);
@@ -20,8 +21,11 @@ void checkMethodField(IsMethodField* mfList) {
             if(currentElement != NULL) {
                 checkParams(currentElement, mfList->mfType.methodDecl->methodHeader->paramDeclList);
                 checkBody(currentElement, mfList->mfType.methodDecl->methodBody->vardDeclSatetmentList);
+                int print = checkOtherMethod(currentElement, count);
+                currentElement->print = print;
             }
         }
+        count ++;
         mfList = mfList->next;
     }
 }

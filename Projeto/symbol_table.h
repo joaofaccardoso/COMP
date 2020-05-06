@@ -10,6 +10,7 @@ typedef struct t5 {
     char* id;
     int line, col;
     struct t5* next;
+    int print;
 } MethodElement;
 
 typedef enum {var_decl, method_decl} element_type;
@@ -21,6 +22,7 @@ typedef struct t2 {
     MethodElement* elements;
     int line, col;
     struct t2* next;
+    int print;
 } TableElement;
 
 typedef struct t1 {
@@ -33,10 +35,16 @@ TableElement* insertParamBody(TableElement* elem, char* type, char* id, element_
 TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType, int line, int col);
 TableHead* insertHead(char* id, int line, int col);
 char *strlwr(char *str);
-MethodElement* findMethodElement(char* id, int line, int col, TableElement* method);
-TableElement* findTableField(char* id, int line, int col);
-TableElement* findTableMethod(char* id, IsExpr* expr, int line, int col, TableElement* methodTable);
-char* findExprTypeTable(IsExpr* expr, int line, int col, TableElement* methodTable);
+
+char* findTerminalType(IsTerminal* terminal, TableElement* tableElement);
 char* findIdTable(char* id, int line, int col, TableElement* methodTable);
+TableElement* findMethodTable(char* id, IsExpr* paramsElement, int line, int col, TableElement* tableElement);
+int checkFunctionType(char* id, MethodElement* methodElement, IsExpr* paramsElement, TableElement* currentElement, TableElement* tableElement, int closest);
+char* getExprType(IsExpr* expr, TableElement* tableElement);
+char* getOpType(IsOp* op, TableElement* tableElement);
+int isClosestFunction(char* id, TableElement* tableIt, IsExpr* paramsElement, TableElement* tableElement);
+char* getAssignType(IsAssign* assign, TableElement* tableElement);
+int checkOtherMethod(TableElement* el, int count);
+int checkOtherParam(MethodElement* param, TableElement* el, int count);
 
 #endif

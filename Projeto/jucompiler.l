@@ -215,7 +215,7 @@ void printFieldDecl(int count, IsFieldDecl* fieldDecl) {
     printf("%s\n",fieldDecl->type->value);
 
     printPoints(count);
-    printf("Id(%s)\n",fieldDecl->id->value);    
+    printf("Id(%s)\n",fieldDecl->id->value); 
 }
 
 void printMethodHeader(int count, IsMethodHeader* methodHeader){
@@ -377,42 +377,49 @@ void printReturnStatement(IsReturnStatement* returnStatement, int count, TableEl
 }
 
 void printCallStatement(IsCallStatement* callStatement, int count, TableElement* methodTable){
-    TableElement* elem = NULL;
-    if (flag == 3){
-        elem = findTableMethod(callStatement->id->value, callStatement->callExpr, callStatement->line, callStatement->col, methodTable);
-    }
     printPoints(count);
-    printf("Call");
+    TableElement* el = NULL;
     if (flag == 3){
-        if (elem) {
-            printf(" - %s", elem->type);
-        }
-        else {
+        el = findMethodTable(callStatement->id->value, callStatement->callExpr, callStatement->line, callStatement->col, methodTable);
+    }
+    printf("Call");
+    
+    if(flag == 3){
+        if(el == NULL){
             printf(" - undef");
         }
+        else{
+            printf(" - %s", el->type);
+        }
     }
+
     printf("\n");
     count+=2;
 
     printPoints(count);
     printf("Id(%s)",callStatement->id->value);
-    if (flag == 3) {
-        if (elem) {
+
+    if(flag == 3){
+        if(el){
             printf(" - (");
-            MethodElement* paramIterator = elem->elements;
-            while (paramIterator && paramIterator->meth_type == param) {
-                printf("%s", paramIterator->type);
-                if (paramIterator->next && paramIterator->next->meth_type == param) {
-                    printf(",");
+            MethodElement* paramsList = el->elements;
+            if(paramsList && paramsList->meth_type == param){
+                printf("%s",paramsList->type);
+                int count = 1;
+                for(paramsList=paramsList->next;paramsList;paramsList=paramsList->next, count++){
+                    int check = checkOtherParam(paramsList,el,count);
+                    if(check == 0){
+                        printf(",%s",paramsList->type);
+                    }
                 }
-                paramIterator = paramIterator->next;
             }
             printf(")");
         }
-        else {
+        else{
             printf(" - undef");
         }
     }
+
     printf("\n");
 
     IsExpr* iterator = callStatement->callExpr;
@@ -423,21 +430,33 @@ void printCallStatement(IsCallStatement* callStatement, int count, TableElement*
 }
 
 void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count, TableElement* methodTable) {
+    char* type = "undef"; 
+    if(parseArgsStatement->parseArgsExpr){
+        type = getExprType(parseArgsStatement->parseArgsExpr,methodTable);
+        if(strcmp(type,"int") != 0){
+            type = "undef";
+        }
+    }
+    
     printPoints(count);
     printf("ParseArgs");
     if (flag == 3) {
-        printf(" - int");
+        printf(" - %s", type);
     }
     printf("\n");
     count+=2;
 
     printPoints(count);
-    printf("Id(%s)\n", parseArgsStatement->id->value);
+    printf("Id(%s)", parseArgsStatement->id->value);
 
-    IsExpr* iterator = parseArgsStatement->parseArgsExpr;
-    if(iterator) {
-        printExpression(iterator, count, methodTable);
-        iterator = iterator->next;
+    if (flag == 3) {
+        printf(" - %s", findIdTable(parseArgsStatement->id->value, parseArgsStatement->line, parseArgsStatement->col, methodTable));
+    }
+
+    printf("\n");
+
+    if(parseArgsStatement->parseArgsExpr) {
+        printExpression(parseArgsStatement->parseArgsExpr, count, methodTable);
     }
 }
 
@@ -448,7 +467,13 @@ void printPrintStatement(IsPrintStatement* ips, int count, TableElement* methodT
 
     if (ips->p == stringLiteral) {
         printPoints(count);
-        printf("StrLit(%s)\n", ips->pType.printString);
+        printf("StrLit(%s)", ips->pType.printString);
+
+        if(flag == 3){
+            printf(" - String");
+        }
+
+        printf("\n");
     }
     else {
         printExpression(ips->pType.printExpr, count, methodTable);
@@ -459,7 +484,7 @@ void printAssign(IsAssign* assignStatement, int count, TableElement* methodTable
     printPoints(count);
     printf("Assign");
     if (flag == 3) {
-        printf(" - %s",findIdTable(assignStatement->id->value, assignStatement->line, assignStatement->col, methodTable));
+        printf(" - %s", getAssignType(assignStatement, methodTable));
     }
     printf("\n");
     count+=2;
@@ -498,36 +523,17 @@ void printExpression(IsExpr* expression, int count, TableElement* methodTable) {
 void printOp(IsOp* operation, int count, TableElement* methodTable) {
     printPoints(count);
     printf("%s",operation->op);
-    if (flag == 3) {
-        if (!strcmp(operation->op, "EQ") || !strcmp(operation->op, "GE") || !strcmp(operation->op, "GT") || !strcmp(operation->op, "LE") || !strcmp(operation->op, "LT") || !strcmp(operation->op, "NE") || !strcmp(operation->op, "AND") || !strcmp(operation->op, "OR")  || !strcmp(operation->op, "XOR")) {
-            printf(" - boolean");
-        }
-        else {
-            char* leftResult = findExprTypeTable(operation->opExprLeft, operation->line, operation->col, methodTable);
-            char* rightResult = findExprTypeTable(operation->opExprRight, operation->line, operation->col, methodTable);
 
-            if (!strcmp(leftResult, "undef") || !strcmp(rightResult, "undef")) {
-                printf(" - undef");
-            }
-            else if ((!strcmp(leftResult, "int") && !strcmp(rightResult, "double")) || (!strcmp(leftResult, "double") && !strcmp(rightResult, "int"))) {
-                printf(" - double");
-            }
-            else if ((!strcmp(leftResult, "int") && !strcmp(rightResult, "boolean")) || (!strcmp(leftResult, "boolean") && !strcmp(rightResult, "int"))) {
-                printf(" - undef");
-            }
-            else if ((!strcmp(leftResult, "double") && !strcmp(rightResult, "boolean")) || (!strcmp(leftResult, "boolean") && !strcmp(rightResult, "double"))) {
-                printf(" - undef");
-            }
-            else {
-                printf(" - %s", leftResult);
-            }
-        }
+    char* type = getOpType(operation,methodTable);
+
+    if(flag == 3 && strcmp(operation->op,"Lshift") != 0 && strcmp(operation->op,"Rshift") != 0 && strcmp(operation->op,"Xor") != 0){
+        printf(" - %s", type);
     }
+
     printf("\n");
     count+=2;
     
     printExpression(operation->opExprLeft,count, methodTable);
-
     printExpression(operation->opExprRight,count, methodTable);
 }
 
@@ -535,18 +541,7 @@ void printTerminal(IsTerminal* terminal, int count, TableElement* methodTable) {
     printPoints(count);
     printf("%s(%s)", terminal->type, terminal->value);
     if (flag == 3) {
-        if (!strcmp(terminal->type, "DecLit")) {
-            printf(" - int");
-        }
-        else if (!strcmp(terminal->type, "RealLit")) {
-            printf(" - double");
-        }
-        else if (!strcmp(terminal->type, "BoolLit")) {
-            printf(" - boolean");
-        }
-        else if (!strcmp(terminal->type, "Id")) {
-            printf(" - %s", findIdTable(terminal->value, terminal->line, terminal->col, methodTable));
-        }
+        printf(" - %s", findTerminalType(terminal, methodTable));
     }
     printf("\n");
 }
@@ -554,14 +549,23 @@ void printTerminal(IsTerminal* terminal, int count, TableElement* methodTable) {
 void printUnit(IsUnit* unit, int count, TableElement* methodTable) {
     printPoints(count);
     printf("%s", unit->op);
-    if (flag==3) {
+
+    if(flag == 3){
         if (strcmp(unit->op, "Length")==0) {
             printf(" - int");
         }
-        else {
-            printf(" - %s",findExprTypeTable(unit->unitExpr, unit->line, unit->col, methodTable));
+        else{
+            printf(" - %s",getExprType(unit->unitExpr, methodTable));
         }
     }
+    // if (flag==3) {
+    //     if (strcmp(unit->op, "Length")==0) {
+    //         printf(" - int");
+    //     }
+    //     else {
+    //         printf(" - %s",findExprTypeTable(unit->unitExpr, unit->line, unit->col, methodTable));
+    //     }
+    // }
     printf("\n");
     count+=2;
 
@@ -574,6 +578,12 @@ void printTable(){
     TableElement* tableElement = symHead->table;
 
     for(;tableElement;tableElement=tableElement->next){
+        while(tableElement && tableElement->print == 0){
+            tableElement=tableElement->next;
+        }
+        if(!tableElement){
+            break;
+        }
         if(tableElement->elem_type == var_decl){
             printf("%s\t\t%s\n",tableElement->id,tableElement->type);
         }
@@ -589,6 +599,7 @@ void printTable(){
             }
             printf(")\t%s\n",tableElement->type);
         }
+
     }
 
     printMethodFieldTable(symHead->table);
@@ -615,10 +626,10 @@ void printMethodFieldTable(TableElement* tableElement){
 
 void printMethodParamsBodyTable(MethodElement* elements){
     for(;elements;elements=elements->next){
-        if(elements->meth_type == param){
+        if(elements->meth_type == param && elements->print == 1){
             printf("%s\t\t%s\tparam\n",elements->id,elements->type);
         }
-        else{
+        else if(elements->print == 1){
             printf("%s\t\t%s\n",elements->id,elements->type);
         }
     }
