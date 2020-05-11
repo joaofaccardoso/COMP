@@ -8,9 +8,6 @@
 
     IsProgram* myProgram;
 
-    extern int line;
-    extern int initCol;
-
 %}
 %nonassoc REDUCE 
 %nonassoc ELSE 
@@ -60,7 +57,7 @@
 
 %%
 
-Program: CLASS ID LBRACE Program1 RBRACE                    {$$=myProgram=insertProgram($2, $4, line, initCol);}                    
+Program: CLASS ID LBRACE Program1 RBRACE                    {$$=myProgram=insertProgram($2, $4, @1.first_line, @1.first_column, @2.first_line, @2.first_column);}                    
     ;
 
 Program1: MethodDecl Program1                               {$$=insertMethodField($2, $1);}                             
@@ -69,14 +66,14 @@ Program1: MethodDecl Program1                               {$$=insertMethodFiel
     | %empty                                                {$$=NULL;}
     ;
 
-MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {$$=insertMethod($3, $4, line, initCol);}         
+MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {$$=insertMethod($3, $4, @1.first_line, @1.first_column);}         
     ;
 
-FieldDecl:  PUBLIC STATIC Type ID CommaId SEMICOLON         {$$=insertField($3,$4,$5, line, initCol);}
+FieldDecl:  PUBLIC STATIC Type ID CommaId SEMICOLON         {$$=insertField($3,$4,$5, @3.first_line, @3.first_column, @4.first_line, @4.first_column);}
     | error SEMICOLON                                       {$$=NULL;}
     ;
 
-CommaId: COMMA ID CommaId                                   {$$=insertVarId($2,$3, line, initCol);}
+CommaId: COMMA ID CommaId                                   {$$=insertVarId($2,$3, @2.first_line, @2.first_column);}
     | %empty                                                {$$=NULL;}
     ;
 
@@ -85,20 +82,20 @@ Type: BOOL                                                  {$$="Bool";}
     | DOUBLE                                                {$$="Double";}
     ;
 
-MethodHeader: Type ID LPAR FormalParams RPAR                {$$=insertMethodHeader($1,$2,$4, line, initCol);}            
-    | VOID ID LPAR FormalParams RPAR                        {$$=insertMethodHeader("Void",$2,$4, line, initCol);}
+MethodHeader: Type ID LPAR FormalParams RPAR                {$$=insertMethodHeader($1,$2,$4, @1.first_line, @1.first_column, @2.first_line, @2.first_column);}            
+    | VOID ID LPAR FormalParams RPAR                        {$$=insertMethodHeader("Void",$2,$4, @1.first_line, @1.first_column, @2.first_line, @2.first_column);}
     ;
 
-FormalParams: Type ID CommaTypeId                           {$$=insertParamDecl($1,$2,$3, line, initCol);}                     
-    | STRING LSQ RSQ ID                                     {$$=insertParamDecl("StringArray",$4,NULL, line, initCol);}
+FormalParams: Type ID CommaTypeId                           {$$=insertParamDecl($1,$2,$3, @1.first_line, @1.first_column, @2.first_line, @2.first_column);}                     
+    | STRING LSQ RSQ ID                                     {$$=insertParamDecl("StringArray",$4,NULL, @1.first_line, @1.first_column, @4.first_line, @4.first_column);}
     | %empty                                                {$$=NULL;}
     ;
 
-CommaTypeId: COMMA Type ID CommaTypeId                      {$$=insertParamDecl($2, $3, $4, line, initCol);}
+CommaTypeId: COMMA Type ID CommaTypeId                      {$$=insertParamDecl($2, $3, $4, @2.first_line, @2.first_column, @3.first_line, @3.first_column);}
     | %empty                                                {$$=NULL;}
     ;
 
-MethodBody:  LBRACE MethodBody1 RBRACE                      {$$=insertMethodBody($2, line, initCol);}                  
+MethodBody:  LBRACE MethodBody1 RBRACE                      {$$=insertMethodBody($2, @1.first_line, @1.first_column);}                  
     ;
 
 MethodBody1: VarDecl MethodBody1                            {$$=insertVarDeclStatement($1,$2);}
@@ -106,21 +103,21 @@ MethodBody1: VarDecl MethodBody1                            {$$=insertVarDeclSta
     | %empty                                                {$$=NULL;}
     ;
             
-VarDecl:  Type ID CommaId SEMICOLON                         {$$=insertVarDecl($1,$2,$3, line, initCol);}                     
+VarDecl:  Type ID CommaId SEMICOLON                         {$$=insertVarDecl($1,$2,$3, @1.first_line, @1.first_column, @2.first_line, @2.first_column);}                     
     ;                      
 
-Statement: LBRACE StatementLoop RBRACE                      {$$=insertBlockStatement($2, line, initCol);}
-    | IF LPAR Expr RPAR Statement %prec REDUCE              {$$=insertIfStatement($3,$5,NULL,0, line, initCol);}
-    | IF LPAR Expr RPAR Statement ELSE Statement            {$$=insertIfStatement($3,$5,$7,1, line, initCol);}
-    | WHILE LPAR Expr RPAR Statement                        {$$=insertWhileStatement($3, $5, line, initCol);}
-    | RETURN Expr SEMICOLON                                 {$$=insertReturnStatement($2, line, initCol);}
-    | RETURN SEMICOLON                                      {$$=insertReturnStatement(NULL, line, initCol);}
-    | MethodInvocation SEMICOLON                            {$$=insertCallStatement($1, line, initCol);}
+Statement: LBRACE StatementLoop RBRACE                      {$$=insertBlockStatement($2, @1.first_line, @1.first_column);}
+    | IF LPAR Expr RPAR Statement %prec REDUCE              {$$=insertIfStatement($3,$5,NULL,0, @1.first_line, @1.first_column);}
+    | IF LPAR Expr RPAR Statement ELSE Statement            {$$=insertIfStatement($3,$5,$7,1, @1.first_line, @1.first_column);}
+    | WHILE LPAR Expr RPAR Statement                        {$$=insertWhileStatement($3, $5, @1.first_line, @1.first_column);}
+    | RETURN Expr SEMICOLON                                 {$$=insertReturnStatement($2, @1.first_line, @1.first_column);}
+    | RETURN SEMICOLON                                      {$$=insertReturnStatement(NULL, @1.first_line, @1.first_column);}
+    | MethodInvocation SEMICOLON                            {$$=insertCallStatement($1);}
     | Assignment SEMICOLON                                  {$$=insertAssignStatement($1);}
     | ParseArgs SEMICOLON                                   {$$=insertParseArgsStatement($1);}
     | SEMICOLON                                             {$$=NULL;}
-    | PRINT LPAR STRLIT RPAR SEMICOLON                      {$$=insertPrintStatement(stringLiteral, $3, NULL, line, initCol);}
-    | PRINT LPAR Expr RPAR SEMICOLON                        {$$=insertPrintStatement(expression, NULL, $3, line, initCol);}
+    | PRINT LPAR STRLIT RPAR SEMICOLON                      {$$=insertPrintStatement(stringLiteral, $3, NULL, @1.first_line, @1.first_column);}
+    | PRINT LPAR Expr RPAR SEMICOLON                        {$$=insertPrintStatement(expression, NULL, $3, @1.first_line, @1.first_column);}
     | error SEMICOLON                                       {$$=NULL;}
     ;
     
@@ -128,19 +125,19 @@ StatementLoop: Statement StatementLoop                      {$$=createBlockState
     | %empty                                                {$$=NULL;}
     ;
 
-MethodInvocation: ID LPAR Expr CommaExpr RPAR               {$$=createCallStatement($1, $3, $4, line, initCol);}
-    | ID LPAR RPAR                                          {$$=createCallStatement($1, NULL, NULL, line, initCol);}
+MethodInvocation: ID LPAR Expr CommaExpr RPAR               {$$=createCallStatement($1, $3, $4, @1.first_line, @1.first_column);}
+    | ID LPAR RPAR                                          {$$=createCallStatement($1, NULL, NULL, @1.first_line, @1.first_column);}
     | ID LPAR error RPAR                                    {$$=NULL;}
     ;
 
-Assignment: ID ASSIGN Expr                                  {$$=createAssign($1, $3, line, initCol);}
+Assignment: ID ASSIGN Expr                                  {$$=createAssign($1, $3, @2.first_line, @2.first_column, @1.first_line, @1.first_column);}
     ;
 
 CommaExpr: COMMA Expr CommaExpr                             {$$=insertCallExpr($2, $3);}
     | %empty                                                {$$=NULL;}
     ;
 
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR               {$$=createParseArgsStatement($3, $5, line, initCol);}
+ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR               {$$=createParseArgsStatement($3, $5, @1.first_line, @1.first_column, @3.first_line, @3.first_column);}
     | PARSEINT LPAR error RPAR                              {$$=NULL;}
     ;
 
@@ -148,37 +145,37 @@ Expr: Assignment                                            {$$=insertAssignExpr
     | Expr1                                                 {$$=$1;}
     ;
 
-Expr1: Expr1 PLUS Expr1                                     {$$=insertOp($1,"Add",$3, line, initCol);} 
-    | Expr1 MINUS Expr1                                     {$$=insertOp($1,"Sub",$3, line, initCol);}
-    | Expr1 STAR Expr1                                      {$$=insertOp($1,"Mul",$3, line, initCol);}
-    | Expr1 DIV Expr1                                       {$$=insertOp($1,"Div",$3, line, initCol);}
-    | Expr1 MOD Expr1                                       {$$=insertOp($1,"Mod",$3, line, initCol);}
-    | Expr1 AND Expr1                                       {$$=insertOp($1,"And",$3, line, initCol);}
-    | Expr1 OR Expr1                                        {$$=insertOp($1,"Or",$3, line, initCol);}
-    | Expr1 XOR Expr1                                       {$$=insertOp($1,"Xor",$3, line, initCol);}
-    | Expr1 LSHIFT Expr1                                    {$$=insertOp($1,"Lshift",$3, line, initCol);}
-    | Expr1 RSHIFT Expr1                                    {$$=insertOp($1,"Rshift",$3, line, initCol);}
-    | Expr1 EQ Expr1                                        {$$=insertOp($1,"Eq",$3, line, initCol);}
-    | Expr1 GE Expr1                                        {$$=insertOp($1,"Ge",$3, line, initCol);}
-    | Expr1 GT Expr1                                        {$$=insertOp($1,"Gt",$3, line, initCol);}
-    | Expr1 LE Expr1                                        {$$=insertOp($1,"Le",$3, line, initCol);}
-    | Expr1 LT Expr1                                        {$$=insertOp($1,"Lt",$3, line, initCol);}
-    | Expr1 NE Expr1                                        {$$=insertOp($1,"Ne",$3, line, initCol);}
+Expr1: Expr1 PLUS Expr1                                     {$$=insertOp($1,"Add",$3, @2.first_line, @2.first_column);} 
+    | Expr1 MINUS Expr1                                     {$$=insertOp($1,"Sub",$3, @2.first_line, @2.first_column);}
+    | Expr1 STAR Expr1                                      {$$=insertOp($1,"Mul",$3, @2.first_line, @2.first_column);}
+    | Expr1 DIV Expr1                                       {$$=insertOp($1,"Div",$3, @2.first_line, @2.first_column);}
+    | Expr1 MOD Expr1                                       {$$=insertOp($1,"Mod",$3, @2.first_line, @2.first_column);}
+    | Expr1 AND Expr1                                       {$$=insertOp($1,"And",$3, @2.first_line, @2.first_column);}
+    | Expr1 OR Expr1                                        {$$=insertOp($1,"Or",$3, @2.first_line, @2.first_column);}
+    | Expr1 XOR Expr1                                       {$$=insertOp($1,"Xor",$3, @2.first_line, @2.first_column);}
+    | Expr1 LSHIFT Expr1                                    {$$=insertOp($1,"Lshift",$3, @2.first_line, @2.first_column);}
+    | Expr1 RSHIFT Expr1                                    {$$=insertOp($1,"Rshift",$3, @2.first_line, @2.first_column);}
+    | Expr1 EQ Expr1                                        {$$=insertOp($1,"Eq",$3, @2.first_line, @2.first_column);}
+    | Expr1 GE Expr1                                        {$$=insertOp($1,"Ge",$3, @2.first_line, @2.first_column);}
+    | Expr1 GT Expr1                                        {$$=insertOp($1,"Gt",$3, @2.first_line, @2.first_column);}
+    | Expr1 LE Expr1                                        {$$=insertOp($1,"Le",$3, @2.first_line, @2.first_column);}
+    | Expr1 LT Expr1                                        {$$=insertOp($1,"Lt",$3, @2.first_line, @2.first_column);}
+    | Expr1 NE Expr1                                        {$$=insertOp($1,"Ne",$3, @2.first_line, @2.first_column);}
     | Expr2                                                 {$$=$1;}
     ;
 
-Expr2: NOT Expr2 %prec PRE                                  {$$=insertUnit("Not",$2,NULL, line, initCol);}
-    | PLUS Expr2 %prec PRE                                  {$$=insertUnit("Plus",$2,NULL, line, initCol);}
-    | MINUS Expr2 %prec PRE                                 {$$=insertUnit("Minus",$2,NULL, line, initCol);}
+Expr2: NOT Expr2 %prec PRE                                  {$$=insertUnit("Not",$2,NULL, @1.first_line, @1.first_column, 0, 0);}
+    | PLUS Expr2 %prec PRE                                  {$$=insertUnit("Plus",$2,NULL, @1.first_line, @1.first_column, 0, 0);}
+    | MINUS Expr2 %prec PRE                                 {$$=insertUnit("Minus",$2,NULL, @1.first_line, @1.first_column, 0, 0);}
     | MethodInvocation                                      {$$=insertExprCall($1);}
     | ParseArgs                                             {$$=insertExprParseArgs($1);}
     | LPAR Expr RPAR                                        {$$=$2;}
     | LPAR error RPAR                                       {$$=NULL;}
-    | ID                                                    {$$=insertTerminal("Id",$1, line, initCol);}
-    | ID DOTLENGHT                                          {$$=insertUnit("Length",NULL,$1, line, initCol);}
-    | INTLIT                                                {$$=insertTerminal("DecLit",$1, line, initCol);}
-    | REALLIT                                               {$$=insertTerminal("RealLit",$1, line, initCol);}
-    | BOOLLIT                                               {$$=insertTerminal("BoolLit",$1, line, initCol);}
+    | ID                                                    {$$=insertTerminal("Id",$1, @1.first_line, @1.first_column);}
+    | ID DOTLENGHT                                          {$$=insertUnit("Length",NULL,$1, @2.first_line, @2.first_column, @1.first_line, @1.first_column);}
+    | INTLIT                                                {$$=insertTerminal("DecLit",$1, @1.first_line, @1.first_column);}
+    | REALLIT                                               {$$=insertTerminal("RealLit",$1, @1.first_line, @1.first_column);}
+    | BOOLLIT                                               {$$=insertTerminal("BoolLit",$1, @1.first_line, @1.first_column);}
     ;
 
 %%

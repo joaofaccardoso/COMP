@@ -15,24 +15,24 @@ IsTerminal* insertIdType(char* type, char* value, int line, int col){
     return it;
 }
 
-IsProgram* insertProgram(char* id, IsMethodField* list, int line, int col) {
+IsProgram* insertProgram(char* id, IsMethodField* list, int programLine, int programCol, int idLine, int idCol) {
     IsProgram* ip = (IsProgram*)malloc(sizeof(IsProgram));
 
-    ip->id = insertIdType("Id",id, line, col);
+    ip->id = insertIdType("Id",id, idLine, idCol);
     ip->methodFieldList = list;
-    ip->line = line;
-    ip->col = col;
+    ip->line = programLine;
+    ip->col = programCol;
 
     return ip;
 }
 
-IsMethodField* insertField(char* type, char* id, IsVarId* idsList, int line, int col) {
+IsMethodField* insertField(char* type, char* id, IsVarId* idsList, int typeLine, int typeCol, int idLine, int idCol) {
     IsVarId* ivi = (IsVarId*)malloc(sizeof(IsVarId));
 
-    ivi->id = insertIdType("Id",id, line, col);
+    ivi->id = insertIdType("Id",id, idLine, idCol);
     ivi->next = idsList;
-    ivi->line = line;
-    ivi->col = col;
+    ivi->line = idLine;
+    ivi->col = idCol;
 
     idsList = ivi;
     
@@ -45,7 +45,7 @@ IsMethodField* insertField(char* type, char* id, IsVarId* idsList, int line, int
         IsMethodField* imf = (IsMethodField*)malloc(sizeof(IsMethodField));
         IsFieldDecl* ifd = (IsFieldDecl*)malloc(sizeof(IsFieldDecl));
 
-        ifd->type = insertIdType("Type",type, line, col);
+        ifd->type = insertIdType("Type",type, typeLine, typeCol);
         ifd->id = temp->id;
         ifd->line = temp->line;
         ifd->col = temp->col;
@@ -100,26 +100,26 @@ IsMethodField* insertMethod(IsMethodHeader* methodHeader, IsMethodBody* methodBo
     return imf;
 }
 
-IsMethodHeader* insertMethodHeader(char* type, char* id, IsParamDecl* paramDeclList, int line, int col) {
+IsMethodHeader* insertMethodHeader(char* type, char* id, IsParamDecl* paramDeclList, int typeLine, int typeCol, int idLine, int idCol) {
     IsMethodHeader* imh = (IsMethodHeader*)malloc(sizeof(IsMethodHeader));
 
-    imh->type = insertIdType("Type",type, line, col);
-    imh->id = insertIdType("Id",id, line, col);
+    imh->type = insertIdType("Type",type, typeLine, typeCol);
+    imh->id = insertIdType("Id",id, idLine, idCol);
     imh->paramDeclList = paramDeclList;
-    imh->line = line;
-    imh->col = col;
+    imh->line = typeLine;
+    imh->col = typeCol;
 
     return imh;
 }
 
-IsParamDecl* insertParamDecl(char* type, char* id, IsParamDecl* head, int line, int col) {
+IsParamDecl* insertParamDecl(char* type, char* id, IsParamDecl* head, int typeLine, int typeCol, int idLine, int idCol) {
     IsParamDecl* ipd = (IsParamDecl*)malloc(sizeof(IsParamDecl));
 
-    ipd->type = insertIdType("Type",type, line, col);
-    ipd->id = insertIdType("Id",id, line, col);
+    ipd->type = insertIdType("Type",type, typeLine, typeCol);
+    ipd->id = insertIdType("Id",id, idLine, idCol);
     ipd->next = head;
-    ipd->line = line;
-    ipd->col = col;
+    ipd->line = typeLine;
+    ipd->col = typeCol;
 
     return ipd;
 }
@@ -135,13 +135,13 @@ IsVarId* insertVarId(char* id, IsVarId* head, int line, int col){
     return ivi;
 }
 
-IsVarDeclStatement* insertVarDecl(char* type, char* id, IsVarId* idList, int line, int col) {
+IsVarDeclStatement* insertVarDecl(char* type, char* id, IsVarId* idList, int decLine, int decCol, int idLine, int idCol) {
     IsVarId* ivi = (IsVarId*)malloc(sizeof(IsVarId));
 
-    ivi->id = insertIdType("Id",id, line, col);
+    ivi->id = insertIdType("Id",id, idLine, idCol);
     ivi->next = idList;
-    ivi->line = line;
-    ivi->col = col;
+    ivi->line = decLine;
+    ivi->col = decCol;
 
     idList = ivi;
     
@@ -154,7 +154,7 @@ IsVarDeclStatement* insertVarDecl(char* type, char* id, IsVarId* idList, int lin
         IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
         IsVarDecl* ivd = (IsVarDecl*)malloc(sizeof(IsVarDecl));
 
-        ivd->type = insertIdType("Type",type, line, col);
+        ivd->type = insertIdType("Type",type, temp->line, temp->col);
         ivd->id = temp->id;
         ivd->line = temp->line;
         ivd->col = temp->col;
@@ -292,8 +292,14 @@ IsVarDeclStatement* insertReturnStatement(IsExpr* returnExpr, int line, int col)
     IsReturnStatement* irs = (IsReturnStatement*)malloc(sizeof(IsReturnStatement));
 
     irs->returnExpr = returnExpr;
-    irs->line = line;
-    irs->col = col;
+    if (returnExpr) {
+        irs->line = returnExpr->line;
+        irs->col = returnExpr->col;
+    }
+    else {
+        irs->line = line;
+        irs->col = col;
+    }
 
     is->sm = sReturn;
     is->smType.returnStatement = irs;
@@ -308,7 +314,7 @@ IsVarDeclStatement* insertReturnStatement(IsExpr* returnExpr, int line, int col)
     return ivds;
 }
 
-IsVarDeclStatement* insertCallStatement(IsCallStatement* ics, int line, int col) {
+IsVarDeclStatement* insertCallStatement(IsCallStatement* ics) {
     IsVarDeclStatement* ivds = (IsVarDeclStatement*)malloc(sizeof(IsVarDeclStatement));
     IsStatement* is = (IsStatement*)malloc(sizeof(IsStatement));
 
@@ -365,13 +371,13 @@ IsVarDeclStatement* insertAssignStatement(IsAssign* assignStatement) {
     return ivds;
 }
 
-IsAssign* createAssign(char* id, IsExpr* assignExpr, int line, int col) {
+IsAssign* createAssign(char* id, IsExpr* assignExpr, int assignLine, int assignCol, int idLine, int idCol) {
     IsAssign* ia = (IsAssign*)malloc(sizeof(IsAssign));
 
-    ia->id = insertIdType("Id",id, line, col);
+    ia->id = insertIdType("Id",id, idLine, idCol);
     ia->assignExpr = assignExpr;
-    ia->line = line;
-    ia->col = col;
+    ia->line = assignLine;
+    ia->col = assignCol;
 
     return ia;
 }
@@ -397,13 +403,13 @@ IsVarDeclStatement* insertParseArgsStatement(IsParseArgsStatement* ipas) {
     return ivds;
 }
 
-IsParseArgsStatement* createParseArgsStatement(char* id, IsExpr* parseArgsExpr, int line, int col) {
+IsParseArgsStatement* createParseArgsStatement(char* id, IsExpr* parseArgsExpr, int parseLine, int parseCol, int idLine, int idCol) {
     IsParseArgsStatement* ipas = (IsParseArgsStatement*)malloc(sizeof(IsParseArgsStatement));
 
-    ipas->id = insertIdType("Id",id, line, col);
+    ipas->id = insertIdType("Id",id, idLine, idCol);
     ipas->parseArgsExpr = parseArgsExpr;
-    ipas->line = line;
-    ipas->col = col;
+    ipas->line = parseLine;
+    ipas->col = parseCol;
 
     return ipas;
 }
@@ -465,20 +471,20 @@ IsExpr* insertOp(IsExpr* opExprLeft, char* op, IsExpr* opExprRight, int line, in
     return ie;
 }
 
-IsExpr* insertUnit(char* op, IsExpr* unitExpr, char* id, int line, int col) {
+IsExpr* insertUnit(char* op, IsExpr* unitExpr, char* id, int opLine, int opCol, int exprLine, int exprCol) {
     IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
     IsUnit* iu = (IsUnit*)malloc(sizeof(IsUnit));
     iu->op = op;
 
     if(id!=NULL){
-        iu->unitExpr = insertTerminal("Id",id, line, col);
+        iu->unitExpr = insertTerminal("Id",id, exprLine, exprCol);
     }
     else{
         iu->unitExpr = unitExpr;
     }
 
-    iu->line = line;
-    iu->col = col;
+    iu->line = opLine;
+    iu->col = opCol;
 
     ie->e = eUnit;
     ie->eType.exprUnit = iu;
@@ -525,4 +531,4 @@ IsExpr* insertTerminal(char* type, char* value, int line, int col){
     ie->col = it->col;
 
     return ie;
-}   
+} 

@@ -243,38 +243,40 @@ void insertAssignType(IsAssign* assign, TableElement* tableElement){
 }
 
 void insertExprType(IsExpr* expr, TableElement* tableElement){
-    char* type = NULL;
-    if(expr->e == eAssign){
-        IsAssign* assign = expr->eType.exprAssign;
-        insertAssignType(assign, tableElement);
-        type = assign->returnType;
+    if (expr) {
+        char* type = NULL;
+        if(expr->e == eAssign){
+            IsAssign* assign = expr->eType.exprAssign;
+            insertAssignType(assign, tableElement);
+            type = assign->returnType;
+        }
+        else if(expr->e == eOp){
+            IsOp* op = expr->eType.exprOp;
+            insertOpType(op, tableElement);
+            type = op->returnType;
+        }
+        else if(expr->e == eCall){
+            IsCallStatement* call = expr->eType.exprCall;
+            insertCallType(call, tableElement);
+            type = call->returnType;
+        }
+        else if(expr->e == eParseArgs){
+            IsParseArgsStatement* parseArgs = expr->eType.exprParseArgs;
+            insertParseArgsType(parseArgs, tableElement);
+            type = parseArgs->returnType;
+        }
+        else if(expr->e == eTerminal){
+            IsTerminal* terminal = expr->eType.exprTerminal;
+            insertTerminalType(terminal, tableElement);
+            type = terminal->returnType;
+        }
+        else if(expr->e == eUnit){
+            IsUnit* unit = expr->eType.exprUnit;
+            insertUnitType(unit, tableElement);
+            type = unit->returnType;
+        }
+        expr->returnType = type;
     }
-    else if(expr->e == eOp){
-        IsOp* op = expr->eType.exprOp;
-        insertOpType(op, tableElement);
-        type = op->returnType;
-    }
-    else if(expr->e == eCall){
-        IsCallStatement* call = expr->eType.exprCall;
-        insertCallType(call, tableElement);
-        type = call->returnType;
-    }
-    else if(expr->e == eParseArgs){
-        IsParseArgsStatement* parseArgs = expr->eType.exprParseArgs;
-        insertParseArgsType(parseArgs, tableElement);
-        type = parseArgs->returnType;
-    }
-    else if(expr->e == eTerminal){
-        IsTerminal* terminal = expr->eType.exprTerminal;
-        insertTerminalType(terminal, tableElement);
-        type = terminal->returnType;
-    }
-    else if(expr->e == eUnit){
-        IsUnit* unit = expr->eType.exprUnit;
-        insertUnitType(unit, tableElement);
-        type = unit->returnType;
-    }
-    expr->returnType = type;
 }
 
 void insertOpType(IsOp* operation, TableElement* tableElement){
@@ -290,7 +292,7 @@ void insertOpType(IsOp* operation, TableElement* tableElement){
         }
     }
     else if(strcmp(operation->op, "Lshift") == 0 || strcmp(operation->op, "Rshift") == 0 || strcmp(operation->op,"Xor") == 0){
-        operation->returnType = "undef";
+        operation->returnType = "none";
     }
     else if((strcmp(operation->opExprLeft->returnType,"boolean") == 0 || strcmp(operation->opExprRight->returnType,"boolean") == 0) && (strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Sub") == 0 || strcmp(operation->op,"Mul") == 0 || strcmp(operation->op,"Div") == 0 || strcmp(operation->op,"Mod") == 0)){
         operation->returnType = "undef";

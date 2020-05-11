@@ -88,7 +88,7 @@ TableHead* symHead = NULL;
 <COMMENT><<EOF>>                {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated comment\n",lComment,cComment); BEGIN 0;}
 <COMMENT>.                      {column+=yyleng; initCol=column;}
 
-<STRINGFLAG>\"                      {column+=yyleng; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; if(string==0){ yylval.charvalue=(char*)strdup(printString); return STRLIT;} else string=0;}
+<STRINGFLAG>\"                      {column+=yyleng; yylloc.first_line = line; yylloc.first_column = initCol; if(flag==1 && string==0) printf("STRLIT(%s)\n",printString); BEGIN 0; if(string==0){ yylval.charvalue=(char*)strdup(printString); return STRLIT;} else string=0;}
 <STRINGFLAG>(\n|\r|\r\n)            {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}
 <STRINGFLAG><<EOF>>                 {if(flag==1 || flag == 2 || flag == 0) printf("Line %d, col %d: unterminated string literal\n",lString,cString); column=1; line++; string=0; BEGIN 0;}
 <STRINGFLAG>{escape}                {column+=yyleng;}
@@ -98,57 +98,57 @@ TableHead* symHead = NULL;
 \/\/([^\r\n])*                  {isString=0; ;}
 {whiteSpace}                    {isString=0; column+=yyleng; initCol=column;}
 (\n|\r|\r\n)                    {isString=0; column=1; initCol=1; line++;}
-System"."out"."print            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("PRINT\n"); yylval.charvalue=(char*)strdup(yytext); return PRINT;}
-Integer"."parseInt              {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("PARSEINT\n"); yylval.charvalue=(char*)strdup(yytext); return PARSEINT;}
-"."length                       {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("DOTLENGHT\n"); yylval.charvalue=(char*)strdup(yytext); return DOTLENGHT;}
-public                          {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("PUBLIC\n"); yylval.charvalue=(char*)strdup(yytext); return PUBLIC;}
-return                          {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("RETURN\n"); yylval.charvalue=(char*)strdup(yytext); return RETURN;}
-static                          {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("STATIC\n"); yylval.charvalue=(char*)strdup(yytext); return STATIC;}
-String                          {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("STRING\n"); yylval.charvalue=(char*)strdup(yytext); return STRING;}
-void                            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("VOID\n"); yylval.charvalue=(char*)strdup(yytext); return VOID;}
-while                           {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("WHILE\n"); yylval.charvalue=(char*)strdup(yytext); return WHILE;}
-int                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("INT\n"); yylval.charvalue=(char*)strdup(yytext); return INT;}
-double                          {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("DOUBLE\n"); yylval.charvalue=(char*)strdup(yytext); return DOUBLE;}
-if                              {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("IF\n"); yylval.charvalue=(char*)strdup(yytext); return IF;}
-else                            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("ELSE\n"); yylval.charvalue=(char*)strdup(yytext); return ELSE;}
-boolean                         {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("BOOL\n"); yylval.charvalue=(char*)strdup(yytext); return BOOL;}
-class                           {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("CLASS\n"); yylval.charvalue=(char*)strdup(yytext); return CLASS;}
-(true|false)                    {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("BOOLLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return BOOLLIT;}
-==                              {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("EQ\n"); yylval.charvalue=(char*)strdup(yytext); return EQ;}
-=                               {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("ASSIGN\n"); yylval.charvalue=(char*)strdup(yytext); return ASSIGN;}
-","                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("COMMA\n"); yylval.charvalue=(char*)strdup(yytext); return COMMA;}
-"/"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("DIV\n"); yylval.charvalue=(char*)strdup(yytext); return DIV;}
-">>"                            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("RSHIFT\n"); yylval.charvalue=(char*)strdup(yytext); return RSHIFT;}
-"<<"                            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("LSHIFT\n"); yylval.charvalue=(char*)strdup(yytext); return LSHIFT;}
-"^"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("XOR\n"); yylval.charvalue=(char*)strdup(yytext); return XOR;}
-">="                            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("GE\n"); yylval.charvalue=(char*)strdup(yytext); return GE;}
-">"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("GT\n"); yylval.charvalue=(char*)strdup(yytext); return GT;}
-"<="                            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("LE\n"); yylval.charvalue=(char*)strdup(yytext); return LE;}
-"<"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("LT\n"); yylval.charvalue=(char*)strdup(yytext); return LT;}
-"-"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("MINUS\n"); yylval.charvalue=(char*)strdup(yytext); return MINUS;}
-"%"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("MOD\n"); yylval.charvalue=(char*)strdup(yytext); return MOD;}
-"!="                            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("NE\n"); yylval.charvalue=(char*)strdup(yytext); return NE;}
-"!"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("NOT\n"); yylval.charvalue=(char*)strdup(yytext); return NOT;}
-"||"                            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("OR\n"); yylval.charvalue=(char*)strdup(yytext); return OR;}
-"+"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("PLUS\n"); yylval.charvalue=(char*)strdup(yytext); return PLUS;}
-";"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("SEMICOLON\n"); yylval.charvalue=(char*)strdup(yytext); return SEMICOLON;}
-"*"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("STAR\n"); yylval.charvalue=(char*)strdup(yytext); return STAR;}
-"->"                            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("ARROW\n"); yylval.charvalue=(char*)strdup(yytext); return ARROW;}
-"&&"                            {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("AND\n"); yylval.charvalue=(char*)strdup(yytext); return AND;}
-"{"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("LBRACE\n"); yylval.charvalue=(char*)strdup(yytext); return LBRACE;}
-"}"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("RBRACE\n"); yylval.charvalue=(char*)strdup(yytext); return RBRACE;}
-"("                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("LPAR\n"); yylval.charvalue=(char*)strdup(yytext); return LPAR;}
-")"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("RPAR\n"); yylval.charvalue=(char*)strdup(yytext); return RPAR;}
-"["                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("LSQ\n"); yylval.charvalue=(char*)strdup(yytext); return LSQ;}
-"]"                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("RSQ\n"); yylval.charvalue=(char*)strdup(yytext); return RSQ;}
-{reserved}                      {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("RESERVED(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return RESERVED;}
+System"."out"."print            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("PRINT\n"); yylval.charvalue=(char*)strdup(yytext); return PRINT;}
+Integer"."parseInt              {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("PARSEINT\n"); yylval.charvalue=(char*)strdup(yytext); return PARSEINT;}
+"."length                       {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("DOTLENGHT\n"); yylval.charvalue=(char*)strdup(yytext); return DOTLENGHT;}
+public                          {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("PUBLIC\n"); yylval.charvalue=(char*)strdup(yytext); return PUBLIC;}
+return                          {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("RETURN\n"); yylval.charvalue=(char*)strdup(yytext); return RETURN;}
+static                          {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("STATIC\n"); yylval.charvalue=(char*)strdup(yytext); return STATIC;}
+String                          {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("STRING\n"); yylval.charvalue=(char*)strdup(yytext); return STRING;}
+void                            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("VOID\n"); yylval.charvalue=(char*)strdup(yytext); return VOID;}
+while                           {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("WHILE\n"); yylval.charvalue=(char*)strdup(yytext); return WHILE;}
+int                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("INT\n"); yylval.charvalue=(char*)strdup(yytext); return INT;}
+double                          {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("DOUBLE\n"); yylval.charvalue=(char*)strdup(yytext); return DOUBLE;}
+if                              {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("IF\n"); yylval.charvalue=(char*)strdup(yytext); return IF;}
+else                            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("ELSE\n"); yylval.charvalue=(char*)strdup(yytext); return ELSE;}
+boolean                         {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("BOOL\n"); yylval.charvalue=(char*)strdup(yytext); return BOOL;}
+class                           {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("CLASS\n"); yylval.charvalue=(char*)strdup(yytext); return CLASS;}
+(true|false)                    {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("BOOLLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return BOOLLIT;}
+==                              {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("EQ\n"); yylval.charvalue=(char*)strdup(yytext); return EQ;}
+=                               {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("ASSIGN\n"); yylval.charvalue=(char*)strdup(yytext); return ASSIGN;}
+","                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("COMMA\n"); yylval.charvalue=(char*)strdup(yytext); return COMMA;}
+"/"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("DIV\n"); yylval.charvalue=(char*)strdup(yytext); return DIV;}
+">>"                            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("RSHIFT\n"); yylval.charvalue=(char*)strdup(yytext); return RSHIFT;}
+"<<"                            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("LSHIFT\n"); yylval.charvalue=(char*)strdup(yytext); return LSHIFT;}
+"^"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("XOR\n"); yylval.charvalue=(char*)strdup(yytext); return XOR;}
+">="                            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("GE\n"); yylval.charvalue=(char*)strdup(yytext); return GE;}
+">"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("GT\n"); yylval.charvalue=(char*)strdup(yytext); return GT;}
+"<="                            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("LE\n"); yylval.charvalue=(char*)strdup(yytext); return LE;}
+"<"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("LT\n"); yylval.charvalue=(char*)strdup(yytext); return LT;}
+"-"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("MINUS\n"); yylval.charvalue=(char*)strdup(yytext); return MINUS;}
+"%"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("MOD\n"); yylval.charvalue=(char*)strdup(yytext); return MOD;}
+"!="                            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("NE\n"); yylval.charvalue=(char*)strdup(yytext); return NE;}
+"!"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("NOT\n"); yylval.charvalue=(char*)strdup(yytext); return NOT;}
+"||"                            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("OR\n"); yylval.charvalue=(char*)strdup(yytext); return OR;}
+"+"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("PLUS\n"); yylval.charvalue=(char*)strdup(yytext); return PLUS;}
+";"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("SEMICOLON\n"); yylval.charvalue=(char*)strdup(yytext); return SEMICOLON;}
+"*"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("STAR\n"); yylval.charvalue=(char*)strdup(yytext); return STAR;}
+"->"                            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("ARROW\n"); yylval.charvalue=(char*)strdup(yytext); return ARROW;}
+"&&"                            {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("AND\n"); yylval.charvalue=(char*)strdup(yytext); return AND;}
+"{"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("LBRACE\n"); yylval.charvalue=(char*)strdup(yytext); return LBRACE;}
+"}"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("RBRACE\n"); yylval.charvalue=(char*)strdup(yytext); return RBRACE;}
+"("                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("LPAR\n"); yylval.charvalue=(char*)strdup(yytext); return LPAR;}
+")"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("RPAR\n"); yylval.charvalue=(char*)strdup(yytext); return RPAR;}
+"["                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("LSQ\n"); yylval.charvalue=(char*)strdup(yytext); return LSQ;}
+"]"                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("RSQ\n"); yylval.charvalue=(char*)strdup(yytext); return RSQ;}
+{reserved}                      {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("RESERVED(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return RESERVED;}
 \"                              {BEGIN (STRINGFLAG); lString=line; cString=column; isString = 1; printString = yytext; initCol=column; column+=yyleng;}
 "/*"                            {isString=0; lComment = line; cComment = column; BEGIN (COMMENT); column+=yyleng; initCol=column;}
-("_"|"$"|{letters})("_"|"$"|{letters}|{number0})*           {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("ID(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return ID;}
-(0|{integer})                                               {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("INTLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return INTLIT;}
-{integer0}"."{integer0}?{exp}?                              {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return REALLIT;}
-"."{integer0}{exp}?                                         {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return REALLIT;}
-{integer0}{exp}                                             {isString=0; initCol=column; column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return REALLIT;}
+("_"|"$"|{letters})("_"|"$"|{letters}|{number0})*           {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("ID(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return ID;}
+(0|{integer})                                               {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("INTLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return INTLIT;}
+{integer0}"."{integer0}?{exp}?                              {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return REALLIT;}
+"."{integer0}{exp}?                                         {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return REALLIT;}
+{integer0}{exp}                                             {isString=0; initCol=column; yylloc.first_line = line; yylloc.first_column = initCol; column+=yyleng; if(flag==1) printf("REALLIT(%s)\n",yytext); yylval.charvalue=(char*)strdup(yytext); return REALLIT;}
 
 
 (.)                             {if (flag == 1 || flag == 2 || flag == 0) printf("Line %d, col %d: illegal character (%s)\n",line,column,yytext); column+=yyleng; initCol=column;}
