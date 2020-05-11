@@ -36,15 +36,5 @@ TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType, i
 TableHead* insertHead(char* id, int line, int col);
 char *strlwr(char *str);
 
-char* findTerminalType(IsTerminal* terminal, TableElement* tableElement);
-char* findIdTable(char* id, int line, int col, TableElement* methodTable);
 TableElement* findMethodTable(char* id, IsExpr* paramsElement, int line, int col, TableElement* tableElement);
-int checkFunctionType(char* id, MethodElement* methodElement, IsExpr* paramsElement, TableElement* currentElement, TableElement* tableElement, int closest);
-char* getExprType(IsExpr* expr, TableElement* tableElement);
-char* getOpType(IsOp* op, TableElement* tableElement);
-int isClosestFunction(char* id, TableElement* tableIt, IsExpr* paramsElement, TableElement* tableElement);
-char* getAssignType(IsAssign* assign, TableElement* tableElement);
-int checkOtherMethod(TableElement* el, int count);
-int checkOtherParam(MethodElement* param, TableElement* el, int count);
-
 #endif

@@ -378,19 +378,12 @@ void printReturnStatement(IsReturnStatement* returnStatement, int count, TableEl
 
 void printCallStatement(IsCallStatement* callStatement, int count, TableElement* methodTable){
     printPoints(count);
-    TableElement* el = NULL;
-    if (flag == 3){
-        el = findMethodTable(callStatement->id->value, callStatement->callExpr, callStatement->line, callStatement->col, methodTable);
-    }
+    TableElement* el = findMethodTable(callStatement->id->value, callStatement->callExpr, callStatement->line, callStatement->col, methodTable);
+
     printf("Call");
     
     if(flag == 3){
-        if(el == NULL){
-            printf(" - undef");
-        }
-        else{
-            printf(" - %s", el->type);
-        }
+        printf(" - %s", callStatement->returnType);
     }
 
     printf("\n");
@@ -430,18 +423,10 @@ void printCallStatement(IsCallStatement* callStatement, int count, TableElement*
 }
 
 void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count, TableElement* methodTable) {
-    char* type = "undef"; 
-    if(parseArgsStatement->parseArgsExpr){
-        type = getExprType(parseArgsStatement->parseArgsExpr,methodTable);
-        if(strcmp(type,"int") != 0){
-            type = "undef";
-        }
-    }
-    
     printPoints(count);
     printf("ParseArgs");
     if (flag == 3) {
-        printf(" - %s", type);
+        printf(" - %s", parseArgsStatement->returnType);
     }
     printf("\n");
     count+=2;
@@ -450,7 +435,7 @@ void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count
     printf("Id(%s)", parseArgsStatement->id->value);
 
     if (flag == 3) {
-        printf(" - %s", findIdTable(parseArgsStatement->id->value, parseArgsStatement->line, parseArgsStatement->col, methodTable));
+        printf(" - %s", parseArgsStatement->id->returnType);
     }
 
     printf("\n");
@@ -470,7 +455,7 @@ void printPrintStatement(IsPrintStatement* ips, int count, TableElement* methodT
         printf("StrLit(%s)", ips->pType.printString);
 
         if(flag == 3){
-            printf(" - String");
+            printf(" - %s", ips->returnType);
         }
 
         printf("\n");
@@ -484,7 +469,7 @@ void printAssign(IsAssign* assignStatement, int count, TableElement* methodTable
     printPoints(count);
     printf("Assign");
     if (flag == 3) {
-        printf(" - %s", getAssignType(assignStatement, methodTable));
+        printf(" - %s", assignStatement->returnType);
     }
     printf("\n");
     count+=2;
@@ -492,7 +477,7 @@ void printAssign(IsAssign* assignStatement, int count, TableElement* methodTable
     printPoints(count);
     printf("Id(%s)", assignStatement->id->value);
     if (flag == 3) {
-        printf(" - %s",findIdTable(assignStatement->id->value, assignStatement->line, assignStatement->col, methodTable));
+        printf(" - %s",assignStatement->id->returnType);
     }
     printf("\n");
 
@@ -510,7 +495,7 @@ void printExpression(IsExpr* expression, int count, TableElement* methodTable) {
         printCallStatement(expression->eType.exprCall,count, methodTable);
     }
     else if (expression->e == eParseArgs) {
-        printParseArgsStatement(expression->eType.expParseArgs,count, methodTable);
+        printParseArgsStatement(expression->eType.exprParseArgs,count, methodTable);
     }
     else if (expression->e == eTerminal) {
         printTerminal(expression->eType.exprTerminal,count, methodTable);
@@ -524,10 +509,8 @@ void printOp(IsOp* operation, int count, TableElement* methodTable) {
     printPoints(count);
     printf("%s",operation->op);
 
-    char* type = getOpType(operation,methodTable);
-
     if(flag == 3 && strcmp(operation->op,"Lshift") != 0 && strcmp(operation->op,"Rshift") != 0 && strcmp(operation->op,"Xor") != 0){
-        printf(" - %s", type);
+        printf(" - %s", operation->returnType);
     }
 
     printf("\n");
@@ -541,7 +524,7 @@ void printTerminal(IsTerminal* terminal, int count, TableElement* methodTable) {
     printPoints(count);
     printf("%s(%s)", terminal->type, terminal->value);
     if (flag == 3) {
-        printf(" - %s", findTerminalType(terminal, methodTable));
+        printf(" - %s", terminal->returnType);
     }
     printf("\n");
 }
@@ -551,21 +534,8 @@ void printUnit(IsUnit* unit, int count, TableElement* methodTable) {
     printf("%s", unit->op);
 
     if(flag == 3){
-        if (strcmp(unit->op, "Length")==0) {
-            printf(" - int");
-        }
-        else{
-            printf(" - %s",getExprType(unit->unitExpr, methodTable));
-        }
+        printf(" - %s",unit->returnType);
     }
-    // if (flag==3) {
-    //     if (strcmp(unit->op, "Length")==0) {
-    //         printf(" - int");
-    //     }
-    //     else {
-    //         printf(" - %s",findExprTypeTable(unit->unitExpr, unit->line, unit->col, methodTable));
-    //     }
-    // }
     printf("\n");
     count+=2;
 
@@ -850,7 +820,7 @@ void cleanExpr(IsExpr* temp) {
         cleanCall(temp->eType.exprCall);
     }
     else if (temp->e == eParseArgs) {
-        cleanParseArgs(temp->eType.expParseArgs);
+        cleanParseArgs(temp->eType.exprParseArgs);
     }
     else if (temp->e == eTerminal) {
         if(temp->eType.exprTerminal){
@@ -920,6 +890,7 @@ int main(int argc, char *argv[]){
             flag = 3;
             yyparse();
             checkProgram(myProgram);
+            insertTypes(myProgram);
             printTable();
             printf("\n");
             printTree();

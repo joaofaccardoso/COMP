@@ -503,7 +503,7 @@ IsExpr* insertExprParseArgs(IsParseArgsStatement* ipas) {
     IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
 
     ie->e = eParseArgs;
-    ie->eType.expParseArgs = ipas;
+    ie->eType.exprParseArgs = ipas;
     ie->line = ipas->line;
     ie->col = ipas->col;
 

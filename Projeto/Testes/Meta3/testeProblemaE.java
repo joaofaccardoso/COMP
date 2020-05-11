@@ -1,5 +1,4 @@
 class Java {
-	public static boolean a;
   	public static void funcao2(String[] args){
   		Integer.parseInt(args[0]);
   		boolean a,b;
@@ -27,6 +26,7 @@ class Java {
 		a = x;
 	}
 
+	public static boolean a;
     public static int funcao3(int a,int b,double c){
   	}
   	public static int funcao3(int a,int b,double c){
@@ -71,4 +71,3 @@ class Java {
     }
     public static boolean ola56;
 }
-

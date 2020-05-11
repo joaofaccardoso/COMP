@@ -5,12 +5,14 @@ typedef struct s23 {
     char* type;    
     char* value;
     int line, col;
+    char* returnType;
 } IsTerminal;
 
 typedef struct s22 {
     char* op;    
     struct s20* unitExpr;
     int line, col;
+    char* returnType;
 } IsUnit;
 
 typedef struct s21 {
@@ -18,6 +20,7 @@ typedef struct s21 {
     char* op;
     struct s20* opExprRight;
     int line, col;
+    char* returnType;
 } IsOp;
 
 typedef enum {eAssign, eOp, eCall, eParseArgs, eTerminal, eUnit} dExpr;
@@ -29,10 +32,11 @@ typedef struct s20 {
         IsOp* exprOp;
         IsUnit* exprUnit;
         struct s16* exprCall;
-        struct s18* expParseArgs;
+        struct s18* exprParseArgs;
         IsTerminal* exprTerminal;
     } eType;
     int line, col;
+    char* returnType;
     struct s20* next;
 } IsExpr;
 
@@ -45,24 +49,28 @@ typedef struct s17 {
         IsExpr* printExpr;
     } pType;
     int line, col;
+    char* returnType;
 } IsPrintStatement;
 
 typedef struct s18 {
     IsTerminal* id;
     IsExpr* parseArgsExpr;
     int line, col;
+    char* returnType;
 } IsParseArgsStatement;
 
 typedef struct s19 {
     IsTerminal* id;
     IsExpr* assignExpr;
     int line, col;
+    char* returnType;
 } IsAssign;
 
 typedef struct s16 {
     IsTerminal* id;
     IsExpr* callExpr;
     int line, col;
+    char* returnType;
 } IsCallStatement;
 
 typedef struct s15 {
