@@ -2,41 +2,27 @@ Line 4, col 23: Symbol c already defined
 Line 4, col 26: Symbol a already defined
 Line 4, col 29: Symbol b already defined
 Line 5, col 26: Symbol _ is reserved
-Line 7, col 23: Symbol _ is reserved
+Line 7, col 23: Symbol _(int) already defined
 Line 15, col 45: Symbol i already defined
 Line 15, col 51: Symbol _ is reserved
 Line 23, col 45: Symbol i already defined
 Line 23, col 51: Symbol _ is reserved
-Line 25, col 6: Symbol factorial(int, int, int) already defined
-Line 13, col 11: Symbol ola already defined
+Line 23, col 24: Symbol factorial(int,int,int) already defined
 Line 17, col 13: Symbol i already defined
 Line 18, col 13: Symbol argument already defined
 Line 20, col 16: Symbol i already defined
 Line 20, col 18: Symbol _ is reserved
-Line 20, col 18: Symbol _ already defined
 ===== Class errors Symbol Table =====
 a		int
 b		int
 c		int
-_		double
-_	(int)	int
 factorial	(int,int,int)	void
 
-===== Method _(int) Symbol Table =====
-return		int
-ola		int	param
-
 ===== Method factorial(int,int,int) Symbol Table =====
 return		void
 i		int	param
-_		int	param
 argument		int
 a		int
-
-===== Method factorial(int,int,int) Symbol Table =====
-return		void
-i		int	param
-_		int	param
 
 Program
 ..Id(errors)
@@ -71,11 +57,11 @@ Program
 ..........Id(ola)
 ....MethodBody
 ......If
-........Id(ola) - int
+........Id(ola)
 ........Return
-..........Id(ola) - int
+..........Id(ola)
 ........Return
-..........Id(ola) - int
+..........Id(ola)
 ......VarDecl
 ........Int
 ........Id(ola)
@@ -127,8 +113,8 @@ Program
 ..........Int
 ..........Id(_)
 ....MethodBody
-......Assign - int
-........Id(i) - int
-........Add - int
-..........Id(i) - int
-..........Id(i) - int
+......Assign
+........Id(i)
+........Add
+..........Id(i)
+..........Id(i)

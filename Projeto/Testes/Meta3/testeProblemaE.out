@@ -1,3 +1,18 @@
+Line 24, col 24: Symbol main(String[]) already defined
+Line 32, col 22: Symbol funcao3(int,int,double) already defined
+Line 34, col 22: Symbol funcao3(int,int,double) already defined
+Line 43, col 41: Symbol i already defined
+Line 55, col 40: Symbol i already defined
+Line 57, col 26: Symbol funcao already defined
+Line 10, col 9: Operator + cannot be applied to types boolean, boolean
+Line 10, col 15: Operator == cannot be applied to types undef, int
+Line 13, col 6: Operator = cannot be applied to types boolean, int
+Line 21, col 11: Operator = cannot be applied to types int, none
+Line 62, col 10: Operator = cannot be applied to types boolean, double
+Line 63, col 10: Operator = cannot be applied to types int, double
+Line 64, col 10: Operator = cannot be applied to types int, double
+Line 66, col 13: Operator Integer.parseInt cannot be applied to types boolean, double
+Line 69, col 12: Operator = cannot be applied to types int, boolean
 ===== Class Java Symbol Table =====
 funcao2	(String[])	void
 x	(double,int)	double
@@ -32,23 +47,6 @@ return		void
 args		String[]	param
 x		int
 b		int
-
-===== Method main(String[]) Symbol Table =====
-return		void
-args		String[]	param
-x		int
-
-===== Method funcao3(int,int,double) Symbol Table =====
-return		int
-a		int	param
-b		int	param
-c		double	param
-
-===== Method funcao3(int,int,double) Symbol Table =====
-return		int
-a		int	param
-b		int	param
-c		double	param
 
 ===== Method funcao3(int,int,double) Symbol Table =====
 return		int
@@ -144,7 +142,7 @@ Program
 ........Id(d) - int
 ........DecLit(1) - int
 ......If
-........Eq - undef
+........Eq - boolean
 ..........Add - undef
 ............Id(a) - boolean
 ............BoolLit(true) - boolean
@@ -186,10 +184,10 @@ Program
 ......Assign - int
 ........Id(x) - int
 ........Lshift
-..........DecLit(1) - int
-..........Mul - int
-............Id(x) - int
-............DecLit(1) - int
+..........DecLit(1)
+..........Mul
+............Id(x)
+............DecLit(1)
 ..MethodDecl
 ....MethodHeader
 ......Void
@@ -202,9 +200,9 @@ Program
 ......VarDecl
 ........Int
 ........Id(x)
-......Assign - boolean
-........Id(a) - boolean
-........Id(x) - int
+......Assign
+........Id(a)
+........Id(x)
 ..FieldDecl
 ....Bool
 ....Id(a)
@@ -330,7 +328,7 @@ Program
 ..........Id(m) - int
 ..........DecLit(1) - int
 ........Call - int
-..........Id(funcao) - (int)
+..........Id(funcao) - (int,int)
 ..........Id(m) - int
 ..........Id(m) - int
 ........Block
@@ -445,7 +443,7 @@ Program
 ......................Id(l) - boolean
 ......Assign - double
 ........Id(f) - double
-........ParseArgs - undef
+........ParseArgs - int
 ..........Id(i) - boolean
 ..........Add - double
 ............Add - double

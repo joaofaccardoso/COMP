@@ -15,7 +15,10 @@ void checkMethodField(IsMethodField* mfList) {
     int count = 0;
     while (mfList) {
         if (mfList->mf==isField) {
-            insertMethodVarDecl(mfList->mfType.fieldDecl->type->value, mfList->mfType.fieldDecl->id->value, var_decl, mfList->mfType.fieldDecl->line, mfList->mfType.fieldDecl->col);
+            if (strcmp(mfList->mfType.fieldDecl->id->value, "_") == 0) {
+                printf("Line %d, col %d: Symbol _ is reserved\n", mfList->mfType.fieldDecl->id->line, mfList->mfType.fieldDecl->id->col);
+            }
+            insertMethodVarDecl(mfList->mfType.fieldDecl->type->value, mfList->mfType.fieldDecl->id->value, var_decl, mfList->mfType.fieldDecl->id->line, mfList->mfType.fieldDecl->id->col);
         }
         else {
             TableElement* currentElement = insertMethodVarDecl(mfList->mfType.methodDecl->methodHeader->type->value, mfList->mfType.methodDecl->methodHeader->id->value, method_decl, mfList->mfType.methodDecl->methodHeader->line, mfList->mfType.methodDecl->methodHeader->col);
@@ -23,6 +26,28 @@ void checkMethodField(IsMethodField* mfList) {
                 checkParams(currentElement, mfList->mfType.methodDecl->methodHeader->paramDeclList);
                 checkBody(currentElement, mfList->mfType.methodDecl->methodBody->vardDeclSatetmentList);
                 int print = checkOtherMethod(currentElement, count);
+                if (strcmp(currentElement->id, "_") == 0) {
+                    printf("Line %d, col %d: Symbol _(", mfList->mfType.methodDecl->methodHeader->id->line, mfList->mfType.methodDecl->methodHeader->id->col);
+                    MethodElement* paramIt = currentElement->elements;
+                    if(paramIt && paramIt->meth_type == param){
+                        printf("%s",paramIt->type);
+                        for(paramIt=paramIt->next;paramIt && paramIt->meth_type==param;paramIt=paramIt->next){
+                            printf(",%s",paramIt->type);
+                        }
+                    }
+                    printf(") is reserved\n");
+                }
+                else if(print == 0){
+                    printf("Line %d, col %d: Symbol %s(", mfList->mfType.methodDecl->methodHeader->id->line, mfList->mfType.methodDecl->methodHeader->id->col,  mfList->mfType.methodDecl->methodHeader->id->value);
+                    MethodElement* paramIt = currentElement->elements;
+                    if(paramIt && paramIt->meth_type == param){
+                        printf("%s",paramIt->type);
+                        for(paramIt=paramIt->next;paramIt && paramIt->meth_type==param;paramIt=paramIt->next){
+                            printf(",%s",paramIt->type);
+                        }
+                    }
+                    printf(") already defined\n");
+                }
                 currentElement->print = print;
             }
         }
@@ -57,7 +82,10 @@ int checkOtherMethod(TableElement* el, int count){
 
 void checkParams(TableElement* currentElement, IsParamDecl* paramList) {
     while (paramList) {
-        insertParamBody(currentElement, paramList->type->value, paramList->id->value , param, paramList->line, paramList->col);
+        if (strcmp(paramList->id->value, "_") == 0) {
+            printf("Line %d, col %d: Symbol _ is reserved\n", paramList->id->line, paramList->id->col);
+        }
+        insertParamBody(currentElement, paramList->type->value, paramList->id->value , param, paramList->id->line, paramList->id->col);
         paramList = paramList->next;
     }
 }
@@ -88,8 +116,11 @@ void insertVarStatementType(IsVarDeclStatement* varStatement, IsMethodDecl* meth
         }       
         else{
             check = checkParamsDecl(varStatement->vdsType.varDecl, method, tableElement);
-            if(check){
-                printf("Line %d, col %d: Symbol %s already defined\n",varStatement->vdsType.varDecl->line, varStatement->vdsType.varDecl->col, varStatement->vdsType.varDecl->id->value);
+            if (strcmp(varStatement->vdsType.varDecl->id->value, "_") == 0) {
+                printf("Line %d, col %d: Symbol _ is reserved\n",varStatement->vdsType.varDecl->id->line, varStatement->vdsType.varDecl->id->col);
+            }
+            else if(check){
+                printf("Line %d, col %d: Symbol %s already defined\n",varStatement->vdsType.varDecl->id->line, varStatement->vdsType.varDecl->id->col, varStatement->vdsType.varDecl->id->value);
             }
         }
     }
@@ -98,7 +129,7 @@ void insertVarStatementType(IsVarDeclStatement* varStatement, IsMethodDecl* meth
 int checkParamsDecl(IsVarDecl* var, IsMethodDecl* method, TableElement* tableElement){
     IsParamDecl* param = method->methodHeader->paramDeclList;
     for(;param;param=param->next){
-        if(strcmp(param->type->value,var->type->value) == 0 && strcmp(param->id->value,var->id->value) == 0){
+        if(strcmp(param->id->value,var->id->value) == 0){
             return 1;
         }
     }
