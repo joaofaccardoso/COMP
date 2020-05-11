@@ -46,8 +46,7 @@ TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType, i
     elem->col = col;
     TableElement* prev, *aux;
     int print = 1;
-    int count = 1;
-    for(aux=symHead->table;aux;prev=aux,aux=aux->next,count++){
+    for(aux=symHead->table;aux;prev=aux,aux=aux->next){
         if(strcmp(aux->id,id)==0 && strcmp(aux->type,lower(type)) == 0){
             if(elemType == var_decl) {
                 print = 0;

@@ -75,61 +75,98 @@ void insertTypes(IsProgram* program){
     TableElement* element = symHead->table;
     for(;methFieldIt;methFieldIt=methFieldIt->next,element=element->next){
         if(methFieldIt->mf == isMethod){
-            insertVarStatementType(methFieldIt->mfType.methodDecl->methodBody->vardDeclSatetmentList, element);
+            insertVarStatementType(methFieldIt->mfType.methodDecl->methodBody->vardDeclSatetmentList, methFieldIt->mfType.methodDecl, element);
         }
     }
 }
 
-void insertVarStatementType(IsVarDeclStatement* varStatement, TableElement* tableElement){
+void insertVarStatementType(IsVarDeclStatement* varStatement, IsMethodDecl* method, TableElement* tableElement){
+    int check;
     for(;varStatement;varStatement=varStatement->next){
         if(varStatement->vds == statement){
-            insertStatementType(varStatement->vdsType.statement, tableElement);
+            insertStatementType(varStatement->vdsType.statement, method, tableElement);
         }       
+        else{
+            check = checkParamsDecl(varStatement->vdsType.varDecl, method, tableElement);
+            if(check){
+                printf("Line %d, col %d: Symbol %s already defined\n",varStatement->vdsType.varDecl->line, varStatement->vdsType.varDecl->col, varStatement->vdsType.varDecl->id->value);
+            }
+        }
     }
 }
 
-void insertStatementType(IsStatement* statement, TableElement* tableElement){
+int checkParamsDecl(IsVarDecl* var, IsMethodDecl* method, TableElement* tableElement){
+    IsParamDecl* param = method->methodHeader->paramDeclList;
+    for(;param;param=param->next){
+        if(strcmp(param->type->value,var->type->value) == 0 && strcmp(param->id->value,var->id->value) == 0){
+            return 1;
+        }
+    }
+
+    IsVarDeclStatement* body = method->methodBody->vardDeclSatetmentList;
+    for(;body && (body->line < var->line || (body->line == var->line && body->col < var->col));body=body->next){
+        if(body->vds == varDecl){
+            IsVarDecl* var2 = body->vdsType.varDecl;
+            if(strcmp(var2->type->value,var->type->value) == 0 && strcmp(var2->id->value,var->id->value) == 0){
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+int checkOtherParam(MethodElement* param, TableElement* el, int count){
+    MethodElement* iterator = el->elements;
+    for(int i=0;i<count;i++,iterator=iterator->next){
+        if(strcmp(param->type,iterator->type) == 0 && strcmp(param->id,iterator->id) == 0){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void insertStatementType(IsStatement* statement, IsMethodDecl* method, TableElement* tableElement){
     if(statement->sm == sBlock){
         IsVarDeclStatement* block = statement->smType.blockStatement;
-        insertVarStatementType(block, tableElement);
+        insertVarStatementType(block, method, tableElement);
     }
     else if(statement->sm == sIf){
         IsIfStatement* ifStatement = statement->smType.ifStatement;
-        insertExprType(ifStatement->ifExpr, tableElement);
-        insertVarStatementType(ifStatement->thenBlock, tableElement);
-        insertVarStatementType(ifStatement->elseBlock, tableElement);
+        insertExprType(ifStatement->ifExpr, method, tableElement);
+        insertVarStatementType(ifStatement->thenBlock, method, tableElement);
+        insertVarStatementType(ifStatement->elseBlock, method, tableElement);
     }
     else if(statement->sm == sWhile){
         IsWhileStatement* whileStatement = statement->smType.whileStatement;
-        insertExprType(whileStatement->whileExpr, tableElement);
-        insertVarStatementType(whileStatement->whileStatement, tableElement);
+        insertExprType(whileStatement->whileExpr, method, tableElement);
+        insertVarStatementType(whileStatement->whileStatement, method, tableElement);
     }
     else if(statement->sm == sReturn){
         IsReturnStatement* returnStatement = statement->smType.returnStatement;
-        insertExprType(returnStatement->returnExpr, tableElement);
+        insertExprType(returnStatement->returnExpr, method, tableElement);
     }
     else if(statement->sm == sCall){
         IsCallStatement* callStatement = statement->smType.callStatement;
-        insertCallType(callStatement, tableElement);
+        insertCallType(callStatement, method, tableElement);
     }
     else if(statement->sm == sPrint){
         IsPrintStatement* printStatement = statement->smType.printStatement;
-        insertPrintType(printStatement, tableElement);
+        insertPrintType(printStatement, method, tableElement);
     }
     else if(statement->sm == sParseArgs){
         IsParseArgsStatement* parseArgsStatement = statement->smType.parseArgsStatement;
-        insertParseArgsType(parseArgsStatement, tableElement);
+        insertParseArgsType(parseArgsStatement, method, tableElement);
     }
     else if(statement->sm == sAssign){
         IsAssign* assignStatement = statement->smType.assignStatement;
-        insertAssignType(assignStatement, tableElement);
+        insertAssignType(assignStatement, method, tableElement);
     }
 }
 
-void insertCallType(IsCallStatement* call, TableElement* tableElement){
+void insertCallType(IsCallStatement* call, IsMethodDecl* method, TableElement* tableElement){
     IsExpr* param = call->callExpr;
     for(;param;param=param->next){
-        insertExprType(param, tableElement);
+        insertExprType(param, method, tableElement);
     }
 
     TableElement* tableIt = symHead->table;
@@ -148,12 +185,12 @@ void insertCallType(IsCallStatement* call, TableElement* tableElement){
     call->returnType = "undef";
 }
 
-void insertPrintType(IsPrintStatement* print, TableElement* tableElement){
+void insertPrintType(IsPrintStatement* print, IsMethodDecl* method, TableElement* tableElement){
     if(print->p == stringLiteral){
         print->returnType = "String";
     }
     else{
-        insertExprType(print->pType.printExpr, tableElement);
+        insertExprType(print->pType.printExpr, method, tableElement);
         print->returnType = print->pType.printExpr->returnType;
     }
 }
@@ -205,20 +242,10 @@ int isClosestFunction(char* id, TableElement* tableIt, IsExpr* paramsElement, Ta
     return 1;
 }
 
-int checkOtherParam(MethodElement* param, TableElement* el, int count){
-    MethodElement* iterator = el->elements;
-    for(int i=0;i<count;i++,iterator=iterator->next){
-        if(strcmp(param->type,iterator->type) == 0 && strcmp(param->id,iterator->id) == 0){
-            return 1;
-        }
-    }
-    return 0;
-}
-
-void insertParseArgsType(IsParseArgsStatement* parseArgs, TableElement* tableElement){
-    insertTerminalType(parseArgs->id, tableElement);
+void insertParseArgsType(IsParseArgsStatement* parseArgs, IsMethodDecl* method, TableElement* tableElement){
+    insertTerminalType(parseArgs->id, method, tableElement);
     if(parseArgs->parseArgsExpr){
-        insertExprType(parseArgs->parseArgsExpr, tableElement);
+        insertExprType(parseArgs->parseArgsExpr, method, tableElement);
 
         if(strcmp(parseArgs->parseArgsExpr->returnType,"int") != 0){
             parseArgs->parseArgsExpr->returnType = "undef";
@@ -230,9 +257,9 @@ void insertParseArgsType(IsParseArgsStatement* parseArgs, TableElement* tableEle
     }
 }
 
-void insertAssignType(IsAssign* assign, TableElement* tableElement){
-    insertTerminalType(assign->id,tableElement);
-    insertExprType(assign->assignExpr,tableElement);
+void insertAssignType(IsAssign* assign, IsMethodDecl* method, TableElement* tableElement){
+    insertTerminalType(assign->id, method, tableElement);
+    insertExprType(assign->assignExpr, method, tableElement);
 
     if(strcmp(assign->id->returnType,"undef") == 0){
         assign->returnType = assign->assignExpr->returnType;
@@ -242,46 +269,46 @@ void insertAssignType(IsAssign* assign, TableElement* tableElement){
     }
 }
 
-void insertExprType(IsExpr* expr, TableElement* tableElement){
+void insertExprType(IsExpr* expr, IsMethodDecl* method, TableElement* tableElement){
     if (expr) {
         char* type = NULL;
         if(expr->e == eAssign){
             IsAssign* assign = expr->eType.exprAssign;
-            insertAssignType(assign, tableElement);
+            insertAssignType(assign, method, tableElement);
             type = assign->returnType;
         }
         else if(expr->e == eOp){
             IsOp* op = expr->eType.exprOp;
-            insertOpType(op, tableElement);
+            insertOpType(op, method, tableElement);
             type = op->returnType;
         }
         else if(expr->e == eCall){
             IsCallStatement* call = expr->eType.exprCall;
-            insertCallType(call, tableElement);
+            insertCallType(call, method, tableElement);
             type = call->returnType;
         }
         else if(expr->e == eParseArgs){
             IsParseArgsStatement* parseArgs = expr->eType.exprParseArgs;
-            insertParseArgsType(parseArgs, tableElement);
+            insertParseArgsType(parseArgs, method, tableElement);
             type = parseArgs->returnType;
         }
         else if(expr->e == eTerminal){
             IsTerminal* terminal = expr->eType.exprTerminal;
-            insertTerminalType(terminal, tableElement);
+            insertTerminalType(terminal, method, tableElement);
             type = terminal->returnType;
         }
         else if(expr->e == eUnit){
             IsUnit* unit = expr->eType.exprUnit;
-            insertUnitType(unit, tableElement);
+            insertUnitType(unit, method, tableElement);
             type = unit->returnType;
         }
         expr->returnType = type;
     }
 }
 
-void insertOpType(IsOp* operation, TableElement* tableElement){
-    insertExprType(operation->opExprLeft, tableElement);
-    insertExprType(operation->opExprRight, tableElement);
+void insertOpType(IsOp* operation, IsMethodDecl* method, TableElement* tableElement){
+    insertExprType(operation->opExprLeft, method, tableElement);
+    insertExprType(operation->opExprRight, method, tableElement);
     
     if (!strcmp(operation->op, "Eq") || !strcmp(operation->op, "Ge") || !strcmp(operation->op, "Gt") || !strcmp(operation->op, "Le") || !strcmp(operation->op, "Lt") || !strcmp(operation->op, "Ne") || !strcmp(operation->op, "And") || !strcmp(operation->op, "Or")  || !strcmp(operation->op, "Xor")) {
         if(strcmp(operation->opExprLeft->returnType, "undef") == 0 || strcmp(operation->opExprRight->returnType, "undef") == 0){
@@ -292,7 +319,7 @@ void insertOpType(IsOp* operation, TableElement* tableElement){
         }
     }
     else if(strcmp(operation->op, "Lshift") == 0 || strcmp(operation->op, "Rshift") == 0 || strcmp(operation->op,"Xor") == 0){
-        operation->returnType = "none";
+        operation->returnType = "undef";
     }
     else if((strcmp(operation->opExprLeft->returnType,"boolean") == 0 || strcmp(operation->opExprRight->returnType,"boolean") == 0) && (strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Sub") == 0 || strcmp(operation->op,"Mul") == 0 || strcmp(operation->op,"Div") == 0 || strcmp(operation->op,"Mod") == 0)){
         operation->returnType = "undef";
@@ -308,7 +335,7 @@ void insertOpType(IsOp* operation, TableElement* tableElement){
     }
 }
 
-void insertTerminalType(IsTerminal* terminal, TableElement* tableElement){
+void insertTerminalType(IsTerminal* terminal, IsMethodDecl* method, TableElement* tableElement){
     if (!strcmp(terminal->type, "DecLit")) {
         terminal->returnType = "int";
     }
@@ -322,27 +349,27 @@ void insertTerminalType(IsTerminal* terminal, TableElement* tableElement){
         terminal->returnType = "String";
     }
     else if (!strcmp(terminal->type, "Id")) {
-        terminal->returnType = getIdType(terminal->value, terminal->line, terminal->col, tableElement);
+        terminal->returnType = getIdType(terminal->value, terminal->line, terminal->col, method, tableElement);
     }
     else{
         terminal->returnType = "undef";
     }
 }
 
-void insertUnitType(IsUnit* unit, TableElement* tableElement){
+void insertUnitType(IsUnit* unit, IsMethodDecl* method, TableElement* tableElement){
     if(strcmp(unit->op,"Length") == 0){
-        insertExprType(unit->unitExpr,tableElement);
+        insertExprType(unit->unitExpr, method, tableElement);
         unit->returnType = "int";
     }
     else{
-        insertExprType(unit->unitExpr,tableElement);
+        insertExprType(unit->unitExpr, method, tableElement);
         unit->returnType = unit->unitExpr->returnType;
     }
 }
 
-char* getIdType(char* id, int line, int col, TableElement* tableElement){
+char* getIdType(char* id, int line, int col, IsMethodDecl* method, TableElement* tableElement){
     MethodElement* methodIterator = tableElement->elements;
-    for(;methodIterator && methodIterator->line <= line;methodIterator=methodIterator->next){
+    for(;methodIterator && (methodIterator->line < line || (methodIterator->line == line && methodIterator->col < col));methodIterator=methodIterator->next){
         if(strcmp(methodIterator->id,id) == 0){
             return methodIterator->type;
         }
