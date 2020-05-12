@@ -8,12 +8,16 @@ class ola{
     }
 
     public static double _(boolean _) {
-        boolean m;
-        double l;
-        int a;
+        int a,b,c;
+        double d,e;
+        boolean x,y;
 
-        fatorial(a, m, l);
-
-        return true;
+        if(x==y){
+        	if(a==b){
+        		if(d==b){
+        			x = ((d*e)<=(a>>c))||((x)==(!y));
+        		}
+        	}
+        }
     }
 }

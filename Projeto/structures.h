@@ -10,6 +10,7 @@ typedef struct s23 {
 
 typedef struct s22 {
     char* op;    
+    char* symbol;
     struct s20* unitExpr;
     int line, col;
     char* returnType;
@@ -17,8 +18,9 @@ typedef struct s22 {
 
 typedef struct s21 {
     struct s20* opExprLeft;
-    char* op;
     struct s20* opExprRight;
+    char* op;
+    char* symbol;
     int line, col;
     char* returnType;
 } IsOp;

@@ -128,7 +128,7 @@ void insertVarStatementType(IsVarDeclStatement* varStatement, IsMethodDecl* meth
 
 int checkParamsDecl(IsVarDecl* var, IsMethodDecl* method, TableElement* tableElement){
     IsParamDecl* param = method->methodHeader->paramDeclList;
-    for(;param;param=param->next){
+    for(;param && (param->line<var->line || (param->line==var->line && param->col<var->col));param=param->next){
         if(strcmp(param->id->value,var->id->value) == 0){
             return 1;
         }
@@ -175,6 +175,14 @@ void insertStatementType(IsStatement* statement, IsMethodDecl* method, TableElem
     else if(statement->sm == sReturn){
         IsReturnStatement* returnStatement = statement->smType.returnStatement;
         insertExprType(returnStatement->returnExpr, method, tableElement);
+
+        if (!returnStatement->returnExpr && strcmp(method->methodHeader->type->value, "void") != 0) {
+            printf("Line %d, col %d: Incompatible type void in return statement\n", returnStatement->line, returnStatement->col);
+        }
+        else if (strcmp(returnStatement->returnExpr->returnType, method->methodHeader->type->value) != 0) {
+            printf("Line %d, col %d: Incompatible type %s in return statement\n", returnStatement->line, returnStatement->col, returnStatement->returnExpr->returnType);
+        }
+
     }
     else if(statement->sm == sCall){
         IsCallStatement* callStatement = statement->smType.callStatement;
@@ -308,6 +316,13 @@ void insertAssignType(IsAssign* assign, IsMethodDecl* method, TableElement* tabl
     else{
         assign->returnType = assign->id->returnType;
     }
+
+    if(strcmp(assign->id->returnType,"undef") == 0 || strcmp(assign->assignExpr->returnType,"undef") == 0){
+        printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", assign->line, assign->col, assign->id->returnType, assign->assignExpr->returnType);
+    }
+    else if(strcmp(assign->id->returnType, assign->assignExpr->returnType) != 0 && (strcmp(assign->id->returnType,"double") != 0 || strcmp(assign->assignExpr->returnType,"int") != 0)){
+        printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", assign->line, assign->col, assign->id->returnType, assign->assignExpr->returnType);
+    }
 }
 
 void insertExprType(IsExpr* expr, IsMethodDecl* method, TableElement* tableElement){
@@ -354,22 +369,28 @@ void insertOpType(IsOp* operation, IsMethodDecl* method, TableElement* tableElem
     if (!strcmp(operation->op, "Eq") || !strcmp(operation->op, "Ge") || !strcmp(operation->op, "Gt") || !strcmp(operation->op, "Le") || !strcmp(operation->op, "Lt") || !strcmp(operation->op, "Ne") || !strcmp(operation->op, "And") || !strcmp(operation->op, "Or")  || !strcmp(operation->op, "Xor")) {
         if(strcmp(operation->opExprLeft->returnType, "undef") == 0 || strcmp(operation->opExprRight->returnType, "undef") == 0){
             operation->returnType = "undef";
+            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
         }
         else{
+            if(strcmp(operation->opExprLeft->returnType, "none") == 0 || strcmp(operation->opExprRight->returnType, "none") == 0){
+                printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
+            }
             operation->returnType = "boolean";
         }
     }
     else if(strcmp(operation->op, "Lshift") == 0 || strcmp(operation->op, "Rshift") == 0 || strcmp(operation->op,"Xor") == 0){
-        operation->returnType = "undef";
+        operation->returnType = "none";
     }
     else if((strcmp(operation->opExprLeft->returnType,"boolean") == 0 || strcmp(operation->opExprRight->returnType,"boolean") == 0) && (strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Sub") == 0 || strcmp(operation->op,"Mul") == 0 || strcmp(operation->op,"Div") == 0 || strcmp(operation->op,"Mod") == 0)){
         operation->returnType = "undef";
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
     }
     else if((strcmp(operation->opExprLeft->returnType,"double") == 0 && strcmp(operation->opExprRight->returnType,"int") == 0)  || (strcmp(operation->opExprRight->returnType,"double") == 0 && strcmp(operation->opExprLeft->returnType,"int") == 0)){
         operation->returnType = "double";
     }
-    else if(strcmp(operation->opExprLeft->returnType,operation->opExprRight->returnType) != 0){
+    else if(strcmp(operation->opExprLeft->returnType,operation->opExprRight->returnType) != 0 || (strcmp(operation->opExprLeft->returnType,"undef") == 0 && strcmp(operation->opExprRight->returnType,"undef") == 0)){
         operation->returnType = "undef";
+        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
     }
     else{
         operation->returnType = operation->opExprLeft->returnType;
@@ -406,6 +427,9 @@ void insertUnitType(IsUnit* unit, IsMethodDecl* method, TableElement* tableEleme
         insertExprType(unit->unitExpr, method, tableElement);
         unit->returnType = unit->unitExpr->returnType;
     }
+    if((strcmp(unit->symbol,"!") != 0 && strcmp(unit->unitExpr->returnType,"boolean") == 0) || (strcmp(unit->symbol,"!") == 0 && strcmp(unit->unitExpr->returnType,"boolean") != 0)){
+        printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", unit->line, unit->col, unit->symbol, unit->unitExpr->returnType);
+    }
 }
 
 char* getIdType(char* id, int line, int col, IsMethodDecl* method, TableElement* tableElement){
@@ -423,5 +447,6 @@ char* getIdType(char* id, int line, int col, IsMethodDecl* method, TableElement*
         }
     }
 
+    printf("Line %d, col %d: Cannot find symbol %s\n", line, col, id);
     return "undef";
 }

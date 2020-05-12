@@ -453,13 +453,14 @@ IsExpr* insertAssignExpr(IsAssign* assignExpr) {
     return ie;
 }
 
-IsExpr* insertOp(IsExpr* opExprLeft, char* op, IsExpr* opExprRight, int line, int col) {
+IsExpr* insertOp(IsExpr* opExprLeft, char* op, char* symbol, IsExpr* opExprRight, int line, int col) {
     IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
     IsOp* io = (IsOp*)malloc(sizeof(IsOp));
 
     io->opExprLeft = opExprLeft;
-    io->op = op;
     io->opExprRight = opExprRight;
+    io->op = op;
+    io->symbol = symbol;
     io->line = line;
     io->col = col;
     
@@ -471,10 +472,11 @@ IsExpr* insertOp(IsExpr* opExprLeft, char* op, IsExpr* opExprRight, int line, in
     return ie;
 }
 
-IsExpr* insertUnit(char* op, IsExpr* unitExpr, char* id, int opLine, int opCol, int exprLine, int exprCol) {
+IsExpr* insertUnit(char* op, char* symbol, IsExpr* unitExpr, char* id, int opLine, int opCol, int exprLine, int exprCol) {
     IsExpr* ie = (IsExpr*)malloc(sizeof(IsExpr));
     IsUnit* iu = (IsUnit*)malloc(sizeof(IsUnit));
     iu->op = op;
+    iu->symbol = symbol;
 
     if(id!=NULL){
         iu->unitExpr = insertTerminal("Id",id, exprLine, exprCol);

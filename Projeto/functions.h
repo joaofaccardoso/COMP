@@ -24,8 +24,8 @@ IsAssign* createAssign(char* id, IsExpr* assignExpr, int assignLine, int assignC
 IsVarDeclStatement* insertBlockStatement(IsVarDeclStatement* statementList, int line, int col);
 IsVarDeclStatement* createBlockStatement(IsVarDeclStatement* newStatement, IsVarDeclStatement* head);
 IsExpr* insertAssignExpr(IsAssign* assignExpr);
-IsExpr* insertOp(IsExpr* opExprLeft, char* op, IsExpr* opExprRight, int line, int col);
-IsExpr* insertUnit(char* op, IsExpr* unitExpr, char* id, int opLine, int opCol, int exprLine, int exprCol);
+IsExpr* insertOp(IsExpr* opExprLeft, char* op, char* symbol, IsExpr* opExprRight, int line, int col);
+IsExpr* insertUnit(char* op, char* symbol, IsExpr* unitExpr, char* id, int opLine, int opCol, int exprLine, int exprCol);
 IsExpr* insertExprCall(IsCallStatement* ics);
 IsExpr* insertExprParseArgs(IsParseArgsStatement* ipas);
 IsExpr* insertTerminal(char* type, char* value, int line, int col);
