@@ -2,12 +2,10 @@ Line 4, col 23: Symbol c already defined
 Line 4, col 26: Symbol a already defined
 Line 4, col 29: Symbol b already defined
 Line 5, col 26: Symbol _ is reserved
-Line 7, col 23: Symbol _(int) already defined
 Line 15, col 45: Symbol i already defined
-Line 15, col 51: Symbol _ is reserved
 Line 23, col 45: Symbol i already defined
 Line 23, col 51: Symbol _ is reserved
-Line 23, col 24: Symbol factorial(int,int,int) already defined
+Line 13, col 11: Symbol ola already defined
 Line 17, col 13: Symbol i already defined
 Line 18, col 13: Symbol argument already defined
 Line 20, col 16: Symbol i already defined
@@ -16,13 +14,23 @@ Line 20, col 18: Symbol _ is reserved
 a		int
 b		int
 c		int
+underscore	(int)	int
+factorial	(int,int)	void
 factorial	(int,int,int)	void
 
-===== Method factorial(int,int,int) Symbol Table =====
+===== Method underscore(int) Symbol Table =====
+return		int
+ola		int	param
+
+===== Method factorial(int,int) Symbol Table =====
 return		void
 i		int	param
 argument		int
 a		int
+
+===== Method factorial(int,int,int) Symbol Table =====
+return		void
+i		int	param
 
 Program
 ..Id(errors)
@@ -50,18 +58,18 @@ Program
 ..MethodDecl
 ....MethodHeader
 ......Int
-......Id(_)
+......Id(underscore)
 ......MethodParams
 ........ParamDecl
 ..........Int
 ..........Id(ola)
 ....MethodBody
 ......If
-........Id(ola)
+........Id(ola) - int
 ........Return
-..........Id(ola)
+..........Id(ola) - int
 ........Return
-..........Id(ola)
+..........Id(ola) - int
 ......VarDecl
 ........Int
 ........Id(ola)
@@ -76,9 +84,6 @@ Program
 ........ParamDecl
 ..........Int
 ..........Id(i)
-........ParamDecl
-..........Int
-..........Id(_)
 ....MethodBody
 ......VarDecl
 ........Int
@@ -113,8 +118,8 @@ Program
 ..........Int
 ..........Id(_)
 ....MethodBody
-......Assign
-........Id(i)
-........Add
-..........Id(i)
-..........Id(i)
+......Assign - int
+........Id(i) - int
+........Add - int
+..........Id(i) - int
+..........Id(i) - int

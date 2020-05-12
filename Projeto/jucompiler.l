@@ -399,7 +399,7 @@ void printCallStatement(IsCallStatement* callStatement, int count, TableElement*
             if(paramsList && paramsList->meth_type == param){
                 printf("%s",paramsList->type);
                 int count = 1;
-                for(paramsList=paramsList->next;paramsList;paramsList=paramsList->next, count++){
+                for(paramsList=paramsList->next;paramsList && paramsList->meth_type==param;paramsList=paramsList->next, count++){
                     int check = checkOtherParam(paramsList,el,count);
                     if(check == 0){
                         printf(",%s",paramsList->type);
@@ -555,7 +555,9 @@ void printTable(){
             break;
         }
         if(tableElement->elem_type == var_decl){
-            printf("%s\t\t%s\n",tableElement->id,tableElement->type);
+            if(strcmp(tableElement->id,"_")!=0){
+                printf("%s\t\t%s\n",tableElement->id,tableElement->type);
+            }
         }
         else{
             printf("%s\t(",tableElement->id);
@@ -577,7 +579,7 @@ void printTable(){
 
 void printMethodFieldTable(TableElement* tableElement){
     for(;tableElement;tableElement=tableElement->next){
-        if(tableElement->elem_type == method_decl){
+        if(tableElement->elem_type == method_decl && tableElement->print == 1){
             printf("\n===== Method %s(",tableElement->id);
             if(tableElement->elements != NULL && tableElement->elements->meth_type == param){
                 printf("%s",tableElement->elements->type);
@@ -589,7 +591,6 @@ void printMethodFieldTable(TableElement* tableElement){
             printf(") Symbol Table =====\nreturn\t\t%s\n",tableElement->type);
             
             printMethodParamsBodyTable(tableElement->elements);
-
         }
     }
 }

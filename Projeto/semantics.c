@@ -26,18 +26,7 @@ void checkMethodField(IsMethodField* mfList) {
                 checkParams(currentElement, mfList->mfType.methodDecl->methodHeader->paramDeclList);
                 checkBody(currentElement, mfList->mfType.methodDecl->methodBody->vardDeclSatetmentList);
                 int print = checkOtherMethod(currentElement, count);
-                if (strcmp(currentElement->id, "_") == 0) {
-                    printf("Line %d, col %d: Symbol _(", mfList->mfType.methodDecl->methodHeader->id->line, mfList->mfType.methodDecl->methodHeader->id->col);
-                    MethodElement* paramIt = currentElement->elements;
-                    if(paramIt && paramIt->meth_type == param){
-                        printf("%s",paramIt->type);
-                        for(paramIt=paramIt->next;paramIt && paramIt->meth_type==param;paramIt=paramIt->next){
-                            printf(",%s",paramIt->type);
-                        }
-                    }
-                    printf(") is reserved\n");
-                }
-                else if(print == 0){
+                if(print == 0){
                     printf("Line %d, col %d: Symbol %s(", mfList->mfType.methodDecl->methodHeader->id->line, mfList->mfType.methodDecl->methodHeader->id->col,  mfList->mfType.methodDecl->methodHeader->id->value);
                     MethodElement* paramIt = currentElement->elements;
                     if(paramIt && paramIt->meth_type == param){
@@ -47,6 +36,18 @@ void checkMethodField(IsMethodField* mfList) {
                         }
                     }
                     printf(") already defined\n");
+                }
+                else if (strcmp(currentElement->id, "_") == 0) {
+                    printf("Line %d, col %d: Symbol _(", mfList->mfType.methodDecl->methodHeader->id->line, mfList->mfType.methodDecl->methodHeader->id->col);
+                    MethodElement* paramIt = currentElement->elements;
+                    if(paramIt && paramIt->meth_type == param){
+                        printf("%s",paramIt->type);
+                        for(paramIt=paramIt->next;paramIt && paramIt->meth_type==param;paramIt=paramIt->next){
+                            printf(",%s",paramIt->type);
+                        }
+                    }
+                    printf(") is reserved\n");
+                    print = 0;
                 }
                 currentElement->print = print;
             }
@@ -176,12 +177,12 @@ void insertStatementType(IsStatement* statement, IsMethodDecl* method, TableElem
         IsReturnStatement* returnStatement = statement->smType.returnStatement;
         insertExprType(returnStatement->returnExpr, method, tableElement);
 
-        if (!returnStatement->returnExpr && strcmp(method->methodHeader->type->value, "void") != 0) {
-            printf("Line %d, col %d: Incompatible type void in return statement\n", returnStatement->line, returnStatement->col);
-        }
-        else if (strcmp(returnStatement->returnExpr->returnType, method->methodHeader->type->value) != 0) {
-            printf("Line %d, col %d: Incompatible type %s in return statement\n", returnStatement->line, returnStatement->col, returnStatement->returnExpr->returnType);
-        }
+        // if (!returnStatement->returnExpr && strcmp(method->methodHeader->type->value, "void") != 0) {
+        //     printf("Line %d, col %d: Incompatible type void in return statement\n", returnStatement->line, returnStatement->col);
+        // }
+        // else if (strcmp(returnStatement->returnExpr->returnType, method->methodHeader->type->value) != 0) {
+        //     printf("Line %d, col %d: Incompatible type %s in return statement\n", returnStatement->line, returnStatement->col, returnStatement->returnExpr->returnType);
+        // }
 
     }
     else if(statement->sm == sCall){

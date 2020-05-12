@@ -4,7 +4,7 @@ class errors {
     public static int c, a, b;
     public static double _;
 
-    public static int _(int ola) {
+    public static int underscore(int ola) {
       if (ola) {
         return ola;
       }else{
@@ -12,7 +12,7 @@ class errors {
       }
       int ola;
     }
-    public static void factorial(int i, int i,int _) {
+    public static void factorial(int i, int i) {
         int argument;
         int i;
         int argument;

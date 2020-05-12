@@ -84,6 +84,10 @@ TableElement* insertParamBody(TableElement* elem, char* type, char* id, element_
             paramElem->print = 0;
         }
     }
+
+    if(strcmp("_",id) == 0){
+        paramElem->print = 0;
+    }
     
     if(elem->elements == NULL){
         elem->elements = paramElem;
