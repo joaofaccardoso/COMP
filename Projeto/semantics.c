@@ -214,6 +214,16 @@ void insertCallType(IsCallStatement* call, IsMethodDecl* method, TableElement* t
     }
     call->id->returnType = "undef";
     call->returnType = "undef";
+    printf("Line %d, col %d: Cannot find symbol %s(", call->line, call->col, call->id->value);
+    param = call->callExpr;
+    if (param) {
+        printf("%s", param->returnType);
+        param = param->next;
+        for (;param; param = param->next) {
+            printf(",%s", param->returnType);
+        }
+    }
+    printf(")\n");
 }
 
 void insertPrintType(IsPrintStatement* print, IsMethodDecl* method, TableElement* tableElement){

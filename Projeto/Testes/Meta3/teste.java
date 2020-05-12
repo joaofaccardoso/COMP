@@ -8,6 +8,12 @@ class ola{
     }
 
     public static double _(boolean _) {
+        boolean m;
+        double l;
+        int a;
+
+        fatorial(a, m, l);
+
         return true;
     }
 }
