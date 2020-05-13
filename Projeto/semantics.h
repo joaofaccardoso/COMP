@@ -17,8 +17,8 @@ int checkParamsDecl(IsVarDecl* var, IsMethodDecl* method, TableElement* tableEle
 int checkOtherParam(MethodElement* param, TableElement* el, int count);
 void insertParseArgsType(IsParseArgsStatement* parseArgs,  IsMethodDecl* method, TableElement* tableElement);
 void insertAssignType(IsAssign* assign,  IsMethodDecl* method, TableElement* tableElement);
-void insertExprType(IsExpr* expr,  IsMethodDecl* method, TableElement* tableElement);
+int insertExprType(IsExpr* expr,  IsMethodDecl* method, TableElement* tableElement);
 void insertOpType(IsOp* operation,  IsMethodDecl* method, TableElement* tableElement);
-void insertTerminalType(IsTerminal* terminal,  IsMethodDecl* method, TableElement* tableElement);
+int insertTerminalType(IsTerminal* terminal,  IsMethodDecl* method, TableElement* tableElement);
 void insertUnitType(IsUnit* unit,  IsMethodDecl* method, TableElement* tableElement);
 char* getIdType(char* id, int line, int col,  IsMethodDecl* method, TableElement* tableElement);

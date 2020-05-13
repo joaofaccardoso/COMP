@@ -1,13 +1,7 @@
 class ola{
-     public static int fib(int n)
+     public static int fib(String [] args)
     {
-        int a, b, c;
-        return b;
-    }
- 
-    public static void main (String[] args)
-    {
-        int n;
-        System.out.print(fib(n));
+        int x;
+        a = x;
     }
 }

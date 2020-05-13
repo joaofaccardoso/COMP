@@ -890,11 +890,13 @@ int main(int argc, char *argv[]){
         else if(strcmp(argv[1],"-s")==0){
             flag = 3;
             yyparse();
-            checkProgram(myProgram);
-            insertTypes(myProgram);
-            printTable();
-            printf("\n");
-            printTree();
+            if(error == 0){
+                checkProgram(myProgram);
+                insertTypes(myProgram);
+                printTable();
+                printf("\n");
+                printTree();
+            }
         }
         else{
             yyparse();

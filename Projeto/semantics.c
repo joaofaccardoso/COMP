@@ -242,6 +242,7 @@ void insertPrintType(IsPrintStatement* print, IsMethodDecl* method, TableElement
     else{
         insertExprType(print->pType.printExpr, method, tableElement);
         print->returnType = print->pType.printExpr->returnType;
+        printf("%s\n",print->returnType);
     }
 }
 
@@ -300,7 +301,14 @@ void insertParseArgsType(IsParseArgsStatement* parseArgs, IsMethodDecl* method, 
         if(strcmp(parseArgs->parseArgsExpr->returnType,"int") != 0){
             parseArgs->parseArgsExpr->returnType = "undef";
         }
-        parseArgs->returnType = parseArgs->parseArgsExpr->returnType;
+
+        if(strcmp(parseArgs->id->returnType,"String[]") != 0){
+            printf("Line %d, col %d: Operator Integer.parseInt cannot be applied to type %s\n", parseArgs->line, parseArgs->col, parseArgs->id->returnType);
+            parseArgs->returnType = "undef";
+        }
+        else{
+            parseArgs->returnType = parseArgs->parseArgsExpr->returnType;
+        }
     }
     else{
         parseArgs->returnType = "undef";
@@ -308,7 +316,7 @@ void insertParseArgsType(IsParseArgsStatement* parseArgs, IsMethodDecl* method, 
 }
 
 void insertAssignType(IsAssign* assign, IsMethodDecl* method, TableElement* tableElement){
-    insertTerminalType(assign->id, method, tableElement);
+    int check = insertTerminalType(assign->id, method, tableElement);
     insertExprType(assign->assignExpr, method, tableElement);
 
     if(strcmp(assign->id->returnType,"undef") == 0){
@@ -318,15 +326,16 @@ void insertAssignType(IsAssign* assign, IsMethodDecl* method, TableElement* tabl
         assign->returnType = assign->id->returnType;
     }
 
-    if(strcmp(assign->id->returnType,"undef") == 0 || strcmp(assign->assignExpr->returnType,"undef") == 0){
+    if(check == -1){
         printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", assign->line, assign->col, assign->id->returnType, assign->assignExpr->returnType);
     }
-    else if(strcmp(assign->id->returnType, assign->assignExpr->returnType) != 0 && (strcmp(assign->id->returnType,"double") != 0 || strcmp(assign->assignExpr->returnType,"int") != 0)){
+    else if(strcmp(assign->id->returnType,"undef") != 0 && strcmp(assign->id->returnType, assign->assignExpr->returnType) != 0 && (strcmp(assign->id->returnType,"double") != 0 || strcmp(assign->assignExpr->returnType,"int") != 0)){
         printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", assign->line, assign->col, assign->id->returnType, assign->assignExpr->returnType);
     }
 }
 
-void insertExprType(IsExpr* expr, IsMethodDecl* method, TableElement* tableElement){
+int insertExprType(IsExpr* expr, IsMethodDecl* method, TableElement* tableElement){
+    int check = 0;
     if (expr) {
         char* type = NULL;
         if(expr->e == eAssign){
@@ -351,7 +360,7 @@ void insertExprType(IsExpr* expr, IsMethodDecl* method, TableElement* tableEleme
         }
         else if(expr->e == eTerminal){
             IsTerminal* terminal = expr->eType.exprTerminal;
-            insertTerminalType(terminal, method, tableElement);
+            check = insertTerminalType(terminal, method, tableElement);
             type = terminal->returnType;
         }
         else if(expr->e == eUnit){
@@ -361,19 +370,27 @@ void insertExprType(IsExpr* expr, IsMethodDecl* method, TableElement* tableEleme
         }
         expr->returnType = type;
     }
+    return check;
 }
 
 void insertOpType(IsOp* operation, IsMethodDecl* method, TableElement* tableElement){
-    insertExprType(operation->opExprLeft, method, tableElement);
-    insertExprType(operation->opExprRight, method, tableElement);
+    int check = 1;
+    int check1 = insertExprType(operation->opExprLeft, method, tableElement);
+    int check2 = insertExprType(operation->opExprRight, method, tableElement);
+
+    if(check1 == -1 || check2 == -1){
+        check = -1;
+    }
     
     if (!strcmp(operation->op, "Eq") || !strcmp(operation->op, "Ge") || !strcmp(operation->op, "Gt") || !strcmp(operation->op, "Le") || !strcmp(operation->op, "Lt") || !strcmp(operation->op, "Ne") || !strcmp(operation->op, "And") || !strcmp(operation->op, "Or")  || !strcmp(operation->op, "Xor")) {
         if(strcmp(operation->opExprLeft->returnType, "undef") == 0 || strcmp(operation->opExprRight->returnType, "undef") == 0){
             operation->returnType = "undef";
-            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
+            if(check == 1){
+                printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
+            }
         }
         else{
-            if(strcmp(operation->opExprLeft->returnType, "none") == 0 || strcmp(operation->opExprRight->returnType, "none") == 0){
+            if(check == 1 && (strcmp(operation->opExprLeft->returnType, "none") == 0 || strcmp(operation->opExprRight->returnType, "none") == 0)){
                 printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
             }
             operation->returnType = "boolean";
@@ -384,21 +401,26 @@ void insertOpType(IsOp* operation, IsMethodDecl* method, TableElement* tableElem
     }
     else if((strcmp(operation->opExprLeft->returnType,"boolean") == 0 || strcmp(operation->opExprRight->returnType,"boolean") == 0) && (strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Sub") == 0 || strcmp(operation->op,"Mul") == 0 || strcmp(operation->op,"Div") == 0 || strcmp(operation->op,"Mod") == 0)){
         operation->returnType = "undef";
-        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
+        if(check == 1){
+            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
+        }
     }
     else if((strcmp(operation->opExprLeft->returnType,"double") == 0 && strcmp(operation->opExprRight->returnType,"int") == 0)  || (strcmp(operation->opExprRight->returnType,"double") == 0 && strcmp(operation->opExprLeft->returnType,"int") == 0)){
         operation->returnType = "double";
     }
     else if(strcmp(operation->opExprLeft->returnType,operation->opExprRight->returnType) != 0 || (strcmp(operation->opExprLeft->returnType,"undef") == 0 && strcmp(operation->opExprRight->returnType,"undef") == 0)){
         operation->returnType = "undef";
-        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
+        if(check == 1){
+            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
+        }
     }
     else{
         operation->returnType = operation->opExprLeft->returnType;
     }
 }
 
-void insertTerminalType(IsTerminal* terminal, IsMethodDecl* method, TableElement* tableElement){
+int insertTerminalType(IsTerminal* terminal, IsMethodDecl* method, TableElement* tableElement){
+    int check = 1;
     if (!strcmp(terminal->type, "DecLit")) {
         terminal->returnType = "int";
     }
@@ -413,23 +435,40 @@ void insertTerminalType(IsTerminal* terminal, IsMethodDecl* method, TableElement
     }
     else if (!strcmp(terminal->type, "Id")) {
         terminal->returnType = getIdType(terminal->value, terminal->line, terminal->col, method, tableElement);
+        if(strcmp(terminal->returnType,"undef") == 0){
+            check = -1;
+        }
     }
     else{
         terminal->returnType = "undef";
     }
+    return check;
 }
 
 void insertUnitType(IsUnit* unit, IsMethodDecl* method, TableElement* tableElement){
+    int check = insertExprType(unit->unitExpr, method, tableElement);
     if(strcmp(unit->op,"Length") == 0){
-        insertExprType(unit->unitExpr, method, tableElement);
-        unit->returnType = "int";
+
+        if(strcmp(unit->unitExpr->returnType,"String[]") != 0){
+            if(check == 1){
+                printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", unit->line, unit->col, unit->symbol, unit->unitExpr->returnType);
+            }
+            unit->returnType = "undef";
+        }
+        else{
+            unit->returnType = "int";
+        }
     }
     else{
-        insertExprType(unit->unitExpr, method, tableElement);
-        unit->returnType = unit->unitExpr->returnType;
-    }
-    if((strcmp(unit->symbol,"!") != 0 && strcmp(unit->unitExpr->returnType,"boolean") == 0) || (strcmp(unit->symbol,"!") == 0 && strcmp(unit->unitExpr->returnType,"boolean") != 0)){
-        printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", unit->line, unit->col, unit->symbol, unit->unitExpr->returnType);
+        if((strcmp(unit->symbol,"!") != 0 && strcmp(unit->unitExpr->returnType,"boolean") == 0) || (strcmp(unit->symbol,"!") == 0 && strcmp(unit->unitExpr->returnType,"boolean") != 0)){
+            if(check == 1){
+                printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", unit->line, unit->col, unit->symbol, unit->unitExpr->returnType);
+            }
+            unit->returnType = "undef";
+        }
+        else{
+            unit->returnType = unit->unitExpr->returnType;        
+        }
     }
 }
 
