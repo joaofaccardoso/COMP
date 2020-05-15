@@ -98,16 +98,11 @@ TableElement* insertParamBody(TableElement* elem, char* type, char* id, element_
     return elem;
 }
 
-TableElement* findMethodTable(char* id, IsExpr* paramsElement, int line, int col, TableElement* tableElement){
-    TableElement* tableIt = symHead->table;
-    int check;
-    for(;tableIt;tableIt=tableIt->next){
-        if(tableIt->elem_type == method_decl && strcmp(id,tableIt->id) == 0){
-            check = checkFunctionType(id, tableIt->elements, paramsElement, tableIt, tableElement, 0);
-            if(check == 1){
-                return tableIt;
-            }
-        }
+TableElement* findMethod(int pos){
+    if(pos == -1){
+        return NULL;
     }
-    return NULL;
+    TableElement* it = symHead->table;
+    for(int i=0;i<pos;i++,it=it->next){}
+    return it;
 }

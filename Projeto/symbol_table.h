@@ -36,5 +36,5 @@ TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType, i
 TableHead* insertHead(char* id, int line, int col);
 char *strlwr(char *str);
 
-TableElement* findMethodTable(char* id, IsExpr* paramsElement, int line, int col, TableElement* tableElement);
+TableElement* findMethod(int pos);
 #endif

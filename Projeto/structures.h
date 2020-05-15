@@ -1,5 +1,7 @@
+#include "symbol_table.h"
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
+
 
 typedef struct s23 {
     char* type;    
@@ -72,6 +74,7 @@ typedef struct s16 {
     IsTerminal* id;
     IsExpr* callExpr;
     int line, col;
+    int pos;
     char* returnType;
 } IsCallStatement;
 

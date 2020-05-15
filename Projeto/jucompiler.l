@@ -377,9 +377,9 @@ void printReturnStatement(IsReturnStatement* returnStatement, int count, TableEl
 }
 
 void printCallStatement(IsCallStatement* callStatement, int count, TableElement* methodTable){
-    printPoints(count);
-    TableElement* el = findMethodTable(callStatement->id->value, callStatement->callExpr, callStatement->line, callStatement->col, methodTable);
+    TableElement* meth = findMethod(callStatement->pos);
 
+    printPoints(count);
     printf("Call");
     
     if(flag == 3){
@@ -393,14 +393,14 @@ void printCallStatement(IsCallStatement* callStatement, int count, TableElement*
     printf("Id(%s)",callStatement->id->value);
 
     if(flag == 3){
-        if(el){
+        if(meth){
             printf(" - (");
-            MethodElement* paramsList = el->elements;
+            MethodElement* paramsList = meth->elements;
             if(paramsList && paramsList->meth_type == param){
                 printf("%s",paramsList->type);
                 int count = 1;
                 for(paramsList=paramsList->next;paramsList && paramsList->meth_type==param;paramsList=paramsList->next, count++){
-                    int check = checkOtherParam(paramsList,el,count);
+                    int check = checkOtherParam(paramsList,meth,count);
                     if(check == 0){
                         printf(",%s",paramsList->type);
                     }
