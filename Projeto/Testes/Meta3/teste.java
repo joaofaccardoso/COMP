@@ -1,18 +1,19 @@
 class ola{
-     public static int fib(double n, double a)
-    {
-        int b, c;
-        return b;
+    public static int funcao(int i, double i){
     }
-    public static double fib(int n, double a)
-    {
-        int b, c;
-        return b;
+    public static void funcao(double i, int funcao){
+        boolean m;
+        
+    }
+    public static double funcao(double i, double funcao){
+        
+    }
+    public static int funcao(int i, int i){ 
     }
  
     public static void main (String[] args)
     {
         int n;
-        System.out.print(fib(0, 0));
+        System.out.print(funcao(0.0,0));
     }
 }

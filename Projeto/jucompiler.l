@@ -905,6 +905,8 @@ int main(int argc, char *argv[]){
     else{
         flag = 0;
         yyparse();
+        checkProgram(myProgram);
+        insertTypes(myProgram);
     }
     
     if (myProgram)

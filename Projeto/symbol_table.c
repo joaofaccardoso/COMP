@@ -46,23 +46,26 @@ TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType, i
     elem->col = col;
     TableElement* prev, *aux;
     int print = 1;
+    int check = 0;
     for(aux=symHead->table;aux;prev=aux,aux=aux->next){
-        if(elemType == var_decl && strcmp(aux->id,id)==0 && strcmp(aux->type,lower(type)) == 0){
-            if(strcmp(id, "_") != 0){
-                printf("Line %d, col %d: Symbol %s already defined\n",line,col,id);
-            }
+        if(elemType == var_decl && aux->elem_type == var_decl && strcmp(aux->id,id) == 0){
             print = 0;
+            if(strcmp("_",id) != 0 && check == 0){
+                printf("Line %d, col %d: Symbol %s already defined\n",line,col,id);
+                check = 1;
+            }
         }
     }
 
     elem->print = print;
-
+    
     if(symHead->table == NULL){
         symHead->table = elem;
     }
     else{
         prev->next = elem;
     }
+    
     return elem;
 }
 
@@ -76,10 +79,12 @@ TableElement* insertParamBody(TableElement* elem, char* type, char* id, element_
     paramElem->print = 1;
 
     MethodElement* prev, *aux;
+    int check = 0;
     for(aux=elem->elements;aux;prev=aux,aux=aux->next){
         if(strcmp(aux->id,id)==0){
-            if(strcmp("_",id) != 0 && methType == param){
+            if(strcmp("_",id) != 0 && methType == param && check == 0){
                 printf("Line %d, col %d: Symbol %s already defined\n",line,col,id);
+                check = 1;
             }
             paramElem->print = 0;
         }

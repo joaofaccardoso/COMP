@@ -1,71 +1,90 @@
-Line 16, col 9: Cannot find symbol operators()
-===== Class Factorial Symbol Table =====
-operators	(int)	int
+Line 2, col 44: Symbol i already defined
+Line 11, col 41: Symbol i already defined
+Line 17, col 26: Reference to method funcao(double,int) is ambiguous
+===== Class ola Symbol Table =====
+funcao	(int,double)	int
+funcao	(double,int)	void
+funcao	(double,double)	double
+funcao	(int,int)	int
 main	(String[])	void
 
-===== Method operators(int) Symbol Table =====
+===== Method funcao(int,double) Symbol Table =====
 return		int
-n		int	param
-x		int
-b		int
-a		int
-y		double
-z		boolean
-t		boolean
+i		int	param
+
+===== Method funcao(double,int) Symbol Table =====
+return		void
+i		double	param
+funcao		int	param
+m		boolean
+
+===== Method funcao(double,double) Symbol Table =====
+return		double
+i		double	param
+funcao		double	param
+
+===== Method funcao(int,int) Symbol Table =====
+return		int
+i		int	param
 
 ===== Method main(String[]) Symbol Table =====
 return		void
 args		String[]	param
+n		int
 
 Program
-..Id(Factorial)
+..Id(ola)
 ..MethodDecl
 ....MethodHeader
 ......Int
-......Id(operators)
+......Id(funcao)
 ......MethodParams
 ........ParamDecl
 ..........Int
-..........Id(n)
+..........Id(i)
+........ParamDecl
+..........Double
+..........Id(i)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Void
+......Id(funcao)
+......MethodParams
+........ParamDecl
+..........Double
+..........Id(i)
+........ParamDecl
+..........Int
+..........Id(funcao)
 ....MethodBody
 ......VarDecl
-........Int
-........Id(x)
-......VarDecl
-........Int
-........Id(b)
-......VarDecl
-........Int
-........Id(a)
-......VarDecl
-........Double
-........Id(y)
-......VarDecl
 ........Bool
-........Id(z)
-......VarDecl
-........Bool
-........Id(t)
-......If
-........And - boolean
-..........Eq - boolean
-............Id(x) - int
-............Id(b) - int
-..........Eq - boolean
-............Id(z) - boolean
-............Id(t) - boolean
-........Assign - double
-..........Id(y) - double
-..........Mul - undef
-............Lshift
-..............Id(a) - int
-..............Id(b) - int
-............RealLit(1.0) - double
-........Assign - double
-..........Id(y) - double
-..........Mod - double
-............Id(a) - int
-............Id(y) - double
+........Id(m)
+..MethodDecl
+....MethodHeader
+......Double
+......Id(funcao)
+......MethodParams
+........ParamDecl
+..........Double
+..........Id(i)
+........ParamDecl
+..........Double
+..........Id(funcao)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Int
+......Id(funcao)
+......MethodParams
+........ParamDecl
+..........Int
+..........Id(i)
+........ParamDecl
+..........Int
+..........Id(i)
+....MethodBody
 ..MethodDecl
 ....MethodHeader
 ......Void
@@ -75,5 +94,11 @@ Program
 ..........StringArray
 ..........Id(args)
 ....MethodBody
-......Call - undef
-........Id(operators) - undef
+......VarDecl
+........Int
+........Id(n)
+......Print
+........Call - undef
+..........Id(funcao) - undef
+..........RealLit(0.0) - double
+..........DecLit(0) - int
