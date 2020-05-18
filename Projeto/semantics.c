@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 extern TableHead* symHead;
+extern int flag;
 
 void checkProgram(IsProgram* program) {
     insertHead(program->id->value, program->line, program->col);
@@ -15,7 +16,7 @@ void checkMethodField(IsMethodField* mfList) {
     int count = 0;
     while (mfList) {
         if (mfList->mf==isField) {
-            if (strcmp(mfList->mfType.fieldDecl->id->value, "_") == 0) {
+            if ((flag == 0 || flag == 3) && strcmp(mfList->mfType.fieldDecl->id->value, "_") == 0) {
                 printf("Line %d, col %d: Symbol _ is reserved\n", mfList->mfType.fieldDecl->id->line, mfList->mfType.fieldDecl->id->col);
             }
             insertMethodVarDecl(mfList->mfType.fieldDecl->type->value, mfList->mfType.fieldDecl->id->value, var_decl, mfList->mfType.fieldDecl->id->line, mfList->mfType.fieldDecl->id->col);
@@ -26,7 +27,7 @@ void checkMethodField(IsMethodField* mfList) {
                 checkParams(currentElement, mfList->mfType.methodDecl->methodHeader->paramDeclList);
                 checkBody(currentElement, mfList->mfType.methodDecl->methodBody->vardDeclSatetmentList);
                 int print = checkOtherMethod(currentElement, count);
-                if(print == 0){
+                if((flag == 0 || flag == 3) && print == 0){
                     printf("Line %d, col %d: Symbol %s(", mfList->mfType.methodDecl->methodHeader->id->line, mfList->mfType.methodDecl->methodHeader->id->col,  mfList->mfType.methodDecl->methodHeader->id->value);
                     MethodElement* paramIt = currentElement->elements;
                     if(paramIt && paramIt->meth_type == param){
@@ -38,15 +39,18 @@ void checkMethodField(IsMethodField* mfList) {
                     printf(") already defined\n");
                 }
                 else if (strcmp(currentElement->id, "_") == 0) {
-                    printf("Line %d, col %d: Symbol _(", mfList->mfType.methodDecl->methodHeader->id->line, mfList->mfType.methodDecl->methodHeader->id->col);
-                    MethodElement* paramIt = currentElement->elements;
-                    if(paramIt && paramIt->meth_type == param){
-                        printf("%s",paramIt->type);
-                        for(paramIt=paramIt->next;paramIt && paramIt->meth_type==param;paramIt=paramIt->next){
-                            printf(",%s",paramIt->type);
+                    if(flag == 0 || flag == 3){
+                        printf("Line %d, col %d: Symbol _(", mfList->mfType.methodDecl->methodHeader->id->line, mfList->mfType.methodDecl->methodHeader->id->col);
+                        MethodElement* paramIt = currentElement->elements;
+                        if(paramIt && paramIt->meth_type == param){
+                            printf("%s",paramIt->type);
+                            for(paramIt=paramIt->next;paramIt && paramIt->meth_type==param;paramIt=paramIt->next){
+                                printf(",%s",paramIt->type);
+                            }
                         }
+                        printf(") is reserved\n");
                     }
-                    printf(") is reserved\n");
+
                     print = 0;
                 }
                 currentElement->print = print;
@@ -83,7 +87,7 @@ int checkOtherMethod(TableElement* el, int count){
 
 void checkParams(TableElement* currentElement, IsParamDecl* paramList) {
     while (paramList) {
-        if (strcmp(paramList->id->value, "_") == 0) {
+        if ((flag == 0 || flag == 3) && strcmp(paramList->id->value, "_") == 0) {
             printf("Line %d, col %d: Symbol _ is reserved\n", paramList->id->line, paramList->id->col);
         }
         insertParamBody(currentElement, paramList->type->value, paramList->id->value , param, paramList->id->line, paramList->id->col);
@@ -117,10 +121,10 @@ void insertVarStatementType(IsVarDeclStatement* varStatement, IsMethodDecl* meth
         }       
         else{
             check = checkParamsDecl(varStatement->vdsType.varDecl, method, tableElement);
-            if (strcmp(varStatement->vdsType.varDecl->id->value, "_") == 0) {
+            if ((flag == 0 || flag == 3) && strcmp(varStatement->vdsType.varDecl->id->value, "_") == 0) {
                 printf("Line %d, col %d: Symbol _ is reserved\n",varStatement->vdsType.varDecl->id->line, varStatement->vdsType.varDecl->id->col);
             }
-            else if(check){
+            else if((flag == 0 || flag == 3) && check){
                 printf("Line %d, col %d: Symbol %s already defined\n",varStatement->vdsType.varDecl->id->line, varStatement->vdsType.varDecl->id->col, varStatement->vdsType.varDecl->id->value);
             }
         }
@@ -210,53 +214,62 @@ void insertCallType(IsCallStatement* call, IsMethodDecl* method, TableElement* t
     }
 
     int check, pos = 0;
+    int count = 0;
     TableElement* tableIterator = symHead->table;
     for(;tableIterator;tableIterator=tableIterator->next,pos++){
         if(strcmp(tableIterator->id,call->id->value) == 0){
             check = checkParameters(tableIterator->elements,call->callExpr);
 
             if(check == 1 || check == -1){
-                check = checkOtherFunction(tableIterator->next, call);
+                call->returnType = tableIterator->type;
+                call->id->returnType = tableIterator->type;
+                call->pos = pos;
                 
-                if(check == 0){
-                    call->returnType = tableIterator->type;
-                    call->id->returnType = tableIterator->type;
-                    call->pos = pos;
-                    return;
+                if(check == -1){
+                    count++;
                 }
-                else if(check == -1){
-                    printf("Line %d, col %d: Reference to method %s(", call->line, call->col, call->id->value);
-                    IsExpr* params = call->callExpr;
-                    if(params){
-                        printf("%s",params->returnType);
-                        for(params=params->next;params;params=params->next){
-                            printf(",%s",params->returnType);
-                        }
-                    }
-                    printf(") is ambiguous\n");
-                    
-                    call->returnType = "undef";
-                    call->id->returnType = "undef";
-                    call->pos = -1;
+                else{
                     return;
                 }
             }
         }
     }
-    
-    call->id->returnType = "undef";
-    call->returnType = "undef";
-    call->pos = -1;
-    printf("Line %d, col %d: Cannot find symbol %s(", call->line, call->col, call->id->value);
-    param = call->callExpr;
-    if (param) {
-        printf("%s", param->returnType);
-        param = param->next;
-        for (;param; param = param->next) {
-            printf(",%s", param->returnType);
+
+    if(count == 0){
+        call->id->returnType = "undef";
+        call->returnType = "undef";
+        call->pos = -1;
+
+        if(flag == 0 || flag == 3){
+            printf("Line %d, col %d: Cannot find symbol %s(", call->line, call->col, call->id->value);
+            param = call->callExpr;
+            if (param) {
+                printf("%s", param->returnType);
+                param = param->next;
+                for (;param; param = param->next) {
+                    printf(",%s", param->returnType);
+                }
+            }
+            printf(")\n");
         }
     }
-    printf(")\n");
+    else if(count > 1){
+        call->returnType = "undef";
+        call->id->returnType = "undef";
+        call->pos = -1;
+
+        if(flag == 0 || flag == 3){
+            printf("Line %d, col %d: Reference to method %s(", call->line, call->col, call->id->value);
+            IsExpr* params = call->callExpr;
+            if(params){
+                printf("%s",params->returnType);
+                for(params=params->next;params;params=params->next){
+                    printf(",%s",params->returnType);
+                }
+            }
+            printf(") is ambiguous\n");
+        }
+    }
 }
 
 int checkParameters(MethodElement* elements, IsExpr* params){   // RETORNA 0 SE PARAMETROS DIFERENTES, RETORNA 1 SE PARAMETROS IGUAIS, RETORNA -1 SE PARAMETROS COM DOUBLE E INT
@@ -289,24 +302,6 @@ int checkParameters(MethodElement* elements, IsExpr* params){   // RETORNA 0 SE 
     return 1;
 }
 
-int checkOtherFunction(TableElement* tableIterator, IsCallStatement* call){
-    int check;
-
-    for(;tableIterator;tableIterator=tableIterator->next){
-        if(strcmp(tableIterator->id,call->id->value) == 0 && tableIterator->print == 1){
-            check = checkParameters(tableIterator->elements,call->callExpr);
-            
-            if(check == 1){
-                return 1;
-            }
-            else if(check == -1){
-                return -1;
-            }
-        }
-    }
-    return 0;
-}
-
 void insertPrintType(IsPrintStatement* print, IsMethodDecl* method, TableElement* tableElement){
     if(print->p == stringLiteral){
         print->returnType = "String";
@@ -327,7 +322,9 @@ void insertParseArgsType(IsParseArgsStatement* parseArgs, IsMethodDecl* method, 
         }
 
         if(strcmp(parseArgs->id->returnType,"String[]") != 0){
-            printf("Line %d, col %d: Operator Integer.parseInt cannot be applied to type %s\n", parseArgs->line, parseArgs->col, parseArgs->id->returnType);
+            if(flag == 0 || flag == 3){
+                printf("Line %d, col %d: Operator Integer.parseInt cannot be applied to type %s\n", parseArgs->line, parseArgs->col, parseArgs->id->returnType);
+            }
             parseArgs->returnType = "undef";
         }
         else{
@@ -363,7 +360,7 @@ void insertAssignType(IsAssign* assign, IsMethodDecl* method, TableElement* tabl
     }
 
     if(strcmp(assign->id->returnType,"undef") == 0 || strcmp(assign->assignExpr->returnType,"undef") == 0 || strcmp(assign->id->returnType,"String[]") == 0 || strcmp(assign->assignExpr->returnType,"String[]") == 0 || strcmp(assign->assignExpr->returnType,"none") == 0 || strcmp(assign->id->returnType,assign->assignExpr->returnType) != 0){
-        if(!((strcmp(assign->id->returnType,"double") == 0) && strcmp(assign->assignExpr->returnType,"int") == 0)){
+        if((flag == 0 || flag == 3) && !((strcmp(assign->id->returnType,"double") == 0) && strcmp(assign->assignExpr->returnType,"int") == 0)){
             printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", assign->line, assign->col, assign->id->returnType, assign->assignExpr->returnType);
         }
     }
@@ -421,13 +418,13 @@ void insertOpType(IsOp* operation, IsMethodDecl* method, TableElement* tableElem
 
     if(strcmp(operation->op,"Lshift") == 0 || strcmp(operation->op, "Rshift") == 0){
         operation->returnType = "none";
-        if(strcmp(type1,"int") != 0 || strcmp(type2, "int") != 0){
+        if((flag == 0 || flag == 3) && (strcmp(type1,"int") != 0 || strcmp(type2, "int") != 0)){
             printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
         }
     }
     else if(strcmp(operation->op,"Xor") == 0){
         operation->returnType = "none";
-        if(strcmp(type1,"boolean") != 0 || strcmp(type2,"boolean") != 0){
+        if((flag == 0 || flag == 3) && (strcmp(type1,"boolean") != 0 || strcmp(type2,"boolean") != 0)){
             printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
         }
     }
@@ -440,7 +437,9 @@ void insertOpType(IsOp* operation, IsMethodDecl* method, TableElement* tableElem
         }
         else{
             operation->returnType = "undef";
-            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+            if(flag == 0 || flag == 3){
+                printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+            }
         }
     }
     else if(strcmp(operation->op,"Le") == 0 || strcmp(operation->op,"Lt") == 0 || strcmp(operation->op,"Gt") == 0 || strcmp(operation->op,"Ge") == 0){
@@ -449,7 +448,9 @@ void insertOpType(IsOp* operation, IsMethodDecl* method, TableElement* tableElem
         }
         else{
             operation->returnType = "undef";
-            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+            if(flag == 0 || flag == 3){
+                printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+            }
         }
     }
     else if(strcmp(operation->op,"Eq") == 0 || strcmp(operation->op,"Ne") == 0){
@@ -461,7 +462,9 @@ void insertOpType(IsOp* operation, IsMethodDecl* method, TableElement* tableElem
         }
         else{
             operation->returnType = "undef";
-            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+            if(flag == 0 || flag == 3){
+                printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+            }
         }
     }
     else if(strcmp(operation->op,"And") == 0 || strcmp(operation->op,"Or") == 0){
@@ -470,7 +473,9 @@ void insertOpType(IsOp* operation, IsMethodDecl* method, TableElement* tableElem
         }
         else{
             operation->returnType = "undef";
-            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+            if(flag == 0 || flag == 3){
+                printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+            }
         }
     }
 }
@@ -501,7 +506,9 @@ void insertUnitType(IsUnit* unit, IsMethodDecl* method, TableElement* tableEleme
     if(strcmp(unit->op,"Length") == 0){
 
         if(strcmp(unit->unitExpr->returnType,"String[]") != 0){
-            printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", unit->line, unit->col, unit->symbol, unit->unitExpr->returnType);
+            if(flag == 0 || flag == 3){
+                printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", unit->line, unit->col, unit->symbol, unit->unitExpr->returnType);
+            }
             unit->returnType = "undef";
         }
         else{
@@ -510,7 +517,9 @@ void insertUnitType(IsUnit* unit, IsMethodDecl* method, TableElement* tableEleme
     }
     else{
         if((strcmp(unit->symbol,"!") != 0 && strcmp(unit->unitExpr->returnType,"boolean") == 0) || (strcmp(unit->symbol,"!") == 0 && strcmp(unit->unitExpr->returnType,"boolean") != 0)){
-            printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", unit->line, unit->col, unit->symbol, unit->unitExpr->returnType);
+            if(flag == 0 || flag == 3){
+                printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", unit->line, unit->col, unit->symbol, unit->unitExpr->returnType);
+            }
             unit->returnType = "undef";
         }
         else{
@@ -534,6 +543,8 @@ char* getIdType(char* id, int line, int col, IsMethodDecl* method, TableElement*
         }
     }
 
-    printf("Line %d, col %d: Cannot find symbol %s\n", line, col, id);
+    if(flag == 0 || flag == 3){
+        printf("Line %d, col %d: Cannot find symbol %s\n", line, col, id);
+    }
     return "undef";
 }

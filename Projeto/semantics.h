@@ -23,4 +23,3 @@ void insertTerminalType(IsTerminal* terminal,  IsMethodDecl* method, TableElemen
 void insertUnitType(IsUnit* unit,  IsMethodDecl* method, TableElement* tableElement);
 char* getIdType(char* id, int line, int col,  IsMethodDecl* method, TableElement* tableElement);
 int checkParameters(MethodElement* elements, IsExpr* params);
-int checkOtherFunction(TableElement* tableIterator, IsCallStatement* call);
