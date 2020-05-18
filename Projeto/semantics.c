@@ -244,7 +244,6 @@ void insertCallType(IsCallStatement* call, IsMethodDecl* method, TableElement* t
         }
     }
     
-    
     call->id->returnType = "undef";
     call->returnType = "undef";
     call->pos = -1;
@@ -323,7 +322,7 @@ void insertParseArgsType(IsParseArgsStatement* parseArgs, IsMethodDecl* method, 
     if(parseArgs->parseArgsExpr){
         insertExprType(parseArgs->parseArgsExpr, method, tableElement);
 
-        if(strcmp(parseArgs->parseArgsExpr->returnType,"int") != 0){
+        if(strcmp(parseArgs->parseArgsExpr->returnType,"int")){
             parseArgs->parseArgsExpr->returnType = "undef";
         }
 
@@ -340,19 +339,33 @@ void insertParseArgsType(IsParseArgsStatement* parseArgs, IsMethodDecl* method, 
     }
 }
 
+
+/* 
+ * undef = none  :: return undef
+ * double = int  :: return double
+ * undef = qualquer coisa  ::  return qualquer coisa (e vice versa)
+ * String[]/qualquer coisa = String[]/qualquer coisa  ::  return undef
+ */ 
 void insertAssignType(IsAssign* assign, IsMethodDecl* method, TableElement* tableElement){
     insertTerminalType(assign->id, method, tableElement);
     insertExprType(assign->assignExpr, method, tableElement);
 
     if(strcmp(assign->id->returnType,"undef") == 0){
-        assign->returnType = assign->assignExpr->returnType;
+        if(strcmp(assign->assignExpr->returnType,"none") == 0){
+            assign->returnType = "undef";    
+        }
+        else{
+            assign->returnType = assign->assignExpr->returnType;
+        }
     }
     else{
         assign->returnType = assign->id->returnType;
     }
 
-    if(strcmp(assign->id->returnType,"String[]") == 0 || strcmp(assign->assignExpr->returnType,"String[]") == 0 || strcmp(assign->id->returnType,"undef") == 0 || strcmp(assign->assignExpr->returnType,"undef") == 0 || ((strcmp(assign->id->returnType,assign->assignExpr->returnType) != 0 && strcmp(assign->id->returnType,"double") != 0) && strcmp("int",assign->assignExpr->returnType) != 0)){
-        printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", assign->line, assign->col, assign->id->returnType, assign->assignExpr->returnType);
+    if(strcmp(assign->id->returnType,"undef") == 0 || strcmp(assign->assignExpr->returnType,"undef") == 0 || strcmp(assign->id->returnType,"String[]") == 0 || strcmp(assign->assignExpr->returnType,"String[]") == 0 || strcmp(assign->assignExpr->returnType,"none") == 0 || strcmp(assign->id->returnType,assign->assignExpr->returnType) != 0){
+        if(!((strcmp(assign->id->returnType,"double") == 0) && strcmp(assign->assignExpr->returnType,"int") == 0)){
+            printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", assign->line, assign->col, assign->id->returnType, assign->assignExpr->returnType);
+        }
     }
 }
 
@@ -393,44 +406,72 @@ void insertExprType(IsExpr* expr, IsMethodDecl* method, TableElement* tableEleme
     }
 }
 
+/*
+ * lshift e rshift, esq e dir têm de ser int? Esq pode ser double?
+ * undef < boolean  ::  ?
+ * xor tem de ter boolean nos 2 tipos?
+ * lshift e rshift retornam none mas podem ser usados noutras operacoes? Por exemplo, soma?
+ */
 void insertOpType(IsOp* operation, IsMethodDecl* method, TableElement* tableElement){
     insertExprType(operation->opExprLeft, method, tableElement);
     insertExprType(operation->opExprRight, method, tableElement);
 
-    if(strcmp(operation->opExprLeft->returnType,"String[]") == 0 || strcmp(operation->opExprRight->returnType,"String[]") == 0){
-        operation->returnType = "undef";
-        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
+    char* type1 = operation->opExprLeft->returnType;
+    char* type2 = operation->opExprRight->returnType;
+
+    if(strcmp(operation->op,"Lshift") == 0 || strcmp(operation->op, "Rshift") == 0){
+        operation->returnType = "none";
+        if(strcmp(type1,"int") != 0 || strcmp(type2, "int") != 0){
+            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+        }
     }
-    else if (!strcmp(operation->op, "Eq") || !strcmp(operation->op, "Ge") || !strcmp(operation->op, "Gt") || !strcmp(operation->op, "Le") || !strcmp(operation->op, "Lt") || !strcmp(operation->op, "Ne") || !strcmp(operation->op, "And") || !strcmp(operation->op, "Or")  || !strcmp(operation->op, "Xor")) {
-        if(strcmp(operation->opExprLeft->returnType, "undef") == 0 || strcmp(operation->opExprLeft->returnType, "boolean") == 0 || strcmp(operation->opExprRight->returnType, "undef") == 0 || strcmp(operation->opExprRight->returnType, "boolean") == 0){
-            if(strcmp("boolean",operation->opExprRight->returnType) == 0 && strcmp(operation->opExprLeft->returnType, "boolean") == 0){
-                operation->returnType = "boolean";
-            }
-            else{
-                operation->returnType = "undef";
-                printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
-            }
+    else if(strcmp(operation->op,"Xor") == 0){
+        operation->returnType = "none";
+        if(strcmp(type1,"boolean") != 0 || strcmp(type2,"boolean") != 0){
+            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+        }
+    }
+    else if(strcmp(operation->op,"Mul") == 0 || strcmp(operation->op,"Div") == 0 || strcmp(operation->op,"Mod") == 0 || strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Sub") == 0){
+        if((strcmp(type1,"double") == 0 || strcmp(type2,"double") == 0) && (strcmp(type1,"int") == 0 || strcmp(type2,"int") == 0)){
+            operation->returnType = "double";
+        }
+        else if(strcmp(type1,type2) == 0 && (strcmp(type1,"double") == 0 || strcmp(type1,"int") == 0)){
+            operation->returnType = type1;
         }
         else{
-            operation->returnType = "boolean";
+            operation->returnType = "undef";
+            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
         }
     }
-    else if(strcmp(operation->op, "Lshift") == 0 || strcmp(operation->op, "Rshift") == 0 || strcmp(operation->op,"Xor") == 0){
-        operation->returnType = "none";
+    else if(strcmp(operation->op,"Le") == 0 || strcmp(operation->op,"Lt") == 0 || strcmp(operation->op,"Gt") == 0 || strcmp(operation->op,"Ge") == 0){
+        if((strcmp(type1,"int") == 0 || strcmp(type1,"double") == 0) && (strcmp(type2,"int") == 0 || strcmp(type2,"double") == 0)){
+            operation->returnType = "boolean";
+        }
+        else{
+            operation->returnType = "undef";
+            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+        }
     }
-    else if((strcmp(operation->opExprLeft->returnType,"boolean") == 0 || strcmp(operation->opExprRight->returnType,"boolean") == 0) && (strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Add") == 0 || strcmp(operation->op,"Sub") == 0 || strcmp(operation->op,"Mul") == 0 || strcmp(operation->op,"Div") == 0 || strcmp(operation->op,"Mod") == 0)){
-        operation->returnType = "undef";
-        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
+    else if(strcmp(operation->op,"Eq") == 0 || strcmp(operation->op,"Ne") == 0){
+        if(strcmp(type1,type2) == 0 && (strcmp(type1,"int") == 0 || strcmp(type1,"double") == 0 || strcmp(type1,"boolean") == 0)){
+            operation->returnType = "boolean";
+        }
+        else if((strcmp(type1,"int") == 0 || strcmp(type1,"double") == 0) && (strcmp(type2,"int") == 0 || strcmp(type2,"double") == 0)){
+            operation->returnType = "boolean";
+        }
+        else{
+            operation->returnType = "undef";
+            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+        }
     }
-    else if((strcmp(operation->opExprLeft->returnType,"double") == 0 && strcmp(operation->opExprRight->returnType,"int") == 0)  || (strcmp(operation->opExprRight->returnType,"double") == 0 && strcmp(operation->opExprLeft->returnType,"int") == 0)){
-        operation->returnType = "double";
-    }
-    else if(strcmp(operation->opExprLeft->returnType,operation->opExprRight->returnType) != 0 || (strcmp(operation->opExprLeft->returnType,"undef") == 0 && strcmp(operation->opExprRight->returnType,"undef") == 0)){
-        operation->returnType = "undef";
-        printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, operation->opExprLeft->returnType, operation->opExprRight->returnType);
-    }
-    else{
-        operation->returnType = operation->opExprLeft->returnType;
+    else if(strcmp(operation->op,"And") == 0 || strcmp(operation->op,"Or") == 0){
+        if(strcmp(type1,"boolean") == 0 || strcmp(type2,"boolean") == 0){
+            operation->returnType = "boolean";
+        }
+        else{
+            operation->returnType = "undef";
+            printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", operation->line, operation->col, operation->symbol, type1, type2);
+        }
     }
 }
 
