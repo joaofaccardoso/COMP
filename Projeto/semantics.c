@@ -179,7 +179,6 @@ void insertStatementType(IsStatement* statement, IsMethodDecl* method, TableElem
     else if(statement->sm == sReturn){
         IsReturnStatement* returnStatement = statement->smType.returnStatement;
         insertReturnType(returnStatement, method, tableElement);
-
     }
     else if(statement->sm == sCall){
         IsCallStatement* callStatement = statement->smType.callStatement;
