@@ -178,6 +178,7 @@ typedef struct s2 {
         IsFieldDecl* fieldDecl;
     } mfType;
     int line, col;
+    int print;
     struct s2* next;
 } IsMethodField;
 

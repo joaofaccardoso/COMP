@@ -523,6 +523,7 @@ IsExpr* insertTerminal(char* type, char* value, int line, int col){
     IsTerminal* it = (IsTerminal*)malloc(sizeof(IsTerminal));
     
     it->type = type;
+    
     it->value = value;
     it->line = line;
     it->col = col;

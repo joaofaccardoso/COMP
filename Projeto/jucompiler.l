@@ -382,7 +382,7 @@ void printCallStatement(IsCallStatement* callStatement, int count, TableElement*
     printPoints(count);
     printf("Call");
     
-    if(flag == 3){
+    if(flag == 3 && callStatement->returnType && methodTable->print == 1){
         printf(" - %s", callStatement->returnType);
     }
 
@@ -392,7 +392,8 @@ void printCallStatement(IsCallStatement* callStatement, int count, TableElement*
     printPoints(count);
     printf("Id(%s)",callStatement->id->value);
 
-    if(flag == 3){
+
+    if(flag == 3 && methodTable->print == 1){
         if(meth){
             printf(" - (");
             MethodElement* paramsList = meth->elements;
@@ -400,10 +401,7 @@ void printCallStatement(IsCallStatement* callStatement, int count, TableElement*
                 printf("%s",paramsList->type);
                 int count = 1;
                 for(paramsList=paramsList->next;paramsList && paramsList->meth_type==param;paramsList=paramsList->next, count++){
-                    int check = checkOtherParam(paramsList,meth,count);
-                    if(check == 0){
-                        printf(",%s",paramsList->type);
-                    }
+                    printf(",%s",paramsList->type);
                 }
             }
             printf(")");
@@ -425,7 +423,7 @@ void printCallStatement(IsCallStatement* callStatement, int count, TableElement*
 void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count, TableElement* methodTable) {
     printPoints(count);
     printf("ParseArgs");
-    if (flag == 3) {
+    if (flag == 3 && parseArgsStatement->returnType && methodTable->print == 1) {
         printf(" - %s", parseArgsStatement->returnType);
     }
     printf("\n");
@@ -434,7 +432,7 @@ void printParseArgsStatement(IsParseArgsStatement* parseArgsStatement, int count
     printPoints(count);
     printf("Id(%s)", parseArgsStatement->id->value);
 
-    if (flag == 3) {
+    if (flag == 3 && parseArgsStatement->id->returnType && methodTable->print == 1) {
         printf(" - %s", parseArgsStatement->id->returnType);
     }
 
@@ -454,7 +452,7 @@ void printPrintStatement(IsPrintStatement* ips, int count, TableElement* methodT
         printPoints(count);
         printf("StrLit(%s)", ips->pType.printString);
 
-        if(flag == 3){
+        if(flag == 3 && ips->returnType && methodTable->print == 1){
             printf(" - %s", ips->returnType);
         }
 
@@ -468,7 +466,7 @@ void printPrintStatement(IsPrintStatement* ips, int count, TableElement* methodT
 void printAssign(IsAssign* assignStatement, int count, TableElement* methodTable) {
     printPoints(count);
     printf("Assign");
-    if (flag == 3) {
+    if (flag == 3 && assignStatement->returnType && methodTable->print == 1) {
         printf(" - %s", assignStatement->returnType);
     }
     printf("\n");
@@ -476,7 +474,7 @@ void printAssign(IsAssign* assignStatement, int count, TableElement* methodTable
 
     printPoints(count);
     printf("Id(%s)", assignStatement->id->value);
-    if (flag == 3) {
+    if (flag == 3 && assignStatement->id->returnType && methodTable->print == 1) {
         printf(" - %s",assignStatement->id->returnType);
     }
     printf("\n");
@@ -509,7 +507,7 @@ void printOp(IsOp* operation, int count, TableElement* methodTable) {
     printPoints(count);
     printf("%s",operation->op);
 
-    if(flag == 3 && strcmp(operation->op,"Lshift") != 0 && strcmp(operation->op,"Rshift") != 0 && strcmp(operation->op,"Xor") != 0){
+    if(flag == 3 && operation->returnType && methodTable->print == 1 && strcmp(operation->op,"Lshift") != 0 && strcmp(operation->op,"Rshift") != 0 && strcmp(operation->op,"Xor") != 0){
         printf(" - %s", operation->returnType);
     }
 
@@ -523,7 +521,7 @@ void printOp(IsOp* operation, int count, TableElement* methodTable) {
 void printTerminal(IsTerminal* terminal, int count, TableElement* methodTable) {
     printPoints(count);
     printf("%s(%s)", terminal->type, terminal->value);
-    if (flag == 3) {
+    if (flag == 3 && terminal->returnType && methodTable->print == 1) {
         printf(" - %s", terminal->returnType);
     }
     printf("\n");
@@ -533,7 +531,7 @@ void printUnit(IsUnit* unit, int count, TableElement* methodTable) {
     printPoints(count);
     printf("%s", unit->op);
 
-    if(flag == 3){
+    if(flag == 3 && unit->returnType && methodTable->print == 1){
         printf(" - %s",unit->returnType);
     }
     printf("\n");
@@ -905,8 +903,10 @@ int main(int argc, char *argv[]){
     else{
         flag = 0;
         yyparse();
-        checkProgram(myProgram);
-        insertTypes(myProgram);
+        if(error == 0){
+            checkProgram(myProgram);
+            insertTypes(myProgram);
+        }
     }
     
     if (myProgram)

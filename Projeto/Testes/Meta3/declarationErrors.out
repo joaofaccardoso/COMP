@@ -5,6 +5,7 @@ Line 5, col 26: Symbol _ is reserved
 Line 15, col 45: Symbol i already defined
 Line 23, col 45: Symbol i already defined
 Line 23, col 51: Symbol _ is reserved
+Line 8, col 11: Incompatible type int in if statement
 Line 13, col 11: Symbol ola already defined
 Line 17, col 13: Symbol i already defined
 Line 18, col 13: Symbol argument already defined

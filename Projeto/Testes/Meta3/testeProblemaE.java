@@ -71,3 +71,4 @@ class Java {
     }
     public static boolean ola56;
 }
+

@@ -9,6 +9,9 @@ void checkBody(TableElement* currentElement, IsVarDeclStatement* bodyList);
 void insertTypes(IsProgram* program);
 void insertVarStatementType(IsVarDeclStatement* varStatement,  IsMethodDecl* method, TableElement* tableElement);
 void insertStatementType(IsStatement* statement,  IsMethodDecl* method, TableElement* tableElement);
+void insertIfType(IsIfStatement* ifStatement, IsMethodDecl* method, TableElement* tableElement);
+void insertWhileType(IsWhileStatement* whileStatement, IsMethodDecl* method, TableElement* tableElement);
+void insertReturnType(IsReturnStatement* returnStatement, IsMethodDecl* method, TableElement* TableElement);
 void insertCallType(IsCallStatement* call,  IsMethodDecl* method, TableElement* tableElement);
 void insertPrintType(IsPrintStatement* print,  IsMethodDecl* method, TableElement* tableElement);
 int checkFunctionType(char* id, MethodElement* methodElement, IsExpr* paramsList, TableElement* currentElement, TableElement* tableElement, int closest);
@@ -23,3 +26,4 @@ void insertTerminalType(IsTerminal* terminal,  IsMethodDecl* method, TableElemen
 void insertUnitType(IsUnit* unit,  IsMethodDecl* method, TableElement* tableElement);
 char* getIdType(char* id, int line, int col,  IsMethodDecl* method, TableElement* tableElement);
 int checkParameters(MethodElement* elements, IsExpr* params);
+char* removeUnderscore(char* value);

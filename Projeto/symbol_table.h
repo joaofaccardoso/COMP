@@ -31,6 +31,7 @@ typedef struct t1 {
     TableElement* table;
 } TableHead;
 
+char* lower(char* type);
 TableElement* insertParamBody(TableElement* elem, char* type, char* id, element_method_type methType, int line, int col);
 TableElement* insertMethodVarDecl(char* type, char* id, element_type elemType, int line, int col);
 TableHead* insertHead(char* id, int line, int col);

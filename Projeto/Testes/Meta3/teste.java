@@ -1,1 +1,16 @@
-class Alguns_Erros {   public static double f(int a, double b, double c, double d) {   }   public static double f(double b, double c, double d, int a) {   }   public static double f(double b) {   }   public static double f(int b) {   }   public static double f(double b,int c) {   }   public static double f(double b,double c) {   }   public static void main(String[] args) {     f(0.1,1);   }  }
+class ola{
+    public static int func(double a, double b){}
+    public static double func(double a, int b){}
+    public static double func(int a, double b){}
+    public static int func(int a, int b){
+        return ;
+    }
+    public static void main (String[] args)
+    {
+        int i;
+        double d;
+        boolean b;
+
+        i = 214748_3_6_4_8;
+    }
+}
