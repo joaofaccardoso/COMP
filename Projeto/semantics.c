@@ -254,7 +254,7 @@ void insertCallType(IsCallStatement* call, IsMethodDecl* method, TableElement* t
     int count = 0;
     TableElement* tableIterator = symHead->table;
     for(;tableIterator;tableIterator=tableIterator->next,pos++){
-        if(strcmp(tableIterator->id,call->id->value) == 0){
+        if(tableIterator->elem_type == method_decl && strcmp(tableIterator->id,call->id->value) == 0){
             check = checkParameters(tableIterator->elements,call->callExpr);
 
             if(check == 1 || check == -1){
