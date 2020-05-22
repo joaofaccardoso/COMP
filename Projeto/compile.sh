@@ -1,7 +1,8 @@
 lex jucompiler.l
 yacc -y -d -t -v jucompiler.y
-cc -o jucompiler y.tab.c lex.yy.c functions.c semantics.c symbol_table.c
-./jucompiler -s < Testes/Meta3/teste.java
+cc *.c -o jucompiler
+
+#./jucompiler -s < Testes/Meta3/teste.java
 # ./jucompiler < Testes/Meta3/NoFlags.java > out.out
 
 # ./jucompiler -s < Testes/Meta3/AindaSemErros.java | diff Testes/Meta3/AindaSemErros.out -

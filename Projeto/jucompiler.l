@@ -896,6 +896,14 @@ int main(int argc, char *argv[]){
                 printTree();
             }
         }
+        else if(strcmp(argv[1],"-e3")==0) {
+            flag = 3;
+            yyparse();
+            if(error == 0){
+                checkProgram(myProgram);
+                insertTypes(myProgram);
+            }
+        }
         else{
             yyparse();
         }
