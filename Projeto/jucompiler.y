@@ -21,7 +21,7 @@
 %left LSHIFT RSHIFT
 %left PLUS MINUS
 %left STAR DIV MOD
-%right NOT PRE
+%right NOT
 
 %token <charvalue> ID STRLIT BOOLLIT PRINT PARSEINT DOTLENGHT PUBLIC RETURN STATIC STRING VOID WHILE INT DOUBLE IF ELSE BOOL CLASS EQ ASSIGN COMMA DIV RSHIFT LSHIFT XOR GE GT LE LT MINUS MOD NE NOT OR PLUS SEMICOLON STAR ARROW AND LBRACE RBRACE LPAR RPAR LSQ RSQ RESERVED INTLIT REALLIT
 
@@ -164,9 +164,9 @@ Expr1: Expr1 PLUS Expr1                                     {$$=insertOp($1,"Add
     | Expr2                                                 {$$=$1;}
     ;
 
-Expr2: NOT Expr2 %prec PRE                                  {$$=insertUnit("Not",$1,$2,NULL, @1.first_line, @1.first_column, 0, 0);}
-    | PLUS Expr2 %prec PRE                                  {$$=insertUnit("Plus",$1,$2,NULL, @1.first_line, @1.first_column, 0, 0);}
-    | MINUS Expr2 %prec PRE                                 {$$=insertUnit("Minus",$1,$2,NULL, @1.first_line, @1.first_column, 0, 0);}
+Expr2: NOT Expr2                                            {$$=insertUnit("Not",$1,$2,NULL, @1.first_line, @1.first_column, 0, 0);}
+    | PLUS Expr2                                            {$$=insertUnit("Plus",$1,$2,NULL, @1.first_line, @1.first_column, 0, 0);}
+    | MINUS Expr2                                           {$$=insertUnit("Minus",$1,$2,NULL, @1.first_line, @1.first_column, 0, 0);}
     | MethodInvocation                                      {$$=insertExprCall($1);}
     | ParseArgs                                             {$$=insertExprParseArgs($1);}
     | LPAR Expr RPAR                                        {$$=$2;}

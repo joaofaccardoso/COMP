@@ -179,7 +179,13 @@ void printPoints(int count) {
 
 void printTree() {
     int count = 0;
-    TableElement* mfTableElement = symHead->table;
+    TableElement* mfTableElement;
+    if(symHead){
+        mfTableElement = symHead->table;
+    }
+    else{
+        mfTableElement = NULL;
+    }
     if (myProgram!=NULL) {
         printf("Program\n..Id(%s)\n", myProgram->id->value);
         count += 2;
@@ -191,7 +197,9 @@ void printTree() {
                 printFieldDecl(count, mfIterator->mfType.fieldDecl);
             }
             mfIterator = mfIterator->next;
-            mfTableElement = mfTableElement->next;
+            if(mfTableElement){
+                mfTableElement = mfTableElement->next;
+            }
         }
     }
 }
